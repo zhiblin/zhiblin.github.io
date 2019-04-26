@@ -19,7 +19,7 @@
     <meta name="description" content>
     <meta name="author" content="牛牛多多">
     <meta name="keywords" content>
-    <title>hello ~ 多读书</title>
+    <title>iOS UIView添加阴影 ~ 多读书</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@4.7.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@4.7.4/css/mdb.min.css">
@@ -66,7 +66,7 @@
     <div class="full-bg-img">
         <div class="mask rgba-black-light flex-center">
         <div class="container text-center white-text wow fadeInUp">
-            <p class="h2">hello</p>
+            <p class="h2">iOS UIView添加阴影</p>
             <br>
             
             <p>Tuesday, April 16th 2019, 1:14 pm</p>
@@ -83,10 +83,23 @@
     <div class="row">
         <div class="col-md-8 offset-md-2 ">
             <div class="post-content py-5 z-depth-3 main">
-                
+                <ol>
+<li>UIView添加四边阴影效果</li>
+</ol>
+<pre><code class="swift">func addShadowToView(_ theView: UIView,_ theColor: UIColor) {
+        theView.layer.shadowColor = theColor.cgColor
+        theView.layer.shadowOffset = CGSize(width: 0, height: 0)
+        theView.layer.shadowOpacity = 0.5
+        theView.layer.shadowRadius = 5
+}
+</code></pre>
+
                 <hr>
                 <div>
                     <p>
+                         
+                        <span class="badge badge-light">#&nbsp;Swift</span>
+                        &nbsp;
                         
                     </p>
                 </div>
