@@ -19,17 +19,19 @@
     <meta name="description" content>
     <meta name="author" content="牛牛多多">
     <meta name="keywords" content>
-    <title>多读书</title>
+    <title>Swift 5 中使用NSClassFromString ~ 多读书</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@4.7.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdbootstrap@4.7.4/css/mdb.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://at.alicdn.com/t/font_1067060_vr10bjtg3us.css">
     
+        <link rel="stylesheet" href="/css/Prettify/tomorrow-night-eighties.min.css">
+    
 </head>
 
 <body>
-  <header style="height: 100vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
 <div class="container">
     <a class="navbar-brand" href="/"><strong>多读书</strong></a>
@@ -64,8 +66,10 @@
     <div class="full-bg-img">
         <div class="mask rgba-black-light flex-center">
         <div class="container text-center white-text wow fadeInUp">
-            <p class="h2">读书笔记</p>
+            <p class="h2">Swift 5 中使用NSClassFromString</p>
             <br>
+            
+            <p>Wednesday, May 8th 2019, 10:07 am</p>
             
         </div>
         </div>
@@ -74,100 +78,54 @@
   </header>
 
   <main>
-    
-  <div class="container">
-    <div class="py-5 z-depth-3 main">
-      
-      <div class="container">
-        <div class="row">
-          <div class="col-10 offset-1">
-            
-
-<div class="row mb-3">
-
-<div class="col-12 col-md-8 offset-md-2">
-    <a href="/2019/05/08/classfromstring/" class="h4" style="font-weight: 700;">Swift 5 中使用NSClassFromString</a>
-    
-      <p class="mb-1">/// 在swift中使用NSClassFromString className要加工程名前缀
+  
+  <div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2 ">
+            <div class="post-content py-5 z-depth-3 main">
+                <pre><code class="swift">/// 在swift中使用NSClassFromString className要加工程名前缀
 ///
 /// - Parameter className: className
 func swiftClassFromString(className: String) -&gt; AnyClass! {
     // get the project name
     if  let appName: String = Bundle.main.object(forInfoDictionaryKey: &quot;CFBundleName&quot;) as! String? {
-        /...</p>
-    
-    
-      <p>
-        <i class="iconfont icon-riqi2"></i>&nbsp;2019-05-08
-        &nbsp;
-        
-      </p>
-    
-</div>
-</div>
-
-<div class="row mb-3">
-
-<div class="col-12 col-md-8 offset-md-2">
-    <a href="/2019/04/16/hello/" class="h4" style="font-weight: 700;">iOS UIView添加阴影</a>
-    
-      <p class="mb-1">
-UIView添加四边阴影效果
-
-简单的一个函数，使用的swift语言
-func addShadowToView(_ theView: UIView,_ theColor: UIColor) {
-        theView.layer.shadowColor = theColor.cgColor
-        theView.layer.shadowOffset = CGSize(width: 0, height: 0)
-        theView.layer.shadowOpacity = 0.5
-        theView.layer.shadowRadius = 5
+        // YourProject.className
+        let classStringName = appName + &quot;.&quot; + className
+        return NSClassFromString(classStringName)
+    }
+    return nil;
 }
+</code></pre>
 
-...</p>
-    
-    
-      <p>
-        <i class="iconfont icon-riqi2"></i>&nbsp;2019-04-16
-        &nbsp;
-        
-            <i class="iconfont icon-cc-tag-more"></i>
-            
-                Swift&nbsp;
-            
-        
-      </p>
-    
-</div>
-</div>
-
-<div class="row mb-3">
-
-<div class="col-12 col-md-8 offset-md-2">
-    <a href="/2019/04/16/hello-world/" class="h4" style="font-weight: 700;">Hello World</a>
-    
-      <p class="mb-1">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post$ hexo new &quot;My New Post&quot;
-
-More info: Writing
-Run server$ hexo serve...</p>
-    
-    
-      <p>
-        <i class="iconfont icon-riqi2"></i>&nbsp;2019-04-16
-        &nbsp;
-        
-      </p>
-    
-</div>
-</div>
- 
-<br><br>
-
-
-          </div>
+                <hr>
+                <div>
+                    <p>
+                        
+                    </p>
+                </div>
+                <br>
+                
+                    <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+                
+            </div>
         </div>
-      </div>
-    </div>
+        <div class="d-none d-md-block col-md-2">
+            
+  <div id="toc" class="py-5">
+    <p class="h6"><i class="iconfont icon-toc" style="vertical-align:middle"></i> Toc:</p> 
+    <div id="tocbot"></div>
   </div>
+
+        </div>
+    </div>        
+</div>
+
+<br><br><br>
+
+<!-- Comments -->
+<div class="comments" id="comments">
+ 
+</div>
   
   </main>
 
@@ -185,6 +143,20 @@ Run server$ hexo serve...</p>
   <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.7.4/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.7.4/js/mdb.min.js"></script>
   <script src="/js/main.js"></script>
+  
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    
+    <script src="/js/post.js"></script>
+    
+      <script src="/js/plugins/prettify.js"></script>
+      <script>
+          $(document).ready(function(){
+              $('pre').addClass('prettyprint linenums');
+              prettyPrint();
+          })
+      </script>
+    
   
 </body>
 </html>
