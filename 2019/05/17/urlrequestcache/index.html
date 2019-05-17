@@ -89,7 +89,7 @@
     
         <!-- Article Catalog -->
         <div class="catalog-dropdown col-xs-12 col-sm-12">
-            
+            <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#官方源码是这样的"><span class="toc-number">1.</span> <span class="toc-text">官方源码是这样的</span></a></li></ol>
         </div>
     
 
@@ -105,12 +105,9 @@
 
     <!-- Article Content -->
     <div class="post-content">
-        <p>源码是这样的</p>
-<pre><code class="swift">public enum CachePolicy : UInt {
-
+        <h4 id="官方源码是这样的"><a href="#官方源码是这样的" class="headerlink" title="官方源码是这样的"></a>官方源码是这样的</h4><pre><code>public enum CachePolicy : UInt {
 
         case useProtocolCachePolicy
-
 
         case reloadIgnoringLocalCacheData
 
@@ -118,16 +115,13 @@
 
         public static var reloadIgnoringCacheData: NSURLRequest.CachePolicy { get }
 
-
         case returnCacheDataElseLoad
 
         case returnCacheDataDontLoad
 
-
         case reloadRevalidatingCacheData
     }
-</code></pre>
-<ol>
+</code></pre><ol>
 <li>useProtocolCachePolicy                  默认的cache policy，使用Protocol协议定义。</li>
 <li>reloadIgnoringLocalCacheData                                        忽略缓存直接从原始地址下载。</li>
 <li>returnCacheDataDontLoad                                     只使用cache数据，如果不存在cache，请求失败；用于没有建立网络连接离线模式</li>
