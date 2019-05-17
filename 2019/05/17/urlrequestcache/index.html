@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="author" content="牛牛多多">
     <meta name="description" itemprop="description" content>
-    <meta name="keywords" content>
+    <meta name="keywords" content=",Swift">
 
     <!-- Page Title -->
     
-        <title>Archive | 多读书</title>
+        <title>URLRequest的几种缓存方式 | 多读书</title>
     
     <link rel="icon" href="/img/avatar-default.png">
     <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
@@ -50,8 +50,10 @@
     <div class="header-title-wrapper">
         <!-- Page Title -->
         <p class="header-title">
-              
-                多读书
+             
+                
+                    URLRequest的几种缓存方式
+                
             
         </p>  
     </div>    
@@ -71,7 +73,7 @@
 
                 
                     <span>
-                        <a class="header-btn" href="/archives" title="archives"><i class="fa fa fa-file-text-o"></i></a>
+                        <a class="catalog-btn header-btn"><i class="fa fa-list-ul"></i></a>
                     </span>
                 
             
@@ -81,48 +83,85 @@
 
             <!-- Main -->
             <main>
-                <!-- Archive -->
-<div class="archive-wrapper">
+                <article class="post-wrapper">
     
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/05/17/urlrequestcache/" title="URLRequest的几种缓存方式">
-            <span class="archive-post-title">URLRequest的几种缓存方式</span>
-        </a>
 
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-05-17</span>
-            <span class="archive-categories">
-                
-            </span>
+    
+        <!-- Article Catalog -->
+        <div class="catalog-dropdown col-xs-12 col-sm-12">
+            
         </div>
-    </div>
     
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/05/08/classfromstring/" title="Swift 5 中使用NSClassFromString">
-            <span class="archive-post-title">Swift 5 中使用NSClassFromString</span>
-        </a>
 
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-05-08</span>
-            <span class="archive-categories">
-                
-            </span>
-        </div>
-    </div>
     
-</div>
+        <!--For now, Lightbox Only Show in Post Layout -->
+        
 
-<!-- Pagination -->
-<div class="pagination-wrapper">
-    <ul class="pagination-btn">
         
         
-    </ul>
-</div>
+    
+
+    
+
+    <!-- Article Content -->
+    <div class="post-content">
+        <p>源码是这样的</p>
+<pre><code class="swift">public enum CachePolicy : UInt {
+
+
+        case useProtocolCachePolicy
+
+
+        case reloadIgnoringLocalCacheData
+
+        case reloadIgnoringLocalAndRemoteCacheData
+
+        public static var reloadIgnoringCacheData: NSURLRequest.CachePolicy { get }
+
+
+        case returnCacheDataElseLoad
+
+        case returnCacheDataDontLoad
+
+
+        case reloadRevalidatingCacheData
+    }
+</code></pre>
+<ol>
+<li>useProtocolCachePolicy                  默认的cache policy，使用Protocol协议定义。</li>
+<li>reloadIgnoringLocalCacheData                                        忽略缓存直接从原始地址下载。</li>
+<li>returnCacheDataDontLoad                                     只使用cache数据，如果不存在cache，请求失败；用于没有建立网络连接离线模式</li>
+<li>returnCacheDataElseLoad                                     只有在cache中不存在data时才从原始地址下载。</li>
+<li>reloadIgnoringLocalAndRemoteCacheData           忽略本地和远程的缓存数据，直接从原始地址下载，与NSURLRequestReloadIgnoringCacheData类似。</li>
+<li>reloadRevalidatingCacheData                              :验证本地数据与远程数据是否相同，如果不同则下载远程数据，否则使用本地数据</li>
+</ol>
+  
+    </div> 
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+
+    <div class="post-info-wrapper">
+            
+                    <!-- Post Info -->
+                    <p class="post-date">2019-05-17</p>
+                    
+                    
+                        <p class="post-info-categories">
+                            
+                        </p>
+                    
+
+                    
+            
+    </div>
+</article>
+
+
+    
+
             </main>
 
             <!-- 'To Top' Btn-->
