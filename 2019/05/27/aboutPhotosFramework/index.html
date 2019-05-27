@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+    <!-- Head -->
+    <head><meta name="generator" content="Hexo 3.8.0">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="牛牛多多">
+    <meta name="description" itemprop="description" content>
+    <meta name="keywords" content=",Photos,Swift">
+
+    <!-- Page Title -->
+    
+        <title>关于Photos.Framework | 多读书</title>
+    
+    <link rel="icon" href="/img/avatar-default.png">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script src="/js/script.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        .deactiveColor{
+            color: #37474f;
+        }
+        .activeColor{
+            color: #006064;
+        }
+        a:hover{
+            color: #006064;
+        }
+        .header-btn{
+            color: #37474f;
+        }
+        
+        .post-content img{
+            margin: 50px auto;
+        }
+        
+    </style>
+</head>
+    <body>
+        <div class="container">
+
+            <!-- Top Anchor -->
+            <div id="top"></div>
+
+            <!-- Header -->
+            <header class="header-wrapper">
+    <div class="header-title-wrapper">
+        <!-- Page Title -->
+        <p class="header-title">
+             
+                
+                    关于Photos.Framework
+                
+            
+        </p>  
+    </div>    
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+    
+    <div class="header-detail">
+        <!-- Header Button -->
+        <div class="header-btn-wrapper">
+            
+                <span>
+                    <a class="home-btn header-btn" href="/" title="homepage"><i class="fa fa-home"></i></a>
+                </span>
+
+                
+                    <span>
+                        <a class="catalog-btn header-btn"><i class="fa fa-list-ul"></i></a>
+                    </span>
+                
+            
+        </div>
+    </div>
+</header>
+
+            <!-- Main -->
+            <main>
+                <article class="post-wrapper">
+    
+
+    
+        <!-- Article Catalog -->
+        <div class="catalog-dropdown col-xs-12 col-sm-12">
+            
+        </div>
+    
+
+    
+        <!--For now, Lightbox Only Show in Post Layout -->
+        
+
+        
+        
+            <!-- Article Img Lightbox -->
+            <div class="gallery">
+    
+    
+    <div class="lightbox">
+        <!-- Close Button -->
+        <span class="close-gallery">&times;</span>
+        
+        <!-- Photo -->
+        <img class="gallery-photo">
+    </div>
+</div>
+        
+    
+
+    
+
+    <!-- Article Content -->
+    <div class="post-content">
+        <p>1.判断相册访问权限</p>
+<pre><code>let status = PHPhotoLibrary.authorizationStatus()
+
+if status == .restricted || status == .denied {
+            print(&quot;无法访问相册&quot;)
+}
+</code></pre><p>2.实时监听相册内部图片变化<br> 遵守PHPhotoLibraryChangeObserver协议</p>
+<pre><code>PHPhotoLibrary.shared().register(self)
+
+
+func photoLibraryDidChange(_ changeInstance: PHChange) {
+     print(&quot;相册变化的运行代码&quot;)
+}
+</code></pre><p>3.读取相册内所有图片资源</p>
+<pre><code>func getAllAssetInPhoto(_ ascending: Bool) -&gt; [PHAsset] {
+        var phs : [PHAsset] = []
+        let option = PHFetchOptions()
+        option.sortDescriptors = [NSSortDescriptor(key: &quot;creationDate&quot;,
+                                                   ascending: ascending)]
+        let result = PHAsset.fetchAssets(with: .image, options: option)
+
+        result.enumerateObjects { (obj, idx, stop) in
+            let asset : PHAsset = obj
+            phs.append(asset)
+        }
+
+        return phs
+    }
+</code></pre><p>4.根据获取的PHAsset对象，解析图片</p>
+<pre><code>func getAllAssetInPhoto(_ ascending: Bool) -&gt; [PHAsset] {
+        var phs : [PHAsset] = []
+        let option = PHFetchOptions()
+        option.sortDescriptors = [NSSortDescriptor(key: &quot;creationDate&quot;,
+                                                   ascending: ascending)]
+        let result = PHAsset.fetchAssets(with: .image, options: option)
+
+        result.enumerateObjects { (obj, idx, stop) in
+            let asset : PHAsset = obj
+            phs.append(asset)
+            let option : PHImageRequestOptions = PHImageRequestOptions()
+            option.resizeMode = .fast
+            option.isNetworkAccessAllowed = true
+            PHCachingImageManager.default().requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFit, options: option, resultHandler: { (img, info) in
+                print(&quot;img就是拿到的图片&quot;)
+//              PHImageManagerMaximumSize这个代表全尺寸，当然你可以传入你想要的尺寸
+            })
+        }
+
+        return phs
+ }
+
+</code></pre><p>5.获取所有智能相册</p>
+<pre><code>let smartAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
+smartAlbum.enumerateObjects { (collecion, idx, stop) in
+    print(&quot;相册名字\(collecion.localizedTitle)&quot;)
+}
+</code></pre><p>目前拿到的相册名字是英文的<br>可以到info这边添加CFBundleAllowMixedLocalizations这个key，并设置为TRUE</p>
+  
+    </div> 
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+
+    <div class="post-info-wrapper">
+            
+                    <!-- Post Info -->
+                    <p class="post-date">2019-05-27</p>
+                    
+                    
+                        <p class="post-info-categories">
+                            
+                        </p>
+                    
+
+                    
+            
+    </div>
+</article>
+
+
+    
+
+            </main>
+
+            <!-- 'To Top' Btn-->
+            
+                <div id="to-top">
+    <a href="#top" class="toTop">
+        <i class="fa fa-pagelines"></i>
+    </a>
+</div>
+            
+
+            <!-- Footer -->
+            
+                <footer class="footer-wrapper col-xs-12 col-sm-12">
+    <div class="footer-banner-wrapper">
+        <p class="footer-banner">Powered by <a href="https://hexo.io/" title="Hexo">Hexo</a></p>
+        <p class="footer-banner">Theme <a href="https://github.com/Lonezj/hexo-theme-wind" title="Wind">wind</a></p>
+    </div>
+</footer>
+            
+        </div>
+
+        <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
+        <link rel="stylesheet" href="/css/google-prettify-monokai.css" type="text/css">
+        <script src="//cdn.bootcss.com/prettify/r298/prettify.min.js" type="text/javascript"></script>
+    </body>
+</html>
