@@ -174,8 +174,17 @@ func photoLibraryDidChange(_ changeInstance: PHChange) {
 smartAlbum.enumerateObjects { (collecion, idx, stop) in
     print(&quot;相册名字\(collecion.localizedTitle)&quot;)
 }
-</code></pre><p>目前拿到的相册名字是英文的<br>可以到info这边添加CFBundleAllowMixedLocalizations这个key，并设置为TRUE</p>
-  
+</code></pre><p>目前拿到的相册名字是英文的<br>可以到info这边添加CFBundleAllowMixedLocalizations这个key，并设置为True<br>这样能获取到中文的相册标题。<br>6.删除相册里面的图片</p>
+<pre><code>let assets = getAllAssetInPhoto(true)
+
+PHPhotoLibrary.shared().performChanges({
+    let result = PHAsset.fetchAssets(withLocalIdentifiers: [assets[0].localIdentifier], options: nil)
+    PHAssetChangeRequest.deleteAssets(result)
+}) { (finish, error) in
+
+}
+
+</code></pre>  
     </div> 
 
     
