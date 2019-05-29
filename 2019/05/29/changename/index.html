@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="author" content="牛牛多多">
     <meta name="description" itemprop="description" content>
-    <meta name="keywords" content=",Photos,Swift">
+    <meta name="keywords" content=",Mac">
 
     <!-- Page Title -->
     
-        <title>关于Photos.Framework | 多读书</title>
+        <title>Mac管理员账号丢失找回 | 多读书</title>
     
     <link rel="icon" href="/img/avatar-default.png">
     <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
@@ -52,7 +52,7 @@
         <p class="header-title">
              
                 
-                    关于Photos.Framework
+                    Mac管理员账号丢失找回
                 
             
         </p>  
@@ -99,93 +99,33 @@
 
         
         
-            <!-- Article Img Lightbox -->
-            <div class="gallery">
-    
-    
-    <div class="lightbox">
-        <!-- Close Button -->
-        <span class="close-gallery">&times;</span>
-        
-        <!-- Photo -->
-        <img class="gallery-photo">
-    </div>
-</div>
-        
     
 
     
 
     <!-- Article Content -->
     <div class="post-content">
-        <p>1.判断相册访问权限</p>
-<pre><code>let status = PHPhotoLibrary.authorizationStatus()
-
-if status == .restricted || status == .denied {
-            print(&quot;无法访问相册&quot;)
-}
-</code></pre><p>2.实时监听相册内部图片变化<br> 遵守PHPhotoLibraryChangeObserver协议</p>
-<pre><code>PHPhotoLibrary.shared().register(self)
-
-
-func photoLibraryDidChange(_ changeInstance: PHChange) {
-     print(&quot;相册变化的运行代码&quot;)
-}
-</code></pre><p>3.读取相册内所有图片资源</p>
-<pre><code>func getAllAssetInPhoto(_ ascending: Bool) -&gt; [PHAsset] {
-        var phs : [PHAsset] = []
-        let option = PHFetchOptions()
-        option.sortDescriptors = [NSSortDescriptor(key: &quot;creationDate&quot;,
-                                                   ascending: ascending)]
-        let result = PHAsset.fetchAssets(with: .image, options: option)
-
-        result.enumerateObjects { (obj, idx, stop) in
-            let asset : PHAsset = obj
-            phs.append(asset)
-        }
-
-        return phs
-    }
-</code></pre><p>4.根据获取的PHAsset对象，解析图片</p>
-<pre><code>func getAllAssetInPhoto(_ ascending: Bool) -&gt; [PHAsset] {
-        var phs : [PHAsset] = []
-        let option = PHFetchOptions()
-        option.sortDescriptors = [NSSortDescriptor(key: &quot;creationDate&quot;,
-                                                   ascending: ascending)]
-        let result = PHAsset.fetchAssets(with: .image, options: option)
-
-        result.enumerateObjects { (obj, idx, stop) in
-            let asset : PHAsset = obj
-            phs.append(asset)
-            let option : PHImageRequestOptions = PHImageRequestOptions()
-            option.resizeMode = .fast
-            option.isNetworkAccessAllowed = true
-            PHCachingImageManager.default().requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFit, options: option, resultHandler: { (img, info) in
-                print(&quot;img就是拿到的图片&quot;)
-//              PHImageManagerMaximumSize这个代表全尺寸，当然你可以传入你想要的尺寸
-            })
-        }
-
-        return phs
- }
-
-</code></pre><p>5.获取所有智能相册</p>
-<pre><code>let smartAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
-smartAlbum.enumerateObjects { (collecion, idx, stop) in
-    print(&quot;相册名字\(collecion.localizedTitle)&quot;)
-}
-</code></pre><p>目前拿到的相册名字是英文的<br>可以到info这边添加CFBundleAllowMixedLocalizations这个key，并设置为True<br>这样能获取到中文的相册标题。</p>
-<p>6.删除相册里面的图片</p>
-<pre><code>let assets = getAllAssetInPhoto(true)
-
-PHPhotoLibrary.shared().performChanges({
-    let result = PHAsset.fetchAssets(withLocalIdentifiers: [assets[0].localIdentifier], options: nil)
-    PHAssetChangeRequest.deleteAssets(result)
-}) { (finish, error) in
-
-}
-
-</code></pre>  
+        <p>事情起因是因为我想给我的管理员用户改名，结果改完之后用户的管理员权限没了。差点就要重装系统了。<br>还好在网上找到了这个方法。<br>暂定出问题的账号是 : UserA<br>暂定新建的账号是 : UserB</p>
+<p>具体步骤如下:</p>
+<ol>
+<li>进入单用户模式</li>
+</ol>
+<p>命令是开机按住 cmd + s<br>这样会进入命令行界面</p>
+<pre><code>//对文件系统检查修复
+fsck -y
+//挂载分区
+mount -uaw /
+//删除系统安装完毕的配置
+rm /var/db/.AppleSetupDone
+//重启系统
+reboot
+</code></pre><p>2.新建管理员账号</p>
+<p>重启之后进入系统，就会走一个新管理员用户新建的流程。新建的管理员账号UserB</p>
+<p>3.把UserA设置为管理员</p>
+<p>在系统偏好设置 -&gt; 用户与群组 这个路径下<br>找到UserA，勾选 “允许用户管理这台电脑”<br>这样UserA就回归之前的管理员账号了。</p>
+<p>重启一下进入UserA用户</p>
+<p>为了安全最好还是把UserB改成普通号。<br>或者直接删除</p>
+  
     </div> 
 
     
@@ -196,7 +136,7 @@ PHPhotoLibrary.shared().performChanges({
     <div class="post-info-wrapper">
             
                     <!-- Post Info -->
-                    <p class="post-date">2019-05-27</p>
+                    <p class="post-date">2019-05-29</p>
                     
                     
                         <p class="post-info-categories">
