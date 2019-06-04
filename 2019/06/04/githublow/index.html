@@ -118,7 +118,10 @@ IP Addresses    192.30.253.118, 192.30.253.119
 </code></pre><p>那么我们可以吧</p>
 <pre><code>192.30.253.118    gist.github.com
 </code></pre><p>复制粘贴到/etc/hosts 这个文件里面</p>
-<p>如果你想要得到其他域名的ip地址，请参照上面的做法在做一次</p>
+<p>最后两步也是最重要的就是刷DNS</p>
+<pre><code>sudo killall -HUP mDNSResponder
+</code></pre><pre><code>say DNS cache has been flushed
+</code></pre><p>如果你想要得到其他域名的ip地址，请参照上面的做法在做一次</p>
 <p>例如：</p>
 <pre><code>http://github.com.ipaddress.com
 </code></pre><pre><code>http://github.global.ssl.fastly.net.ipaddress.com
