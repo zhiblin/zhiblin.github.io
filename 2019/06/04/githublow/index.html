@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="author" content="牛牛多多">
     <meta name="description" itemprop="description" content>
-    <meta name="keywords" content>
+    <meta name="keywords" content=",Github">
 
     <!-- Page Title -->
     
-        <title>Archive | 多读书</title>
+        <title>Github访问速度慢 | 多读书</title>
     
     <link rel="icon" href="/img/avatar-default.png">
     <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
@@ -50,8 +50,10 @@
     <div class="header-title-wrapper">
         <!-- Page Title -->
         <p class="header-title">
-              
-                多读书
+             
+                
+                    Github访问速度慢
+                
             
         </p>  
     </div>    
@@ -71,7 +73,7 @@
 
                 
                     <span>
-                        <a class="header-btn" href="/archives" title="archives"><i class="fa fa fa-file-text-o"></i></a>
+                        <a class="catalog-btn header-btn"><i class="fa fa-list-ul"></i></a>
                     </span>
                 
             
@@ -81,48 +83,73 @@
 
             <!-- Main -->
             <main>
-                <!-- Archive -->
-<div class="archive-wrapper">
+                <article class="post-wrapper">
     
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/06/04/githublow/" title="Github访问速度慢">
-            <span class="archive-post-title">Github访问速度慢</span>
-        </a>
 
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-06-04</span>
-            <span class="archive-categories">
-                
-            </span>
+    
+        <!-- Article Catalog -->
+        <div class="catalog-dropdown col-xs-12 col-sm-12">
+            
         </div>
-    </div>
     
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/06/04/SwiftRichString/" title="一些Swift解析html和富文本开源库">
-            <span class="archive-post-title">一些Swift解析html和富文本开源库</span>
-        </a>
 
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-06-04</span>
-            <span class="archive-categories">
-                
-            </span>
-        </div>
-    </div>
     
-</div>
+        <!--For now, Lightbox Only Show in Post Layout -->
+        
 
-<!-- Pagination -->
-<div class="pagination-wrapper">
-    <ul class="pagination-btn">
         
         
-    </ul>
-</div>
+    
+
+    
+
+    <!-- Article Content -->
+    <div class="post-content">
+        <p>没有翻墙。<br>Github速度慢。<br>具体思路就是找到访问最快的IP地址，添加到host上面去解析。<br>这里推荐一个测试的网站。目前我获取到ip访问还是很快的。</p>
+<p>假设你要获取gist.github.com 最快的ip</p>
+<p>那么把 </p>
+<pre><code>http://gist.github.com.ipaddress.com
+</code></pre><p>这个复制到浏览器上打开</p>
+<p>网页上会显示对应的ip和域名</p>
+<p>比如我这边请求到的ip是这样</p>
+<pre><code>gist.github.com Hostname Summary
+Domain    github.com
+IP Addresses    192.30.253.118, 192.30.253.119
+</code></pre><p>那么我们可以吧</p>
+<pre><code>192.30.253.118    gist.github.com
+</code></pre><p>复制粘贴到/etc/hosts 这个文件里面</p>
+<p>如果你想要得到其他域名的ip地址，请参照上面的做法在做一次</p>
+<p>例如：</p>
+<pre><code>http://github.com.ipaddress.com
+</code></pre><pre><code>http://github.global.ssl.fastly.net.ipaddress.com
+</code></pre><p>等等</p>
+  
+    </div> 
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+
+    <div class="post-info-wrapper">
+            
+                    <!-- Post Info -->
+                    <p class="post-date">2019-06-04</p>
+                    
+                    
+                        <p class="post-info-categories">
+                            
+                        </p>
+                    
+
+                    
+            
+    </div>
+</article>
+
+
+    
+
             </main>
 
             <!-- 'To Top' Btn-->
