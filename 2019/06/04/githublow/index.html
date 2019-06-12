@@ -106,7 +106,7 @@
     <!-- Article Content -->
     <div class="post-content">
         <p>没有翻墙。<br>Github速度慢。<br>具体思路就是找到访问最快的IP地址，添加到host上面去解析。<br>这里推荐一个测试的网站。目前我获取到ip访问还是很快的。</p>
-<p>假设你要获取gist.github.com 最快的ip</p>
+<p>假设你要获取gist.github.com 真实的ip</p>
 <p>那么把 </p>
 <pre><code>http://gist.github.com.ipaddress.com
 </code></pre><p>这个复制到浏览器上打开</p>
@@ -121,7 +121,8 @@ IP Addresses    192.30.253.118, 192.30.253.119
 <p>最后两步也是最重要的就是刷DNS</p>
 <pre><code>sudo killall -HUP mDNSResponder
 </code></pre><pre><code>say DNS cache has been flushed
-</code></pre><p>如果你想要得到其他域名的ip地址，请参照上面的做法在做一次</p>
+</code></pre><p>哈哈上面这命令并没什么实际的作用</p>
+<p>如果你想要得到其他域名的ip地址，请参照上面的做法在做一次</p>
 <p>例如：</p>
 <pre><code>http://github.com.ipaddress.com
 </code></pre><pre><code>http://github.global.ssl.fastly.net.ipaddress.com
