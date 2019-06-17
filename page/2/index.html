@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="author" content="牛牛多多">
     <meta name="description" itemprop="description" content>
-    <meta name="keywords" content=",Mac">
+    <meta name="keywords" content>
 
     <!-- Page Title -->
     
-        <title>Mac管理员账号丢失找回 | 学无止境</title>
+        <title>Home | 学无止境</title>
     
     <link rel="icon" href="/img/avatar-default.png">
     <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
@@ -50,10 +50,8 @@
     <div class="header-title-wrapper">
         <!-- Page Title -->
         <p class="header-title">
-             
-                
-                    Mac管理员账号丢失找回
-                
+              
+                学无止境
             
         </p>  
     </div>    
@@ -73,7 +71,7 @@
 
                 
                     <span>
-                        <a class="catalog-btn header-btn"><i class="fa fa-list-ul"></i></a>
+                        <a class="header-btn" href="/archives" title="archives"><i class="fa fa fa-file-text-o"></i></a>
                     </span>
                 
             
@@ -83,75 +81,48 @@
 
             <!-- Main -->
             <main>
-                <article class="post-wrapper">
+                <!-- Post List -->
+<div class="index-wrapper">
     
+    <div class="index-post-wrapper">
 
-    
-        <!-- Article Catalog -->
-        <div class="catalog-dropdown col-xs-12 col-sm-12">
+        <!-- Post Title -->
+        
+            <a class="index-post-title" href="/2019/04/16/hello-world/">Hello World</a>
+        
+
+        <!-- Post Info -->
+        <div class="index-post-info">
             
+                <!-- Division Line -->
+                <div class="division"></div> 
+            
+
+            <div class="post-preview">
+                
+                    Welcome to Hexo! This is your ve...
+                
+            </div>
+
+            <div class="index-post-meta">
+                    <span class="index-post-time">2019-04-16</span>
+                    <span class="index-post-categories">
+                        
+                    </span>
+                </div>
         </div>
-    
-
-    
-        <!--For now, Lightbox Only Show in Post Layout -->
-        
-
-        
-        
-    
-
-    
-
-    <!-- Article Content -->
-    <div class="post-content">
-        <p>事情起因是因为我想给我的管理员用户改名，结果改完之后用户的管理员权限没了。差点就要重装系统了。<br>还好在网上找到了这个方法。<br>暂定出问题的账号是 : UserA<br>暂定新建的账号是 : UserB</p>
-<p>具体步骤如下:</p>
-<ol>
-<li>进入单用户模式</li>
-</ol>
-<p>命令是开机按住 cmd + s<br>这样会进入命令行界面</p>
-<pre><code>//对文件系统检查修复
-fsck -y
-//挂载分区
-mount -uaw /
-//删除系统安装完毕的配置
-rm /var/db/.AppleSetupDone
-//重启系统
-reboot
-</code></pre><p>2.新建管理员账号</p>
-<p>重启之后进入系统，就会走一个新管理员用户新建的流程。新建的管理员账号UserB</p>
-<p>3.把UserA设置为管理员</p>
-<p>在系统偏好设置 -&gt; 用户与群组 这个路径下<br>找到UserA，勾选 “允许用户管理这台电脑”<br>这样UserA就回归之前的管理员账号了。</p>
-<p>重启一下进入UserA用户</p>
-<p>为了安全最好还是把UserB改成普通号。<br>或者直接删除</p>
-  
-    </div> 
-
-    
-        <!-- Division Line -->
-        <div class="division"></div> 
-    
-
-    <div class="post-info-wrapper">
-            
-                    <!-- Post Info -->
-                    <p class="post-date">2019-05-29</p>
-                    
-                    
-                        <p class="post-info-categories">
-                            
-                        </p>
-                    
-
-                    
-            
     </div>
-</article>
-
-
     
 
+    <div class="pagination-wrapper">
+    <ul class="pagination-btn">
+        
+            <li class="previous"><a href="/"> <i class="fa fa-angle-left "></i> </a></li>
+        
+        
+    </ul>
+</div>
+</div>
             </main>
 
             <!-- 'To Top' Btn-->
