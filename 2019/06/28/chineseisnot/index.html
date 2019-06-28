@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="author" content="牛牛多多">
     <meta name="description" itemprop="description" content>
-    <meta name="keywords" content>
+    <meta name="keywords" content=",Swift">
 
     <!-- Page Title -->
     
-        <title>Home | 多做笔记</title>
+        <title>String识别是否包含中文 | 多做笔记</title>
     
     <link rel="icon" href="/img/avatar-default.png">
     <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
@@ -50,8 +50,10 @@
     <div class="header-title-wrapper">
         <!-- Page Title -->
         <p class="header-title">
-              
-                多做笔记
+             
+                
+                    String识别是否包含中文
+                
             
         </p>  
     </div>    
@@ -71,7 +73,7 @@
 
                 
                     <span>
-                        <a class="header-btn" href="/archives" title="archives"><i class="fa fa fa-file-text-o"></i></a>
+                        <a class="catalog-btn header-btn"><i class="fa fa-list-ul"></i></a>
                     </span>
                 
             
@@ -81,112 +83,64 @@
 
             <!-- Main -->
             <main>
-                <!-- Post List -->
-<div class="index-wrapper">
+                <article class="post-wrapper">
     
-    <div class="index-post-wrapper">
 
-        <!-- Post Title -->
-        
-            <a class="index-post-title" href="/2019/05/08/classfromstring/">Swift 5 中使用NSClassFromString</a>
-        
-
-        <!-- Post Info -->
-        <div class="index-post-info">
+    
+        <!-- Article Catalog -->
+        <div class="catalog-dropdown col-xs-12 col-sm-12">
             
-                <!-- Division Line -->
-                <div class="division"></div> 
-            
-
-            <div class="post-preview">
-                
-                    /// 在swift中使用NSClassFromString className要加工程名前缀
-///
-/// - Parameter clas...
-                
-            </div>
-
-            <div class="index-post-meta">
-                    <span class="index-post-time">2019-05-08</span>
-                    <span class="index-post-categories">
-                        
-                    </span>
-                </div>
         </div>
-    </div>
     
-    <div class="index-post-wrapper">
 
-        <!-- Post Title -->
-        
-            <a class="index-post-title" href="/2019/04/16/hello/">iOS UIView添加阴影</a>
+    
+        <!--For now, Lightbox Only Show in Post Layout -->
         
 
-        <!-- Post Info -->
-        <div class="index-post-info">
-            
-                <!-- Division Line -->
-                <div class="division"></div> 
-            
+        
+        
+    
 
-            <div class="post-preview">
-                
+    
+
+    <!-- Article Content -->
+    <div class="post-content">
+        <p>使用Unicode编码表汉字对应的编码范围。<br>对比字符串中是否这个范围的编码，从而判断是否包含汉字。</p>
+<pre><code>func isIncludeNotChineseIn(string: String) -&gt; Bool {
+    for (_, value) in string.enumerated() {
+        if !(&quot;\u{4E00}&quot; &lt;= value &amp;&amp; value &lt;= &quot;\u{9FA5}&quot;) {
+            return true
+        }
+    }
+    return false
+}
+</code></pre>  
+    </div> 
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+
+    <div class="post-info-wrapper">
+            
+                    <!-- Post Info -->
+                    <p class="post-date">2019-06-28</p>
                     
-UIView添加四边阴影效果
+                    
+                        <p class="post-info-categories">
+                            
+                        </p>
+                    
 
-简单的一个函数，使用的swift语言
-func addSha...
-                
-            </div>
-
-            <div class="index-post-meta">
-                    <span class="index-post-time">2019-04-16</span>
-                    <span class="index-post-categories">
-                        
-                    </span>
-                </div>
-        </div>
-    </div>
-    
-    <div class="index-post-wrapper">
-
-        <!-- Post Title -->
-        
-            <a class="index-post-title" href="/2019/04/16/hello-world/">Hello World</a>
-        
-
-        <!-- Post Info -->
-        <div class="index-post-info">
+                    
             
-                <!-- Division Line -->
-                <div class="division"></div> 
-            
-
-            <div class="post-preview">
-                
-                    Welcome to Hexo! This is your ve...
-                
-            </div>
-
-            <div class="index-post-meta">
-                    <span class="index-post-time">2019-04-16</span>
-                    <span class="index-post-categories">
-                        
-                    </span>
-                </div>
-        </div>
     </div>
+</article>
+
+
     
 
-    <div class="pagination-wrapper">
-    <ul class="pagination-btn">
-        
-            <li class="previous"><a href="/"> <i class="fa fa-angle-left "></i> </a></li>
-        
-        
-    </ul>
-</div>
-</div>
             </main>
 
             <!-- 'To Top' Btn-->
