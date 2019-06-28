@@ -10,7 +10,7 @@
 
     <!-- Page Title -->
     
-        <title>Archive | 学无止境</title>
+        <title>iOS查看代码行数 | 学无止境</title>
     
     <link rel="icon" href="/img/avatar-default.png">
     <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
@@ -50,8 +50,10 @@
     <div class="header-title-wrapper">
         <!-- Page Title -->
         <p class="header-title">
-              
-                学无止境
+             
+                
+                    iOS查看代码行数
+                
             
         </p>  
     </div>    
@@ -71,7 +73,7 @@
 
                 
                     <span>
-                        <a class="header-btn" href="/archives" title="archives"><i class="fa fa fa-file-text-o"></i></a>
+                        <a class="catalog-btn header-btn"><i class="fa fa-list-ul"></i></a>
                     </span>
                 
             
@@ -81,93 +83,62 @@
 
             <!-- Main -->
             <main>
-                <!-- Archive -->
-<div class="archive-wrapper">
+                <article class="post-wrapper">
     
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/06/28/ioshangshu/" title="iOS查看代码行数">
-            <span class="archive-post-title">iOS查看代码行数</span>
-        </a>
 
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-06-28</span>
-            <span class="archive-categories">
-                
-            </span>
+    
+        <!-- Article Catalog -->
+        <div class="catalog-dropdown col-xs-12 col-sm-12">
+            
         </div>
-    </div>
     
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/06/17/stringraw/" title="Swift 5终于有了不转义字符串的特性">
-            <span class="archive-post-title">Swift 5终于有了不转义字符串的特性</span>
-        </a>
 
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-06-17</span>
-            <span class="archive-categories">
-                
-            </span>
-        </div>
-    </div>
     
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/06/11/siweidaotu/" title="思维导图学习">
-            <span class="archive-post-title">思维导图学习</span>
-        </a>
+        <!--For now, Lightbox Only Show in Post Layout -->
+        
 
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-06-11</span>
-            <span class="archive-categories">
-                
-            </span>
-        </div>
-    </div>
-    
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/06/04/githublow/" title="Github访问速度慢">
-            <span class="archive-post-title">Github访问速度慢</span>
-        </a>
-
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-06-04</span>
-            <span class="archive-categories">
-                
-            </span>
-        </div>
-    </div>
-    
-    <div class="archive-block">
-        <!-- Post Title -->
-        <a href="/2019/06/04/SwiftRichString/" title="一些Swift解析html和富文本开源库">
-            <span class="archive-post-title">一些Swift解析html和富文本开源库</span>
-        </a>
-
-        <!-- Date And Categories -->
-        <div>
-            <span class="archive-post-date">2019-06-04</span>
-            <span class="archive-categories">
-                
-            </span>
-        </div>
-    </div>
-    
-</div>
-
-<!-- Pagination -->
-<div class="pagination-wrapper">
-    <ul class="pagination-btn">
         
         
-    </ul>
-</div>
+    
+
+    
+
+    <!-- Article Content -->
+    <div class="post-content">
+        <p>总会有需要查看代码行数的时候。<br>找了一下方法还真找到了，这里记录备份一下。</p>
+<p>打开Mac的终端，进入项目目录，然后输入</p>
+<pre><code>cd demoProject(你自己项目名称)﻿
+</code></pre><pre><code>find . -name &quot;*.m&quot; -or -name &quot;*.h&quot; -or -name &quot;*.swift&quot; -or -name &quot;*.mm&quot; -or -name &quot;*.cpp&quot; -or -name &quot;*.rss&quot; -or -name &quot;*.xib&quot; | xargs wc -l﻿
+
+</code></pre><p>按下回车,就会显示所有的代码行数了。</p>
+<p>这方法兼容 OC, Swift,C++等﻿</p>
+  
+    </div> 
+
+    
+        <!-- Division Line -->
+        <div class="division"></div> 
+    
+
+    <div class="post-info-wrapper">
+            
+                    <!-- Post Info -->
+                    <p class="post-date">2019-06-28</p>
+                    
+                    
+                        <p class="post-info-categories">
+                            
+                        </p>
+                    
+
+                    
+            
+    </div>
+</article>
+
+
+    
+
             </main>
 
             <!-- 'To Top' Btn-->
