@@ -10,12 +10,13 @@
 
     <!--Description-->
     
-        <meta name="description" content="某些时候，我们需要等所有的网络请求结束才能去刷新界面。
-这里使用了DispatchGroup来实现
-let group = DispatchGroup()//创建
-        for i in 0..&amp;lt;10{
-            group.enter()//加入组
-         ">
+        <meta name="description" content="老菜翻新，关于时间格式化的问题。
+格式化时间的时候需要注意hh和HH的区别  
+
+hh:mm:ss  
+ 按照12小时制的格式进行字符串格式化
+ 如果时间处于00：00：00——12：59：59，则返回的字符串正常
+ 如果时间处于13：00：00——23：59：59，则返回的字符串是实际时间-12小">
     
 
     <!--Author-->
@@ -25,7 +26,7 @@ let group = DispatchGroup()//创建
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="Swift DispatchGroup 应用于Alamofire"/>
+        <meta property="og:title" content="时间格式化相关问题"/>
     
 
     <!--Open Graph Description-->
@@ -47,7 +48,7 @@ let group = DispatchGroup()//创建
 
     <!-- Title -->
     
-    <title>Swift DispatchGroup 应用于Alamofire - 无语</title>
+    <title>时间格式化相关问题 - 无语</title>
 
     <!-- Tachyons Core CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
@@ -105,8 +106,8 @@ let group = DispatchGroup()//创建
     <!-- Title -->
     <div class="w-100 mw8 center vh-40 dt">
         <div class="dtc v-mid white">
-            <h1 class="f1-l f2-m tc tc-m tl-ns">Swift DispatchGroup 应用于Alamofire</h1>
-            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2019-09-23</p>
+            <h1 class="f1-l f2-m tc tc-m tl-ns">时间格式化相关问题</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2020-04-07</p>
         </div>
     </div>
 
@@ -126,30 +127,58 @@ let group = DispatchGroup()//创建
                     
                         <div class="tags-container-vertical">
                             <div class="tags-sub-container">
-                                <a class="fw3 ph1 dib" href="/tags/Swift/">#Swift</a>
+                                <a class="fw3 ph1 dib" href="/tags/Other/">#Other</a>
                             </div>
                         </div>
                     
 
                     <!-- Main Post Content -->
-                    <p>某些时候，我们需要等所有的网络请求结束才能去刷新界面。</p>
-<p>这里使用了DispatchGroup来实现</p>
-<pre><code>let group = DispatchGroup()//创建
-        for i in 0..&lt;10{
-            group.enter()//加入组
-             Alamofire.request(urlstring, method:.post).responseJSON { (returnResult) in
-                    group.leave()//离开组
-           }
-         }
+                    <p>老菜翻新，关于时间格式化的问题。</p>
+<p>格式化时间的时候需要注意hh和HH的区别  </p>
+<ol>
+<li><p>hh:mm:ss  </p>
+<p> 按照12小时制的格式进行字符串格式化</p>
+<p> 如果时间处于00：00：00——12：59：59，则返回的字符串正常</p>
+<p> 如果时间处于13：00：00——23：59：59，则返回的字符串是实际时间-12小时后的值，也就是说比真实的时间少了12个小时。</p>
+</li>
+</ol>
+<p>例如：14:00:00进行格式化后的字符串为“2:00:00”</p>
+<ol start="2">
+<li><p>HH:mm:ss </p>
+<p> 按照24小时制的格式进行字符串格式化</p>
+<p> 当时间为任意一个区间，则返回的字符串都是正常的。</p>
+</li>
+</ol>
+<pre><code>具体的 YYYY-mm-dd HH:MM:SS部分解释</code></pre><pre><code>
 
-group.notify(queue: DispatchQueue.main) {
-              //请求全部完毕
-}</code></pre>
+  d               月中的某一天。一位数的日期没有前导零。    
+  dd             月中的某一天。一位数的日期有一个前导零。    
+  ddd           周中某天的缩写名称，在   AbbreviatedDayNames   中定义。  
+  dddd         周中某天的完整名称，在   DayNames   中定义。  
+  M               月份数字。一位数的月份没有前导零。  
+  MM             月份数字。一位数的月份有一个前导零。  
+  MMM           月份的缩写名称，在   AbbreviatedMonthNames   中定义。  
+  MMMM         月份的完整名称，在   MonthNames   中定义。  
+  y               不包含纪元的年份。不具有前导零。  
+  yy             不包含纪元的年份。具有前导零。  
+  yyyy         包括纪元的四位数的年份。  
+  gg             时期或纪元。  
+  h               12   小时制的小时。一位数的小时数没有前导零。  
+  hh             12   小时制的小时。一位数的小时数有前导零。  
+  H               24   小时制的小时。一位数的小时数没有前导零。  
+  HH             24   小时制的小时。一位数的小时数有前导零。  
+  m               分钟。一位数的分钟数没有前导零。  
+  mm             分钟。一位数的分钟数有一个前导零。  
+  s               秒。一位数的秒数没有前导零。  
+  ss             秒。一位数的秒数有一个前导零。  
+  f               秒的小数精度为一位。其余数字被截断。
+</code></pre><p>如果时间为2020-04-06 14：02：30 yyyy-MM-dd HH:mm:ss  ;如果格式为yyyy-MM-dd hh:mm:ss 则显示为2020-04-06 02：02：30</p>
+
                     
                     <!-- Tags Bottom -->
                     
                         <div class="tags-container-bottom">
-                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Swift/">#Swift</a>
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Other/">#Other</a>
                         </div>
                     
 
