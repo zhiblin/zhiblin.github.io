@@ -10,14 +10,16 @@
 
     <!--Description-->
     
-        <meta name="description" content="用Object-C的时候用Dispatchsource大概是像下面这样:
+        <meta name="description" content="使用Alamofire自带的NetworkReachabilityManager很方便。
 
-#import &amp;lt;dispatch/dispatch.h&amp;gt;
-#import &amp;lt;signal.h&amp;gt;
-#import &amp;lt;stdlib.h&amp;gt;
 
-int main() {
-   dispatch_">
+import Alamofire
+
+struct Network {
+
+    let manager = Alamofire.NetworkReachabilityManager()
+
+    func ">
     
 
     <!--Author-->
@@ -27,7 +29,7 @@ int main() {
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="Swift 5 Dispatchsource的实现"/>
+        <meta property="og:title" content="ios网络监测"/>
     
 
     <!--Open Graph Description-->
@@ -49,7 +51,7 @@ int main() {
 
     <!-- Title -->
     
-    <title>Swift 5 Dispatchsource的实现 - 无语</title>
+    <title>ios网络监测 - 无语</title>
 
     <!-- Tachyons Core CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
@@ -107,8 +109,8 @@ int main() {
     <!-- Title -->
     <div class="w-100 mw8 center vh-40 dt">
         <div class="dtc v-mid white">
-            <h1 class="f1-l f2-m tc tc-m tl-ns">Swift 5 Dispatchsource的实现</h1>
-            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2019-10-08</p>
+            <h1 class="f1-l f2-m tc tc-m tl-ns">ios网络监测</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2020-04-10</p>
         </div>
     </div>
 
@@ -134,36 +136,55 @@ int main() {
                     
 
                     <!-- Main Post Content -->
-                    <p>用Object-C的时候用Dispatchsource大概是像下面这样:</p>
+                    <ol>
+<li>使用Alamofire自带的NetworkReachabilityManager很方便。</li>
+</ol>
 <pre><code>
-#import &lt;dispatch/dispatch.h&gt;
-#import &lt;signal.h&gt;
-#import &lt;stdlib.h&gt;
+import Alamofire
 
-int main() {
-   dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL,
-                                                     SIGWINCH,
-                                                     0,
-                                                     dispatch_get_main_queue());
-   dispatch_source_set_event_handler(source, ^{
-      exit(1);
-   });
-   dispatch_resume(source);
+struct Network {
 
-   dispatch_main();
-}</code></pre><p>Swiift 早期版本好像也是这样的写法。<br>目前Swift 5 变成了下面这样:</p>
-<pre><code>
-import Darwin
-import Dispatch
+    let manager = Alamofire.NetworkReachabilityManager()
 
-let source = DispatchSource.makeSignalSource(signal: SIGWINCH, queue: .main)
-source.setEventHandler {
-   exit(1)
-}
-source.resume()
+    func state() {
+        manager?.startListening { status in
+            switch status {
+            case .notReachable:
+                print(&quot;not reachable&quot;)
+            case .reachable(.cellular):
+                print(&quot;cellular&quot;)
+            case .reachable(.ethernetOrWiFi):
+                print(&quot;ethernetOrWiFi&quot;)
+            default:
+                print(&quot;unknown&quot;)
+            }
 
-dispatchMain()</code></pre><p>简洁了很多</p>
+        }
 
+    }
+}</code></pre><ol start="2">
+<li>使用 <a href="https://github.com/ashleymills/Reachability.swift" target="_blank" rel="noopener">Reachability.swift</a>这个库也是不错的</li>
+</ol>
+<pre><code>    let reachability = try! Reachability()
+
+    func netstate() {
+        reachability.whenReachable = { reachability in
+
+            if reachability.connection == .wifi {
+                print(&quot;Reachable via WiFi&quot;)
+            } else {
+                print(&quot;Reachable via Cellular&quot;)
+            }
+        }
+        reachability.whenUnreachable = { _ in
+            print(&quot;Not reachable&quot;)        }
+
+        do {
+            try reachability.startNotifier()
+        } catch {
+            print(&quot;Unable to start notifier&quot;)
+        }
+    }</code></pre>
                     
                     <!-- Tags Bottom -->
                     
