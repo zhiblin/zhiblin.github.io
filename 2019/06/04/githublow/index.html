@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--Description-->
+    
+        <meta name="description" content="更新一个IP查询的网站 https://site.ip138.com/
+没有翻墙。Github速度慢。具体思路就是找到访问最快的IP地址，添加到host上面去解析。这里推荐一个测试的网站。目前我获取到ip访问还是很快的。
+假设你要获取gist.github.com 真实的ip
+那么把 
+http:/">
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="牛牛多多">
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="Github访问速度慢"/>
+    
+
+    <!--Open Graph Description-->
+    
+
+    <!--Open Graph Site Name-->
+    <meta property="og:site_name" content="无语"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article" />
+    
+
+    <!--Page Cover-->
+    
+
+    <meta name="twitter:card" content="summary" />
+    
+
+    <!-- Title -->
+    
+    <title>Github访问速度慢 - 无语</title>
+
+    <!-- Tachyons Core CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Google Analytics -->
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+
+<!-- Main Content -->
+<!-- Banner -->
+<!-- Banner -->
+<div class="w-100 bg-1 ph5-ns ph3 text-light">
+    
+    <nav class="db dt-l w-100 mw8 center border-box pv3">
+        <a class="db dtc-l v-mid link dim w-100 w-25-l tc tl-l mb2 mb0-l white" href="/" title="无语">
+            <img src="http://www.codeblocq.com/assets/projects/hexo-theme-anodyne/assets/anodyne.svg" class="dib h3" alt="无语">
+        </a>
+        <div class="db dtc-l v-mid w-100 w-75-l tc tr-l">
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" 
+                    href="/" 
+                    title="Home">
+                    Home
+                </a>
+            
+                <a class="link dim f6 f5-l dib mr3 mr4-l white" 
+                    href="/about/index.html" 
+                    title="About">
+                    About
+                </a>
+            
+        </div>
+    </nav>
+
+    <!-- Title -->
+    <div class="w-100 mw8 center vh-40 dt">
+        <div class="dtc v-mid white">
+            <h1 class="f1-l f2-m tc tc-m tl-ns">Github访问速度慢</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2019-06-04</p>
+        </div>
+    </div>
+
+    <!-- Icon -->
+    <div class="relative w-100 mw8 center white dn dn-m db-ns">
+        <i class="header-icon fa fa-file-text-o"></i>
+    </div>
+</div>
+
+<!-- Content -->
+<div class="w-100 ph2 ph4-m ph5-l mv5 mv6-l">
+    <div class="content">
+        <div class="mw8 center">
+            <div class="cf">
+                <div class="fl w-100 w-70-l mw7 left fw3 lh-copy pr4-ns pr0-m post-content">
+                    <!-- Tags Vertical -->
+                    
+                        <div class="tags-container-vertical">
+                            <div class="tags-sub-container">
+                                <a class="fw3 ph1 dib" href="/tags/Github/">#Github</a>
+                            </div>
+                        </div>
+                    
+
+                    <!-- Main Post Content -->
+                    <p>更新一个IP查询的网站 <a target="_blank" rel="noopener" href="https://site.ip138.com/">https://site.ip138.com/</a></p>
+<p>没有翻墙。<br>Github速度慢。<br>具体思路就是找到访问最快的IP地址，添加到host上面去解析。<br>这里推荐一个测试的网站。目前我获取到ip访问还是很快的。</p>
+<p>假设你要获取gist.github.com 真实的ip</p>
+<p>那么把 </p>
+<pre><code>http://gist.github.com.ipaddress.com
+</code></pre>
+<p>这个复制到浏览器上打开</p>
+<p>网页上会显示对应的ip和域名</p>
+<p>比如我这边请求到的ip是这样</p>
+<pre><code>gist.github.com Hostname Summary
+Domain	github.com
+IP Addresses	192.30.253.118, 192.30.253.119
+</code></pre>
+<p>那么我们可以吧</p>
+<pre><code>192.30.253.118	gist.github.com
+</code></pre>
+<p>复制粘贴到&#x2F;etc&#x2F;hosts 这个文件里面</p>
+<p>最后两步也是最重要的就是刷DNS</p>
+<pre><code>sudo killall -HUP mDNSResponder
+</code></pre>
+<pre><code>say DNS cache has been flushed
+</code></pre>
+<p>哈哈上面这命令并没什么实际的作用</p>
+<p>如果你想要得到其他域名的ip地址，请参照上面的做法在做一次</p>
+<p>例如：</p>
+<pre><code>http://github.com.ipaddress.com
+</code></pre>
+<pre><code>http://github.global.ssl.fastly.net.ipaddress.com
+</code></pre>
+<p>等等<br>这里放一些github相关的域名。对应ip可能不是你所在的上网环境，请按照上面的方法验证一次</p>
+<pre><code>151.101.73.194 github.global.ssl.fastly.net
+151.101.108.133 assets-cdn.github.com
+185.199.111.153 documentcloud.github.com
+185.199.110.153 documentcloud.github.com
+185.199.109.153 documentcloud.github.com
+185.199.108.153 documentcloud.github.com
+192.30.253.113 github.com
+192.30.253.112 github.com
+192.30.253.119 gist.github.com
+192.30.253.118 gist.github.com
+185.199.111.153 help.github.com
+185.199.110.153 help.github.com
+185.199.109.153 help.github.com
+185.199.108.153 help.github.com
+192.30.253.121 nodeload.github.com
+192.30.253.120 nodeload.github.com
+151.101.108.133 raw.github.com
+18.204.240.114 status.github.com
+18.211.136.12 status.github.com
+18.211.136.12 status.github.com
+192.30.253.166 training.github.com
+151.101.109.194 github.global.ssl.fastly.net
+151.101.108.133 avatars0.githubusercontent.com
+151.101.72.133 avatars1.githubusercontent.com
+</code></pre>
+
+                    
+                    <!-- Tags Bottom -->
+                    
+                        <div class="tags-container-bottom">
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Github/">#Github</a>
+                        </div>
+                    
+
+                    <!-- Comments -->
+                    
+
+
+
+                </div>
+                <div class="fl w-100 w-30-l center fw3 lh-copy pl4-ns tl black-50">
+                    
+                    <hr class="dn-l mw4 black-50 mt5" />
+                    
+                    <!-- Widget 1: About -->
+                    <div class="mt5 mt0-l">
+    <article class="dt db-l mw8 mw8-m mw5-ns center ml0-l bg-white mv3">
+        <div class="dn dtc-m db-l v-mid tc pr4 pr0-l" style="min-width: 6rem;">
+            <img src="http://tachyons.io/img/avatar_1.jpg" class="mb4-l br-100 h3 w3 h4-l w4-l dib" title="牛牛多多">
+        </div>
+        <div class="dtc db-l v-mid lh-copy measure center f6 black-50 tj">
+            我是一个开发者，不擅长写博客.<br>某些时候记起来了，就尝试的写一些.<br> 会改改以前写的文章，或者重新新开一篇来写，所以这里比较杂乱.
+        </div>
+    </article>
+</div>
+
+                    <hr class="dn-l mw4 black-50 mt5" />
+                    
+                    <!-- Widget 2: Categories -->
+                    
+
+                    <!-- Widget 3: Recent Posts -->
+                    <div class="mt5 tc tl-l">
+    <h3>Recent Posts</h3>
+    
+        <p>
+            <a href="/2022/09/28/todoapp/">todoapp</a>
+        </p>
+    
+        <p>
+            <a href="/2020/04/10/iosnetworkstatus/">ios网络监测</a>
+        </p>
+    
+        <p>
+            <a href="/2020/04/07/datehelp/">时间格式化相关问题</a>
+        </p>
+    
+        <p>
+            <a href="/2020/04/01/makebetter/">iOS性能优化记录</a>
+        </p>
+    
+        <p>
+            <a href="/2019/10/23/cocoapodsupdate/">cocoapods 更新版本</a>
+        </p>
+    
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<div class="bg-1 ph2 ph5-ns pv5">
+        <div class="mv8">
+            <div class="center tc">
+                
+                    <div class="dib mh3">
+                        <a class="f3 f2-ns white dim" href="https://github.com/zhiblin" target="_blank">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                
+            </div>
+            <div class="f6 f5-ns center tc white pt5 fw3">
+                @Nomore
+            </div>
+        </div>
+    </div>
+
+<!-- After Footer -->
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
