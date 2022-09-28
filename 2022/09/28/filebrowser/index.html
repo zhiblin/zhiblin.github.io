@@ -10,9 +10,6 @@
 
     <!--Description-->
     
-        <meta name="description" content="最早的时候可能先了解了引用计数，但是其实从iphone全面升级到64为机器之后，内存管理有下列三种方式了
-1.散列表（引用计数表、weak表）SideTables 表在 非嵌入式的64位系统中，有 64张 SideTable 表每一张 SideTable 主要是由三部分组成。自旋锁、引用计数表、弱引">
-    
 
     <!--Author-->
     
@@ -21,7 +18,7 @@
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="内存管理"/>
+        <meta property="og:title" content="filebrowser"/>
     
 
     <!--Open Graph Description-->
@@ -43,7 +40,7 @@
 
     <!-- Title -->
     
-    <title>内存管理 - 无语</title>
+    <title>filebrowser - 无语</title>
 
     <!-- Tachyons Core CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
@@ -101,8 +98,8 @@
     <!-- Title -->
     <div class="w-100 mw8 center vh-40 dt">
         <div class="dtc v-mid white">
-            <h1 class="f1-l f2-m tc tc-m tl-ns">内存管理</h1>
-            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2019-07-03</p>
+            <h1 class="f1-l f2-m tc tc-m tl-ns">filebrowser</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2022-09-28</p>
         </div>
     </div>
 
@@ -120,27 +117,11 @@
                 <div class="fl w-100 w-70-l mw7 left fw3 lh-copy pr4-ns pr0-m post-content">
                     <!-- Tags Vertical -->
                     
-                        <div class="tags-container-vertical">
-                            <div class="tags-sub-container">
-                                <a class="fw3 ph1 dib" href="/tags/基础知识/">#基础知识</a>
-                            </div>
-                        </div>
-                    
 
                     <!-- Main Post Content -->
-                    <p>最早的时候可能先了解了引用计数，但是其实从iphone全面升级到64为机器之后，内存管理有下列三种方式了</p>
-<p>1.散列表（引用计数表、weak表）<br>SideTables 表在 非嵌入式的64位系统中，有 64张 SideTable 表<br>每一张 SideTable 主要是由三部分组成。自旋锁、引用计数表、弱引用表。<br>全局的 引用计数 之所以不存在同一张表中，是为了避免资源竞争，解决效率的问题。<br>引用计数表 中引入了 分离锁的概念，将一张表分拆成多个部分，对他们分别加锁，可以实现并发操作，提升执行效率</p>
-<p>2.TaggedPointer（针对类似于 NSNumber 的小对象类型）</p>
-<p>这个是一个为了64位架构下节省内存和提高执行效率而提出的概念.</p>
-<p>更详细的可以看这个<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/01153d2b28eb">地址</a></p>
-<p>3.NONPOINTER_ISA（64位系统下）<br>第一位的 0 或 1 代表是纯地址型 isa 指针，还是 NONPOINTER_ISA 指针。<br>第二位，代表是否有关联对象<br>第三位代表是否有 C++ 代码。<br>接下来33位代表指向的内存地址<br>接下来有 弱引用 的标记<br>接下来有是否 delloc 的标记….等等</p>
-
+                    
                     
                     <!-- Tags Bottom -->
-                    
-                        <div class="tags-container-bottom">
-                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/基础知识/">#基础知识</a>
-                        </div>
                     
 
                     <!-- Comments -->
