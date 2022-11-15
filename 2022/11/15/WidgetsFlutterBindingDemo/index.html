@@ -10,11 +10,9 @@
 
     <!--Description-->
     
-        <meta name="description" content="1.判断相册访问权限
-let status = PHPhotoLibrary.authorizationStatus()
-        
-if status == .restricted || status == .denied &amp;#123;
-            print(&amp;quot;无法访">
+        <meta name="description" content="首先我们经常使用到的地方是1.自定义GestureBinding，你需要全局定义手势响应
+2.自定义ServicesBinding，这个应该是使用最多的地方，你可以在系统和flutter通信前进行自定义拦截和实现自定方法。例如自定义键盘
+WidgetsFlutterBinding的官方文档显示///">
     
 
     <!--Author-->
@@ -24,7 +22,7 @@ if status == .restricted || status == .denied &amp;#123;
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="关于Photos.Framework"/>
+        <meta property="og:title" content="关于WidgetsFlutterBinding"/>
     
 
     <!--Open Graph Description-->
@@ -46,7 +44,7 @@ if status == .restricted || status == .denied &amp;#123;
 
     <!-- Title -->
     
-    <title>关于Photos.Framework - 无语</title>
+    <title>关于WidgetsFlutterBinding - 无语</title>
 
     <!-- Tachyons Core CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
@@ -104,8 +102,8 @@ if status == .restricted || status == .denied &amp;#123;
     <!-- Title -->
     <div class="w-100 mw8 center vh-40 dt">
         <div class="dtc v-mid white">
-            <h1 class="f1-l f2-m tc tc-m tl-ns">关于Photos.Framework</h1>
-            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2019-05-27</p>
+            <h1 class="f1-l f2-m tc tc-m tl-ns">关于WidgetsFlutterBinding</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2022-11-15</p>
         </div>
     </div>
 
@@ -125,89 +123,41 @@ if status == .restricted || status == .denied &amp;#123;
                     
                         <div class="tags-container-vertical">
                             <div class="tags-sub-container">
-                                <a class="fw3 ph1 dib" href="/tags/Photos-Swift/">#Photos,Swift</a>
+                                <a class="fw3 ph1 dib" href="/tags/Flutter/">#Flutter</a>
                             </div>
                         </div>
                     
 
                     <!-- Main Post Content -->
-                    <p>1.判断相册访问权限</p>
-<pre><code>let status = PHPhotoLibrary.authorizationStatus()
-        
-if status == .restricted || status == .denied &#123;
-            print(&quot;无法访问相册&quot;)
+                    <h2 id="首先我们经常使用到的地方是"><a href="#首先我们经常使用到的地方是" class="headerlink" title="首先我们经常使用到的地方是"></a>首先我们经常使用到的地方是</h2><p>1.自定义GestureBinding，你需要全局定义手势响应</p>
+<p>2.自定义ServicesBinding，这个应该是使用最多的地方，你可以在系统和flutter通信前进行自定义拦截和实现自定方法。例如自定义键盘</p>
+<h2 id="WidgetsFlutterBinding的官方文档显示"><a href="#WidgetsFlutterBinding的官方文档显示" class="headerlink" title="WidgetsFlutterBinding的官方文档显示"></a>WidgetsFlutterBinding的官方文档显示</h2><pre><code>/// This is the glue that binds the framework to the Flutter engine.
+
+WidgetsFlutterBinding是绑定widget 框架和Flutter 引擎的桥梁
+
+class WidgetsFlutterBinding extends BindingBase with GestureBinding, SchedulerBinding, ServicesBinding, PaintingBinding, SemanticsBinding, RendererBinding, WidgetsBinding &#123;
+
+    static WidgetsBinding ensureInitialized() &#123;
+          if (WidgetsBinding._instance == null)
+        WidgetsFlutterBinding();
+        return WidgetsBinding.instance;
+    &#125;    
 &#125;
 </code></pre>
-<p>2.实时监听相册内部图片变化<br> 遵守PHPhotoLibraryChangeObserver协议</p>
-<pre><code>PHPhotoLibrary.shared().register(self)
-
-
-func photoLibraryDidChange(_ changeInstance: PHChange) &#123;
-     print(&quot;相册变化的运行代码&quot;)
-&#125;
-</code></pre>
-<p>3.读取相册内所有图片资源</p>
-<pre><code>func getAllAssetInPhoto(_ ascending: Bool) -&gt; [PHAsset] &#123;
-        var phs : [PHAsset] = []
-        let option = PHFetchOptions()
-        option.sortDescriptors = [NSSortDescriptor(key: &quot;creationDate&quot;,
-                                                   ascending: ascending)]
-        let result = PHAsset.fetchAssets(with: .image, options: option)
-
-        result.enumerateObjects &#123; (obj, idx, stop) in
-            let asset : PHAsset = obj
-            phs.append(asset)
-        &#125;
-
-        return phs
-    &#125;
-</code></pre>
-<p>4.根据获取的PHAsset对象，解析图片</p>
-<pre><code>func getAllAssetInPhoto(_ ascending: Bool) -&gt; [PHAsset] &#123;
-        var phs : [PHAsset] = []
-        let option = PHFetchOptions()
-        option.sortDescriptors = [NSSortDescriptor(key: &quot;creationDate&quot;,
-                                                   ascending: ascending)]
-        let result = PHAsset.fetchAssets(with: .image, options: option)
-
-        result.enumerateObjects &#123; (obj, idx, stop) in
-            let asset : PHAsset = obj
-            phs.append(asset)
-            let option : PHImageRequestOptions = PHImageRequestOptions()
-            option.resizeMode = .fast
-            option.isNetworkAccessAllowed = true
-            PHCachingImageManager.default().requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFit, options: option, resultHandler: &#123; (img, info) in
-                print(&quot;img就是拿到的图片&quot;)
-//              PHImageManagerMaximumSize这个代表全尺寸，当然你可以传入你想要的尺寸
-            &#125;)
-        &#125;
-
-        return phs
- &#125;
-</code></pre>
-<p>5.获取所有智能相册</p>
-<pre><code>let smartAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
-smartAlbum.enumerateObjects &#123; (collecion, idx, stop) in
-    print(&quot;相册名字\(collecion.localizedTitle)&quot;)
-&#125;
-</code></pre>
-<p>目前拿到的相册名字是英文的<br>可以到info这边添加CFBundleAllowMixedLocalizations这个key，并设置为True<br>这样能获取到中文的相册标题。</p>
-<p>6.删除相册里面的图片</p>
-<pre><code>let assets = getAllAssetInPhoto(true)
-
-PHPhotoLibrary.shared().performChanges(&#123;
-    let result = PHAsset.fetchAssets(withLocalIdentifiers: [assets[0].localIdentifier], options: nil)
-    PHAssetChangeRequest.deleteAssets(result)
-&#125;) &#123; (finish, error) in
-
-&#125;
-</code></pre>
+<p>WidgetsFlutterBinding 继承了BindingBase，同时有很多binding扩展，这些都是flutter的重要组成部分</p>
+<p>GestureBinding 手势系统的binding，响应系统手势事件</p>
+<p>SchedulerBinding 我们常说的帧，提供帧开始(onBeginFrame) ，绘制(onDrawFrame)的的时候的回调，监听刷新事件</p>
+<p>ServicesBinding 监听平台消息，并发送到defaultBinaryMessenger，简单说就是主要处理原生和Flutter通信</p>
+<p>PaintingBinding 绑定绘制库，用于处理图片缓存</p>
+<p>SemanticsBinding 语义层和flutter 引擎的桥梁</p>
+<p>RendererBinding 处理渲染树</p>
+<p>WidgetsBinding 处理组件树，渲染层和flutter 引擎的桥梁</p>
 
                     
                     <!-- Tags Bottom -->
                     
                         <div class="tags-container-bottom">
-                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Photos-Swift/">#Photos,Swift</a>
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Flutter/">#Flutter</a>
                         </div>
                     
 
