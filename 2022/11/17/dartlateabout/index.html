@@ -10,11 +10,10 @@
 
     <!--Description-->
     
-        <meta name="description" content="1.判断相册访问权限
-let status = PHPhotoLibrary.authorizationStatus()
-        
-if status == .restricted || status == .denied &amp;#123;
-            print(&amp;quot;无法访">
+        <meta name="description" content="Dart 2.12 添加了late关键字，它的作用是显式声明一个非空的变量，但不初始化。例如下面的代码_temperx如果不加late关键字是通不过静态检查的，但是添加了late通过了检查又可能带来潜在的风险。
+// Using null safety:
+class Milk &amp;#123;
+  la">
     
 
     <!--Author-->
@@ -24,7 +23,7 @@ if status == .restricted || status == .denied &amp;#123;
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="关于Photos.Framework"/>
+        <meta property="og:title" content="Dart语言的late关键字"/>
     
 
     <!--Open Graph Description-->
@@ -46,7 +45,7 @@ if status == .restricted || status == .denied &amp;#123;
 
     <!-- Title -->
     
-    <title>关于Photos.Framework - 无语</title>
+    <title>Dart语言的late关键字 - 无语</title>
 
     <!-- Tachyons Core CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
@@ -104,8 +103,8 @@ if status == .restricted || status == .denied &amp;#123;
     <!-- Title -->
     <div class="w-100 mw8 center vh-40 dt">
         <div class="dtc v-mid white">
-            <h1 class="f1-l f2-m tc tc-m tl-ns">关于Photos.Framework</h1>
-            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2019-05-27</p>
+            <h1 class="f1-l f2-m tc tc-m tl-ns">Dart语言的late关键字</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2022-11-17</p>
         </div>
     </div>
 
@@ -125,89 +124,39 @@ if status == .restricted || status == .denied &amp;#123;
                     
                         <div class="tags-container-vertical">
                             <div class="tags-sub-container">
-                                <a class="fw3 ph1 dib" href="/tags/Photos-Swift/">#Photos,Swift</a>
+                                <a class="fw3 ph1 dib" href="/tags/flutter/">#flutter</a>
                             </div>
                         </div>
                     
 
                     <!-- Main Post Content -->
-                    <p>1.判断相册访问权限</p>
-<pre><code>let status = PHPhotoLibrary.authorizationStatus()
-        
-if status == .restricted || status == .denied &#123;
-            print(&quot;无法访问相册&quot;)
+                    <p>Dart 2.12 添加了late关键字，它的作用是显式声明一个非空的变量，但不初始化。<br>例如下面的代码_temperx如果不加late关键字是通不过静态检查的，但是添加了late通过了检查又可能带来潜在的风险。</p>
+<pre><code>// Using null safety:
+class Milk &#123;
+  late String _temperx;
+
+  void changehot() &#123;
+    _temperx = &#39;hot&#39;;
+  &#125;
+
+  String serve() =&gt; _temperx + &#39; milk&#39;;
+&#125;
+
+main() &#123;
+  var milk = Milk();
+  milk.changehot();
+  milk.serve();
 &#125;
 </code></pre>
-<p>2.实时监听相册内部图片变化<br> 遵守PHPhotoLibraryChangeObserver协议</p>
-<pre><code>PHPhotoLibrary.shared().register(self)
-
-
-func photoLibraryDidChange(_ changeInstance: PHChange) &#123;
-     print(&quot;相册变化的运行代码&quot;)
-&#125;
-</code></pre>
-<p>3.读取相册内所有图片资源</p>
-<pre><code>func getAllAssetInPhoto(_ ascending: Bool) -&gt; [PHAsset] &#123;
-        var phs : [PHAsset] = []
-        let option = PHFetchOptions()
-        option.sortDescriptors = [NSSortDescriptor(key: &quot;creationDate&quot;,
-                                                   ascending: ascending)]
-        let result = PHAsset.fetchAssets(with: .image, options: option)
-
-        result.enumerateObjects &#123; (obj, idx, stop) in
-            let asset : PHAsset = obj
-            phs.append(asset)
-        &#125;
-
-        return phs
-    &#125;
-</code></pre>
-<p>4.根据获取的PHAsset对象，解析图片</p>
-<pre><code>func getAllAssetInPhoto(_ ascending: Bool) -&gt; [PHAsset] &#123;
-        var phs : [PHAsset] = []
-        let option = PHFetchOptions()
-        option.sortDescriptors = [NSSortDescriptor(key: &quot;creationDate&quot;,
-                                                   ascending: ascending)]
-        let result = PHAsset.fetchAssets(with: .image, options: option)
-
-        result.enumerateObjects &#123; (obj, idx, stop) in
-            let asset : PHAsset = obj
-            phs.append(asset)
-            let option : PHImageRequestOptions = PHImageRequestOptions()
-            option.resizeMode = .fast
-            option.isNetworkAccessAllowed = true
-            PHCachingImageManager.default().requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFit, options: option, resultHandler: &#123; (img, info) in
-                print(&quot;img就是拿到的图片&quot;)
-//              PHImageManagerMaximumSize这个代表全尺寸，当然你可以传入你想要的尺寸
-            &#125;)
-        &#125;
-
-        return phs
- &#125;
-</code></pre>
-<p>5.获取所有智能相册</p>
-<pre><code>let smartAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
-smartAlbum.enumerateObjects &#123; (collecion, idx, stop) in
-    print(&quot;相册名字\(collecion.localizedTitle)&quot;)
-&#125;
-</code></pre>
-<p>目前拿到的相册名字是英文的<br>可以到info这边添加CFBundleAllowMixedLocalizations这个key，并设置为True<br>这样能获取到中文的相册标题。</p>
-<p>6.删除相册里面的图片</p>
-<pre><code>let assets = getAllAssetInPhoto(true)
-
-PHPhotoLibrary.shared().performChanges(&#123;
-    let result = PHAsset.fetchAssets(withLocalIdentifiers: [assets[0].localIdentifier], options: nil)
-    PHAssetChangeRequest.deleteAssets(result)
-&#125;) &#123; (finish, error) in
-
-&#125;
+<p>还有就是延迟初始化变量,例如下面的代码，temperx被使用，_readbook这个函数才会被调用，才会temperx初始化。</p>
+<pre><code>late String temperx = _readbook(); // Lazily initialized.
 </code></pre>
 
                     
                     <!-- Tags Bottom -->
                     
                         <div class="tags-container-bottom">
-                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Photos-Swift/">#Photos,Swift</a>
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/flutter/">#flutter</a>
                         </div>
                     
 
