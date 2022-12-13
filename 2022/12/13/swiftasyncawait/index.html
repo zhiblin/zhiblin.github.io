@@ -10,6 +10,8 @@
 
     <!--Description-->
     
+        <meta name="description" content="async-await 是在 WWDC 2021 期间的 Swift 5.5 中的结构化并发变化的一部分。Swift中的并发性意味着允许多段代码同时运行。这是一个非常简化的描述，但它应该让你知道 Swift 中的并发性对你的应用程序的性能是多么重要。有了新的 async 方法和 await 语句，我">
+    
 
     <!--Author-->
     
@@ -18,7 +20,7 @@
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="filebrowser"/>
+        <meta property="og:title" content="Swift5.5的async和await"/>
     
 
     <!--Open Graph Description-->
@@ -40,7 +42,7 @@
 
     <!-- Title -->
     
-    <title>filebrowser - 无语</title>
+    <title>Swift5.5的async和await - 无语</title>
 
     <!-- Tachyons Core CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
@@ -98,8 +100,8 @@
     <!-- Title -->
     <div class="w-100 mw8 center vh-40 dt">
         <div class="dtc v-mid white">
-            <h1 class="f1-l f2-m tc tc-m tl-ns">filebrowser</h1>
-            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2022-09-28</p>
+            <h1 class="f1-l f2-m tc tc-m tl-ns">Swift5.5的async和await</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2022-12-13</p>
         </div>
     </div>
 
@@ -117,11 +119,47 @@
                 <div class="fl w-100 w-70-l mw7 left fw3 lh-copy pr4-ns pr0-m post-content">
                     <!-- Tags Vertical -->
                     
+                        <div class="tags-container-vertical">
+                            <div class="tags-sub-container">
+                                <a class="fw3 ph1 dib" href="/tags/Swift/">#Swift</a>
+                            </div>
+                        </div>
+                    
 
                     <!-- Main Post Content -->
-                    
+                    <p>async-await 是在 WWDC 2021 期间的 Swift 5.5 中的结构化并发变化的一部分。Swift中的并发性意味着允许多段代码同时运行。这是一个非常简化的描述，但它应该让你知道 Swift 中的并发性对你的应用程序的性能是多么重要。有了新的 async 方法和 await 语句，我们可以定义方法来进行异步工作。</p>
+<p>async明确表明了一个方法执行异步操作。<br>await 是用于调用异步方法的关键字。await 跟async是一个组合，await始终等待async的回调。</p>
+<pre><code>//老代码
+func fetchResult(_ value1: Int, _ value2: Int, completion: (Result&lt;Int, Error&gt;) -&gt; Void) &#123;
+    
+&#125;
+//使用了异步的新代码
+func fetchResult(_ value1: Int, _ value2: Int) async throws -&gt; Int &#123;
+    let ret = value1 + value2
+    //假设小于10就返回错误
+    guard ret &gt; 10 else &#123;
+        throw ResultError.failed
+    &#125;
+    return ret
+&#125;
+
+
+func useAsyneAwait() async &#123;
+    do &#123;
+        let ret = try await fetchResult(5, 6)
+        print(&quot;Fetched result: \(ret).&quot;)
+    &#125; catch &#123;
+        print(&quot;Fetched err: \(error).&quot;)
+    &#125;
+&#125;
+</code></pre>
+
                     
                     <!-- Tags Bottom -->
+                    
+                        <div class="tags-container-bottom">
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Swift/">#Swift</a>
+                        </div>
                     
 
                     <!-- Comments -->
