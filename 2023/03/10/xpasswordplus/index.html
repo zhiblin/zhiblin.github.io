@@ -10,17 +10,6 @@
 
     <!--Description-->
     
-        <meta name="description" content="使用Alamofire自带的NetworkReachabilityManager很方便。
-
-
-import Alamofire
-
-struct Network &amp;#123;
-
-    let manager = Alamofire.NetworkReachabilityManager()
-
-    ">
-    
 
     <!--Author-->
     
@@ -29,7 +18,7 @@ struct Network &amp;#123;
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="ios网络监测"/>
+        <meta property="og:title" content="xpasswordplus"/>
     
 
     <!--Open Graph Description-->
@@ -51,7 +40,7 @@ struct Network &amp;#123;
 
     <!-- Title -->
     
-    <title>ios网络监测 - 无语</title>
+    <title>xpasswordplus - 无语</title>
 
     <!-- Tachyons Core CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
@@ -109,8 +98,8 @@ struct Network &amp;#123;
     <!-- Title -->
     <div class="w-100 mw8 center vh-40 dt">
         <div class="dtc v-mid white">
-            <h1 class="f1-l f2-m tc tc-m tl-ns">ios网络监测</h1>
-            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2020-04-10</p>
+            <h1 class="f1-l f2-m tc tc-m tl-ns">xpasswordplus</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2023-03-10</p>
         </div>
     </div>
 
@@ -128,73 +117,11 @@ struct Network &amp;#123;
                 <div class="fl w-100 w-70-l mw7 left fw3 lh-copy pr4-ns pr0-m post-content">
                     <!-- Tags Vertical -->
                     
-                        <div class="tags-container-vertical">
-                            <div class="tags-sub-container">
-                                <a class="fw3 ph1 dib" href="/tags/Swift/">#Swift</a>
-                            </div>
-                        </div>
-                    
 
                     <!-- Main Post Content -->
-                    <ol>
-<li>使用Alamofire自带的NetworkReachabilityManager很方便。</li>
-</ol>
-<pre><code>
-import Alamofire
-
-struct Network &#123;
-
-    let manager = Alamofire.NetworkReachabilityManager()
-
-    func state() &#123;
-        manager?.startListening &#123; status in
-            switch status &#123;
-            case .notReachable:
-                print(&quot;not reachable&quot;)
-            case .reachable(.cellular):
-                print(&quot;cellular&quot;)
-            case .reachable(.ethernetOrWiFi):
-                print(&quot;ethernetOrWiFi&quot;)
-            default:
-                print(&quot;unknown&quot;)
-            &#125;
-
-        &#125;
-
-    &#125;
-&#125;
-</code></pre>
-<ol start="2">
-<li>使用 <a target="_blank" rel="noopener" href="https://github.com/ashleymills/Reachability.swift">Reachability.swift</a>这个库也是不错的</li>
-</ol>
-<pre><code>    let reachability = try! Reachability()
-
-    func netstate() &#123;
-        reachability.whenReachable = &#123; reachability in
-            
-            if reachability.connection == .wifi &#123;
-                print(&quot;Reachable via WiFi&quot;)
-            &#125; else &#123;
-                print(&quot;Reachable via Cellular&quot;)
-            &#125;
-        &#125;
-        reachability.whenUnreachable = &#123; _ in
-            print(&quot;Not reachable&quot;)        &#125;
-
-        do &#123;
-            try reachability.startNotifier()
-        &#125; catch &#123;
-            print(&quot;Unable to start notifier&quot;)
-        &#125;
-    &#125;
-</code></pre>
-
+                    
                     
                     <!-- Tags Bottom -->
-                    
-                        <div class="tags-container-bottom">
-                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Swift/">#Swift</a>
-                        </div>
                     
 
                     <!-- Comments -->
