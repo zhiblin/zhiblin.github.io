@@ -10,13 +10,10 @@
 
     <!--Description-->
     
-        <meta name="description" content="Swift5以前版本 中声明一个字符串常量的时候, 有时候会用到一些特殊字符, 比如换行, 双引号, 反斜杠等等. 这些特殊字符在输入的时候需要进行所谓的转义:
-“My \”money\””
-
-这个”money” 需要通过\来转译才能正确解析出下面的字符
-My &amp;quot;money”
-
-然而到了S">
+        <meta name="description" content="アプリ名かわいいパズル - アニメパズルパラダイス
+キャッチフレーズ夢のようなアニメパズルの世界で、純粋で洗練されたパズル体験を楽しもう！
+詳細説明🌸 純粋なパズル体験、毎回新しいチャレンジ 🌸
+かわいいパズルは最も純粋なパズルゲーム体験をお届けします！複雑なセーブシステムを排除し、毎回のゲーム">
     
 
     <!--Author-->
@@ -26,7 +23,7 @@ My &amp;quot;money”
 
     <!--Open Graph Title-->
     
-        <meta property="og:title" content="Swift 5终于有了不转义字符串的特性"/>
+        <meta property="og:title" content="keaijigsaw"/>
     
 
     <!--Open Graph Description-->
@@ -48,7 +45,7 @@ My &amp;quot;money”
 
     <!-- Title -->
     
-    <title>Swift 5终于有了不转义字符串的特性 - no say</title>
+    <title>keaijigsaw - no say</title>
 
     <!-- Tachyons Core CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tachyons/css/tachyons.min.css">
@@ -106,8 +103,8 @@ My &amp;quot;money”
     <!-- Title -->
     <div class="w-100 mw8 center vh-40 dt">
         <div class="dtc v-mid white">
-            <h1 class="f1-l f2-m tc tc-m tl-ns">Swift 5终于有了不转义字符串的特性</h1>
-            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2019-06-17</p>
+            <h1 class="f1-l f2-m tc tc-m tl-ns">keaijigsaw</h1>
+            <p class="f4 fw3 pab-100px tc tc-m tl-ns">2025-07-23</p>
         </div>
     </div>
 
@@ -127,46 +124,31 @@ My &amp;quot;money”
                     
                         <div class="tags-container-vertical">
                             <div class="tags-sub-container">
-                                <a class="fw3 ph1 dib" href="/tags/Swift/">#Swift</a>
+                                <a class="fw3 ph1 dib" href="/tags/APP/">#APP</a>
                             </div>
                         </div>
                     
 
                     <!-- Main Post Content -->
-                    <p>Swift5以前版本 中声明一个字符串常量的时候, 有时候会用到一些特殊字符, 比如换行, 双引号, 反斜杠等等. 这些特殊字符在输入的时候需要进行所谓的转义:</p>
-<pre><code>“My \”money\””
-</code></pre>
-<p>这个”money” 需要通过\来转译才能正确解析出下面的字符</p>
-<pre><code>My &quot;money”
-</code></pre>
-<p>然而到了Swift 5 我们就可以直接使用下面的方式来解析<br>这个#号称之为定界符</p>
-<pre><code>#My &quot;money”#
-##” My ”money” “##
-</code></pre>
-<p>在双引号的两边各加上了两个 # 号, 那么它的左右定界符就变成了 ##” 和 “##.<br>再例如:</p>
-<pre><code>// 1. 默认双引号定界符, 字符串内的双引号需要转义
-print(&quot;my #1 \&quot;money\&quot;&quot;)        // 输出: my #1 &quot;app&quot;
-
-// 2. 自定义定界符, 加入两个 #, 双引号和定界符不再冲突, 不需转义
-print(##&quot;my #1 &quot;money&quot;&quot;##)      // 输出: my #1 &quot;app&quot;
-
-// 3. 自定义定界符, 默认的转义符 \ 无效,原样输出
-print(##&quot;\&quot;\n&quot;##)      // 输出: \&quot;\n
-
-// 4. 自定义定界符, 使用了合规的转义符 \##, 转义
-print(##&quot;\##&quot;\##n&quot;##)      // 输出: &quot;&lt;换行&gt;
-</code></pre>
-<p>当然作为字符串拼接变量肯定是没问题的，</p>
-<pre><code>let launguage = &quot;swift&quot;
-print(#&quot;&#123; var is : &quot;\#(launguage)&quot; &#125;&quot;#)
-</code></pre>
-<p>Swift5 这个称为raw string。<br>这个特性其他语言已经是实现了的。swift的写法更接近于rust。</p>
+                    <hr>
+<h3 id="アプリ名"><a href="#アプリ名" class="headerlink" title="アプリ名"></a>アプリ名</h3><p><strong>かわいいパズル - アニメパズルパラダイス</strong></p>
+<h3 id="キャッチフレーズ"><a href="#キャッチフレーズ" class="headerlink" title="キャッチフレーズ"></a>キャッチフレーズ</h3><p>夢のようなアニメパズルの世界で、純粋で洗練されたパズル体験を楽しもう！</p>
+<h3 id="詳細説明"><a href="#詳細説明" class="headerlink" title="詳細説明"></a>詳細説明</h3><p><strong>🌸 純粋なパズル体験、毎回新しいチャレンジ 🌸</strong></p>
+<p>かわいいパズルは最も純粋なパズルゲーム体験をお届けします！複雑なセーブシステムを排除し、毎回のゲームが新しいスタートとなり、パズル本来の楽しさに集中できます。美しい二次元スタイルのインターフェースと夢のようなピンク系デザインで、まるでアニメの世界にいるような感覚を味わえます。</p>
+<p><strong>✨ 主要機能 ✨</strong><br>• <strong>85枚の美麗なパズル</strong> - 多様なアニメテーマ画像、どれもが視覚的な饗宴<br>• <strong>段階的アンロックシステム</strong> - パズルを完成させて新しいコンテンツを解放、継続的な達成感<br>• <strong>純粋なゲーム体験</strong> - 複雑なセーブ機能なし、毎回新鮮なチャレンジ<br>• <strong>精巧なUIデザイン</strong> - フロストガラス効果、パーティクルアニメーション、ハート装飾などの精細な要素<br>• <strong>多言語対応</strong> - 日本語、中国語、英語の3言語をサポート</p>
+<p><strong>🎨 精緻なビジュアルデザイン</strong><br>• 夢のようなピンク系二次元インターフェースデザイン<br>• 流暢なアニメーション効果とパーティクルエフェクト<br>• 美しいフロストガラスビジュアル効果<br>• 可愛い装飾要素とアイコンデザイン</p>
+<p><strong>🎮 ゲーム機能</strong><br>• インテリジェントパズルシステム、ドラッグ＆ドロップと自動整列をサポート<br>• 詳細なゲーム統計と進行状況トラッキング<br>• パズル完成後の祝福アニメーション<br>• 滑らかなタッチ操作体験</p>
+<p><strong>📊 個人統計</strong><br>• 完成したパズル数の記録<br>• 総ゲーム時間の追跡<br>• 平均完成時間の表示<br>• アンロック進行状況が一目瞭然</p>
+<p><strong>なぜかわいいパズルを選ぶのか？</strong><br>アニメ文化がお好きで、パズルゲームを愛する方なら、このアプリは絶対に見逃せません！私たちは最も純粋なパズル体験の提供に専念し、美しいアニメの世界でパズルの楽しさを満喫していただけます。毎回のゲームが新しいチャレンジ、完成した每張パズルが一つの成就です！</p>
+<p>今すぐダウンロードして、あなたのアニメパズルの旅を始めましょう！🌸</p>
+<hr>
+<p>提案する場合は、<a href="mailto:&#121;&#105;&#120;&#105;&#x73;&#x74;&#x75;&#x64;&#105;&#111;&#x40;&#x71;&#x71;&#x2e;&#99;&#x6f;&#109;">&#121;&#105;&#120;&#105;&#x73;&#x74;&#x75;&#x64;&#105;&#111;&#x40;&#x71;&#x71;&#x2e;&#99;&#x6f;&#109;</a>にメールを送信してください</p>
 
                     
                     <!-- Tags Bottom -->
                     
                         <div class="tags-container-bottom">
-                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/Swift/">#Swift</a>
+                            <i class="fa fa-tag pr3 text-main-color"></i><a class="fw3 ph1 dib" href="/tags/APP/">#APP</a>
                         </div>
                     
 
