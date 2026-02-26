@@ -1,3 +1,15 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://zhiblin.github.io/'
 languageCode = 'en-us'
-title = 'My New Hugo Project'
+title = 'Diyouo'
+
+theme = "hugo-theme-stack"
+
+[pagination]
+  pagerSize = 5
+
+[params]
+  mainSections = ["post"]
+
+  [params.sidebar]
+    emoji = "🌙"
+    subtitle = "A clean blog"
