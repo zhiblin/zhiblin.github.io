@@ -4,6 +4,8 @@ title = 'Diyouo'
 
 theme = "hugo-theme-stack"
 
+publishDir = "docs"
+
 [pagination]
   pagerSize = 5
 
