@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第19天：HTTP协议基础 今日目标 理解HTTP协议的工作原理 掌握HTTP请求和响应格式 学习HTTP方法和状态码 了解HTTP头部字段 理解Cookie和Session机制 学习HTTP版本演进 实现简单的HTTP服务器 1. HTTP协议概述 1.1 什么是HTTP？ HTTP（HyperText Transfer Protocol）：\n">
+<title>19天：HTTP协议基础</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/19%E5%A4%A9http%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="19天：HTTP协议基础">
+<meta property='og:description' content="第19天：HTTP协议基础 今日目标 理解HTTP协议的工作原理 掌握HTTP请求和响应格式 学习HTTP方法和状态码 了解HTTP头部字段 理解Cookie和Session机制 学习HTTP版本演进 实现简单的HTTP服务器 1. HTTP协议概述 1.1 什么是HTTP？ HTTP（HyperText Transfer Protocol）：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/19%E5%A4%A9http%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:24:39&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:24:39&#43;00:00'/>
+<meta name="twitter:title" content="19天：HTTP协议基础">
+<meta name="twitter:description" content="第19天：HTTP协议基础 今日目标 理解HTTP协议的工作原理 掌握HTTP请求和响应格式 学习HTTP方法和状态码 了解HTTP头部字段 理解Cookie和Session机制 学习HTTP版本演进 实现简单的HTTP服务器 1. HTTP协议概述 1.1 什么是HTTP？ HTTP（HyperText Transfer Protocol）：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-http协议概述">1. HTTP协议概述</a>
+      <ul>
+        <li><a href="#11-什么是http">1.1 什么是HTTP？</a></li>
+        <li><a href="#12-http工作流程">1.2 HTTP工作流程</a></li>
+        <li><a href="#13-http特点">1.3 HTTP特点</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-http请求格式">2. HTTP请求格式</a>
+      <ul>
+        <li><a href="#21-请求格式概览">2.1 请求格式概览</a></li>
+        <li><a href="#22-请求行">2.2 请求行</a></li>
+        <li><a href="#23-请求头">2.3 请求头</a></li>
+        <li><a href="#24-请求体">2.4 请求体</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-http响应格式">3. HTTP响应格式</a>
+      <ul>
+        <li><a href="#31-响应格式概览">3.1 响应格式概览</a></li>
+        <li><a href="#32-状态行">3.2 状态行</a></li>
+        <li><a href="#33-状态码">3.3 状态码</a></li>
+        <li><a href="#34-响应头">3.4 响应头</a></li>
+        <li><a href="#35-响应体">3.5 响应体</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-http方法详解">4. HTTP方法详解</a>
+      <ul>
+        <li><a href="#41-get方法">4.1 GET方法</a></li>
+        <li><a href="#42-post方法">4.2 POST方法</a></li>
+        <li><a href="#43-put方法">4.3 PUT方法</a></li>
+        <li><a href="#44-delete方法">4.4 DELETE方法</a></li>
+        <li><a href="#45-patch方法">4.5 PATCH方法</a></li>
+        <li><a href="#46-head方法">4.6 HEAD方法</a></li>
+        <li><a href="#47-options方法">4.7 OPTIONS方法</a></li>
+        <li><a href="#48-方法对比">4.8 方法对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-cookie和session">5. Cookie和Session</a>
+      <ul>
+        <li><a href="#51-为什么需要cookie">5.1 为什么需要Cookie？</a></li>
+        <li><a href="#52-cookie详解">5.2 Cookie详解</a></li>
+        <li><a href="#53-session详解">5.3 Session详解</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-http版本演进">6. HTTP版本演进</a>
+      <ul>
+        <li><a href="#61-http10">6.1 HTTP/1.0</a></li>
+        <li><a href="#62-http11">6.2 HTTP/1.1</a></li>
+        <li><a href="#63-http2">6.3 HTTP/2</a></li>
+        <li><a href="#64-http3">6.4 HTTP/3</a></li>
+        <li><a href="#65-版本对比">6.5 版本对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-实战项目简单http服务器">7. 实战项目：简单HTTP服务器</a>
+      <ul>
+        <li><a href="#71-项目需求">7.1 项目需求</a></li>
+        <li><a href="#72-工具演示">7.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1手动构建http请求">练习1：手动构建HTTP请求</a></li>
+        <li><a href="#练习2实现http客户端">练习2：实现HTTP客户端</a></li>
+        <li><a href="#练习3分析http流量">练习3：分析HTTP流量</a></li>
+        <li><a href="#练习4扩展http服务器">练习4：扩展HTTP服务器</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-常见问题">9. 常见问题</a></li>
+    <li><a href="#10-总结">10. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/19%E5%A4%A9http%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">19天：HTTP协议基础</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:24:39Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-http协议概述">1. HTTP协议概述</a>
+      <ul>
+        <li><a href="#11-什么是http">1.1 什么是HTTP？</a></li>
+        <li><a href="#12-http工作流程">1.2 HTTP工作流程</a></li>
+        <li><a href="#13-http特点">1.3 HTTP特点</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-http请求格式">2. HTTP请求格式</a>
+      <ul>
+        <li><a href="#21-请求格式概览">2.1 请求格式概览</a></li>
+        <li><a href="#22-请求行">2.2 请求行</a></li>
+        <li><a href="#23-请求头">2.3 请求头</a></li>
+        <li><a href="#24-请求体">2.4 请求体</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-http响应格式">3. HTTP响应格式</a>
+      <ul>
+        <li><a href="#31-响应格式概览">3.1 响应格式概览</a></li>
+        <li><a href="#32-状态行">3.2 状态行</a></li>
+        <li><a href="#33-状态码">3.3 状态码</a></li>
+        <li><a href="#34-响应头">3.4 响应头</a></li>
+        <li><a href="#35-响应体">3.5 响应体</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-http方法详解">4. HTTP方法详解</a>
+      <ul>
+        <li><a href="#41-get方法">4.1 GET方法</a></li>
+        <li><a href="#42-post方法">4.2 POST方法</a></li>
+        <li><a href="#43-put方法">4.3 PUT方法</a></li>
+        <li><a href="#44-delete方法">4.4 DELETE方法</a></li>
+        <li><a href="#45-patch方法">4.5 PATCH方法</a></li>
+        <li><a href="#46-head方法">4.6 HEAD方法</a></li>
+        <li><a href="#47-options方法">4.7 OPTIONS方法</a></li>
+        <li><a href="#48-方法对比">4.8 方法对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-cookie和session">5. Cookie和Session</a>
+      <ul>
+        <li><a href="#51-为什么需要cookie">5.1 为什么需要Cookie？</a></li>
+        <li><a href="#52-cookie详解">5.2 Cookie详解</a></li>
+        <li><a href="#53-session详解">5.3 Session详解</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-http版本演进">6. HTTP版本演进</a>
+      <ul>
+        <li><a href="#61-http10">6.1 HTTP/1.0</a></li>
+        <li><a href="#62-http11">6.2 HTTP/1.1</a></li>
+        <li><a href="#63-http2">6.3 HTTP/2</a></li>
+        <li><a href="#64-http3">6.4 HTTP/3</a></li>
+        <li><a href="#65-版本对比">6.5 版本对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-实战项目简单http服务器">7. 实战项目：简单HTTP服务器</a>
+      <ul>
+        <li><a href="#71-项目需求">7.1 项目需求</a></li>
+        <li><a href="#72-工具演示">7.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1手动构建http请求">练习1：手动构建HTTP请求</a></li>
+        <li><a href="#练习2实现http客户端">练习2：实现HTTP客户端</a></li>
+        <li><a href="#练习3分析http流量">练习3：分析HTTP流量</a></li>
+        <li><a href="#练习4扩展http服务器">练习4：扩展HTTP服务器</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-常见问题">9. 常见问题</a></li>
+    <li><a href="#10-总结">10. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第19天http协议基础">第19天：HTTP协议基础
+</h1><h2 id="今日目标">今日目标
+</h2><ul>
+<li>理解HTTP协议的工作原理</li>
+<li>掌握HTTP请求和响应格式</li>
+<li>学习HTTP方法和状态码</li>
+<li>了解HTTP头部字段</li>
+<li>理解Cookie和Session机制</li>
+<li>学习HTTP版本演进</li>
+<li>实现简单的HTTP服务器</li>
+</ul>
+<hr>
+<h2 id="1-http协议概述">1. HTTP协议概述
+</h2><h3 id="11-什么是http">1.1 什么是HTTP？
+</h3><p><strong>HTTP（HyperText Transfer Protocol）</strong>：</p>
+<pre tabindex="0"><code>HTTP = 超文本传输协议
+
+生活类比：
+HTTP就像邮寄系统：
+1. 你写信（HTTP请求）
+2. 邮递员送信（网络传输）
+3. 收信人回复（HTTP响应）
+4. 邮递员送回回信（网络传输）
+
+特点：
+- 文本协议（可读性强）
+- 无状态（每次请求独立）
+- 客户端-服务器模型
+- 基于TCP（可靠传输）
+</code></pre><p><strong>HTTP的位置</strong>：</p>
+<pre tabindex="0"><code>应用层协议栈：
+
+┌────────────────────────────┐
+│  应用程序（浏览器、APP）    │
+├────────────────────────────┤
+│  HTTP（应用层协议）         │
+├────────────────────────────┤
+│  TCP（传输层协议）          │
+├────────────────────────────┤
+│  IP（网络层协议）           │
+├────────────────────────────┤
+│  物理层                     │
+└────────────────────────────┘
+</code></pre><h3 id="12-http工作流程">1.2 HTTP工作流程
+</h3><p><strong>基本流程</strong>：</p>
+<pre tabindex="0"><code>客户端（浏览器）                    服务器
+
+    1. DNS解析
+       www.example.com → 93.184.216.34
+
+    2. 建立TCP连接
+       ─────────────────────────&gt;
+       三次握手
+       &lt;─────────────────────────
+
+    3. 发送HTTP请求
+       GET /index.html HTTP/1.1
+       Host: www.example.com
+       ─────────────────────────&gt;
+
+    4. 服务器处理请求
+                                  - 解析请求
+                                  - 查找资源
+                                  - 生成响应
+
+    5. 返回HTTP响应
+       &lt;─────────────────────────
+       HTTP/1.1 200 OK
+       Content-Type: text/html
+
+       &lt;html&gt;...&lt;/html&gt;
+
+    6. 关闭连接（HTTP/1.0）
+       或保持连接（HTTP/1.1）
+</code></pre><p><strong>详细步骤</strong>：</p>
+<pre tabindex="0"><code>1. 用户输入URL：http://www.example.com/index.html
+
+2. 浏览器解析URL：
+   - 协议：http
+   - 主机：www.example.com
+   - 端口：80（默认）
+   - 路径：/index.html
+
+3. DNS查询：
+   - 查询www.example.com的IP地址
+   - 得到：93.184.216.34
+
+4. 建立TCP连接：
+   - 连接到 93.184.216.34:80
+   - 三次握手
+
+5. 发送HTTP请求：
+   - 请求行：GET /index.html HTTP/1.1
+   - 请求头：Host, User-Agent等
+   - 空行
+   - 请求体（如果有）
+
+6. 服务器处理：
+   - 解析请求
+   - 找到/index.html文件
+   - 读取文件内容
+
+7. 发送HTTP响应：
+   - 状态行：HTTP/1.1 200 OK
+   - 响应头：Content-Type, Content-Length等
+   - 空行
+   - 响应体（HTML内容）
+
+8. 浏览器渲染：
+   - 解析HTML
+   - 加载CSS、JavaScript、图片等
+   - 渲染页面
+</code></pre><h3 id="13-http特点">1.3 HTTP特点
+</h3><p><strong>无状态（Stateless）</strong>：</p>
+<pre tabindex="0"><code>特点：
+服务器不会记住之前的请求
+
+生活类比：
+你每次去银行取钱，柜员都不认识你
+每次都要重新验证身份
+
+问题：
+- 无法识别用户
+- 无法保持登录状态
+
+解决方案：
+- Cookie
+- Session
+- Token
+</code></pre><p><strong>明文传输</strong>：</p>
+<pre tabindex="0"><code>优点：
+✅ 易于调试
+✅ 中间设备可以缓存
+✅ 简单直观
+
+缺点：
+❌ 不安全（可被窃听）
+❌ 敏感信息暴露
+
+解决方案：
+使用HTTPS（HTTP + TLS/SSL）
+</code></pre><p><strong>请求-响应模式</strong>：</p>
+<pre tabindex="0"><code>特点：
+- 客户端主动发起请求
+- 服务器被动响应
+- 一个请求对应一个响应
+
+限制：
+- 服务器无法主动推送
+- 实时性较差
+
+解决方案：
+- 长轮询（Long Polling）
+- WebSocket
+- Server-Sent Events (SSE)
+</code></pre><hr>
+<h2 id="2-http请求格式">2. HTTP请求格式
+</h2><h3 id="21-请求格式概览">2.1 请求格式概览
+</h3><p><strong>完整的HTTP请求</strong>：</p>
+<pre tabindex="0"><code>GET /index.html HTTP/1.1              ← 请求行
+Host: www.example.com                 ← 请求头
+User-Agent: Mozilla/5.0               ← 请求头
+Accept: text/html                     ← 请求头
+Connection: keep-alive                ← 请求头
+                                      ← 空行（CRLF）
+[请求体，如果有的话]                   ← 请求体
+</code></pre><p><strong>结构</strong>：</p>
+<pre tabindex="0"><code>┌────────────────────────────────┐
+│  请求行（Request Line）         │
+├────────────────────────────────┤
+│  请求头（Request Headers）      │
+│  ...                           │
+├────────────────────────────────┤
+│  空行（CRLF）                   │
+├────────────────────────────────┤
+│  请求体（Request Body）         │
+│  （可选，GET请求通常没有）       │
+└────────────────────────────────┘
+</code></pre><h3 id="22-请求行">2.2 请求行
+</h3><p><strong>格式</strong>：</p>
+<pre tabindex="0"><code>方法 URI HTTP版本
+
+示例：
+GET /index.html HTTP/1.1
+POST /api/login HTTP/1.1
+PUT /api/users/123 HTTP/1.1
+</code></pre><p><strong>组成部分</strong>：</p>
+<pre tabindex="0"><code>1. 方法（Method）
+   - GET：获取资源
+   - POST：提交数据
+   - PUT：更新资源
+   - DELETE：删除资源
+   - HEAD：获取头部
+   - OPTIONS：查询支持的方法
+   - TRACE：追踪请求
+   - CONNECT：建立隧道
+
+2. URI（统一资源标识符）
+   - 路径：/index.html
+   - 查询参数：?name=Alice&amp;age=20
+   - 片段：#section1（不发送到服务器）
+
+3. HTTP版本
+   - HTTP/1.0：早期版本
+   - HTTP/1.1：当前主流
+   - HTTP/2：二进制协议
+   - HTTP/3：基于QUIC
+</code></pre><h3 id="23-请求头">2.3 请求头
+</h3><p><strong>常用请求头</strong>：</p>
+<pre tabindex="0"><code>Host: www.example.com
+  - 指定服务器域名（必需）
+  - HTTP/1.1要求必须有
+
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+  - 客户端信息（浏览器、操作系统）
+
+Accept: text/html,application/json
+  - 客户端可接受的内容类型
+
+Accept-Encoding: gzip, deflate, br
+  - 客户端支持的压缩格式
+
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+  - 客户端首选语言
+
+Connection: keep-alive
+  - 连接管理
+  - keep-alive：保持连接
+  - close：关闭连接
+
+Content-Type: application/json
+  - 请求体的MIME类型
+
+Content-Length: 123
+  - 请求体的长度（字节）
+
+Cookie: session_id=abc123; user=Alice
+  - 发送Cookie给服务器
+
+Authorization: Bearer eyJhbGc...
+  - 身份认证信息
+
+Referer: https://www.google.com/
+  - 来源页面（从哪个页面跳转）
+
+Cache-Control: no-cache
+  - 缓存控制
+
+If-Modified-Since: Wed, 21 Oct 2015 07:28:00 GMT
+  - 条件请求（只在修改后才返回）
+</code></pre><h3 id="24-请求体">2.4 请求体
+</h3><p><strong>何时有请求体</strong>：</p>
+<pre tabindex="0"><code>有请求体的方法：
+- POST：提交表单、上传文件
+- PUT：更新资源
+- PATCH：部分更新
+
+没有请求体的方法：
+- GET：通过URL传参
+- DELETE：通常不需要
+- HEAD：只要头部
+</code></pre><p><strong>常见Content-Type</strong>：</p>
+<pre tabindex="0"><code>1. application/x-www-form-urlencoded（表单默认）
+   Content-Type: application/x-www-form-urlencoded
+
+   请求体：
+   name=Alice&amp;age=20&amp;email=alice@example.com
+
+2. application/json（API常用）
+   Content-Type: application/json
+
+   请求体：
+   {
+       &#34;name&#34;: &#34;Alice&#34;,
+       &#34;age&#34;: 20,
+       &#34;email&#34;: &#34;alice@example.com&#34;
+   }
+
+3. multipart/form-data（文件上传）
+   Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+   请求体：
+   ------WebKitFormBoundary
+   Content-Disposition: form-data; name=&#34;file&#34;; filename=&#34;photo.jpg&#34;
+   Content-Type: image/jpeg
+
+   [二进制文件内容]
+   ------WebKitFormBoundary--
+
+4. text/plain（纯文本）
+   Content-Type: text/plain
+
+   请求体：
+   Hello, this is plain text.
+
+5. application/xml（XML数据）
+   Content-Type: application/xml
+
+   请求体：
+   &lt;?xml version=&#34;1.0&#34;?&gt;
+   &lt;user&gt;
+       &lt;name&gt;Alice&lt;/name&gt;
+       &lt;age&gt;20&lt;/age&gt;
+   &lt;/user&gt;
+</code></pre><hr>
+<h2 id="3-http响应格式">3. HTTP响应格式
+</h2><h3 id="31-响应格式概览">3.1 响应格式概览
+</h3><p><strong>完整的HTTP响应</strong>：</p>
+<pre tabindex="0"><code>HTTP/1.1 200 OK                       ← 状态行
+Content-Type: text/html               ← 响应头
+Content-Length: 1234                  ← 响应头
+Date: Mon, 15 Jan 2024 10:00:00 GMT  ← 响应头
+Server: nginx/1.18.0                  ← 响应头
+                                      ← 空行（CRLF）
+&lt;html&gt;                                ← 响应体
+  &lt;body&gt;Hello World&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p><strong>结构</strong>：</p>
+<pre tabindex="0"><code>┌────────────────────────────────┐
+│  状态行（Status Line）          │
+├────────────────────────────────┤
+│  响应头（Response Headers）     │
+│  ...                           │
+├────────────────────────────────┤
+│  空行（CRLF）                   │
+├────────────────────────────────┤
+│  响应体（Response Body）        │
+└────────────────────────────────┘
+</code></pre><h3 id="32-状态行">3.2 状态行
+</h3><p><strong>格式</strong>：</p>
+<pre tabindex="0"><code>HTTP版本 状态码 状态描述
+
+示例：
+HTTP/1.1 200 OK
+HTTP/1.1 404 Not Found
+HTTP/1.1 500 Internal Server Error
+</code></pre><h3 id="33-状态码">3.3 状态码
+</h3><p><strong>状态码分类</strong>：</p>
+<pre tabindex="0"><code>┌─────────┬──────────────────┬────────────────────┐
+│  类别   │      范围        │      含义          │
+├─────────┼──────────────────┼────────────────────┤
+│  1xx    │  100-199         │  信息性响应        │
+│  2xx    │  200-299         │  成功              │
+│  3xx    │  300-399         │  重定向            │
+│  4xx    │  400-499         │  客户端错误        │
+│  5xx    │  500-599         │  服务器错误        │
+└─────────┴──────────────────┴────────────────────┘
+</code></pre><p><strong>1xx 信息性响应</strong>：</p>
+<pre tabindex="0"><code>100 Continue
+  - 客户端应继续发送请求体
+  - 用于大文件上传前的确认
+
+101 Switching Protocols
+  - 切换协议（如WebSocket升级）
+</code></pre><p><strong>2xx 成功</strong>：</p>
+<pre tabindex="0"><code>200 OK
+  - 请求成功
+  - 最常见的成功状态码
+
+201 Created
+  - 资源已创建
+  - 常用于POST请求创建新资源
+
+202 Accepted
+  - 请求已接受，但处理未完成
+  - 用于异步处理
+
+204 No Content
+  - 成功，但无内容返回
+  - 常用于DELETE请求
+
+206 Partial Content
+  - 部分内容
+  - 用于断点续传
+</code></pre><p><strong>3xx 重定向</strong>：</p>
+<pre tabindex="0"><code>301 Moved Permanently
+  - 永久重定向
+  - 搜索引擎会更新索引
+  - 示例：http → https
+
+302 Found（临时重定向）
+  - 临时重定向
+  - 原URL仍然有效
+
+303 See Other
+  - 查看其他位置
+  - POST请求后重定向到GET
+
+304 Not Modified
+  - 资源未修改
+  - 可使用缓存
+
+307 Temporary Redirect
+  - 临时重定向（保持请求方法）
+
+308 Permanent Redirect
+  - 永久重定向（保持请求方法）
+</code></pre><p><strong>4xx 客户端错误</strong>：</p>
+<pre tabindex="0"><code>400 Bad Request
+  - 请求格式错误
+  - 参数错误
+
+401 Unauthorized
+  - 未认证
+  - 需要登录
+
+403 Forbidden
+  - 禁止访问
+  - 已认证但无权限
+
+404 Not Found
+  - 资源不存在
+  - 最常见的错误
+
+405 Method Not Allowed
+  - 不支持的HTTP方法
+
+408 Request Timeout
+  - 请求超时
+
+409 Conflict
+  - 资源冲突
+  - 如重复创建
+
+413 Payload Too Large
+  - 请求体过大
+
+414 URI Too Long
+  - URL过长
+
+415 Unsupported Media Type
+  - 不支持的Content-Type
+
+429 Too Many Requests
+  - 请求过于频繁
+  - 限流
+</code></pre><p><strong>5xx 服务器错误</strong>：</p>
+<pre tabindex="0"><code>500 Internal Server Error
+  - 服务器内部错误
+  - 最常见的服务器错误
+
+501 Not Implemented
+  - 功能未实现
+
+502 Bad Gateway
+  - 网关错误
+  - 上游服务器返回无效响应
+
+503 Service Unavailable
+  - 服务不可用
+  - 服务器过载或维护
+
+504 Gateway Timeout
+  - 网关超时
+  - 上游服务器超时
+
+505 HTTP Version Not Supported
+  - HTTP版本不支持
+</code></pre><h3 id="34-响应头">3.4 响应头
+</h3><p><strong>常用响应头</strong>：</p>
+<pre tabindex="0"><code>Content-Type: text/html; charset=utf-8
+  - 响应体的MIME类型
+
+Content-Length: 1234
+  - 响应体的长度（字节）
+
+Content-Encoding: gzip
+  - 响应体的压缩方式
+
+Date: Mon, 15 Jan 2024 10:00:00 GMT
+  - 响应时间
+
+Server: nginx/1.18.0
+  - 服务器软件信息
+
+Set-Cookie: session_id=abc123; Path=/; HttpOnly
+  - 设置Cookie
+
+Location: https://www.example.com/new-url
+  - 重定向目标URL
+
+Cache-Control: max-age=3600
+  - 缓存控制
+
+Expires: Wed, 21 Oct 2025 07:28:00 GMT
+  - 过期时间
+
+ETag: &#34;33a64df551425fcc55e4d42a148795d9f25f89d4&#34;
+  - 资源版本标识
+
+Last-Modified: Wed, 21 Oct 2015 07:28:00 GMT
+  - 最后修改时间
+
+Access-Control-Allow-Origin: *
+  - CORS跨域控制
+
+Connection: keep-alive
+  - 连接管理
+
+Transfer-Encoding: chunked
+  - 分块传输编码
+
+Vary: Accept-Encoding
+  - 缓存变化因素
+</code></pre><h3 id="35-响应体">3.5 响应体
+</h3><p><strong>常见Content-Type</strong>：</p>
+<pre tabindex="0"><code>text/html        - HTML页面
+text/plain       - 纯文本
+text/css         - CSS样式表
+text/javascript  - JavaScript代码
+
+application/json        - JSON数据
+application/xml         - XML数据
+application/pdf         - PDF文件
+application/zip         - ZIP压缩包
+application/octet-stream - 二进制流（下载）
+
+image/jpeg       - JPEG图片
+image/png        - PNG图片
+image/gif        - GIF图片
+image/svg+xml    - SVG矢量图
+
+video/mp4        - MP4视频
+audio/mpeg       - MP3音频
+</code></pre><hr>
+<h2 id="4-http方法详解">4. HTTP方法详解
+</h2><h3 id="41-get方法">4.1 GET方法
+</h3><pre tabindex="0"><code>作用：
+获取资源（只读）
+
+特点：
+- 参数在URL中（查询字符串）
+- 可缓存
+- 可添加书签
+- 幂等性（多次请求结果相同）
+- 安全性（不修改服务器状态）
+
+示例：
+GET /api/users?id=123&amp;name=Alice HTTP/1.1
+Host: api.example.com
+
+使用场景：
+- 获取网页
+- 查询数据
+- 下载文件
+- API查询
+</code></pre><h3 id="42-post方法">4.2 POST方法
+</h3><pre tabindex="0"><code>作用：
+提交数据（创建资源）
+
+特点：
+- 参数在请求体中
+- 不可缓存
+- 不可添加书签
+- 非幂等（多次请求可能产生不同结果）
+- 非安全（会修改服务器状态）
+
+示例：
+POST /api/users HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+
+{
+    &#34;name&#34;: &#34;Alice&#34;,
+    &#34;email&#34;: &#34;alice@example.com&#34;
+}
+
+使用场景：
+- 提交表单
+- 上传文件
+- 创建资源
+- API提交
+</code></pre><h3 id="43-put方法">4.3 PUT方法
+</h3><pre tabindex="0"><code>作用：
+更新资源（完整更新）
+
+特点：
+- 幂等（多次请求结果相同）
+- 替换整个资源
+
+示例：
+PUT /api/users/123 HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+
+{
+    &#34;id&#34;: 123,
+    &#34;name&#34;: &#34;Alice Updated&#34;,
+    &#34;email&#34;: &#34;alice@example.com&#34;
+}
+
+使用场景：
+- 完整更新资源
+- 替换文件
+</code></pre><h3 id="44-delete方法">4.4 DELETE方法
+</h3><pre tabindex="0"><code>作用：
+删除资源
+
+特点：
+- 幂等（多次删除同一资源结果相同）
+
+示例：
+DELETE /api/users/123 HTTP/1.1
+Host: api.example.com
+
+使用场景：
+- 删除用户
+- 删除文件
+- 注销账号
+</code></pre><h3 id="45-patch方法">4.5 PATCH方法
+</h3><pre tabindex="0"><code>作用：
+部分更新资源
+
+特点：
+- 只更新部分字段
+- 比PUT更节省带宽
+
+示例：
+PATCH /api/users/123 HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+
+{
+    &#34;name&#34;: &#34;Alice Updated&#34;
+}
+
+使用场景：
+- 只更新某些字段
+- 修改配置
+</code></pre><h3 id="46-head方法">4.6 HEAD方法
+</h3><pre tabindex="0"><code>作用：
+获取资源头部信息
+
+特点：
+- 不返回响应体
+- 用于检查资源是否存在
+- 用于获取元数据
+
+示例：
+HEAD /api/users/123 HTTP/1.1
+Host: api.example.com
+
+使用场景：
+- 检查资源是否存在
+- 获取文件大小
+- 检查最后修改时间
+</code></pre><h3 id="47-options方法">4.7 OPTIONS方法
+</h3><pre tabindex="0"><code>作用：
+查询支持的方法
+
+特点：
+- 用于CORS预检请求
+- 返回Allow头部
+
+示例：
+OPTIONS /api/users HTTP/1.1
+Host: api.example.com
+
+响应：
+HTTP/1.1 200 OK
+Allow: GET, POST, PUT, DELETE, OPTIONS
+
+使用场景：
+- CORS预检
+- 服务发现
+</code></pre><h3 id="48-方法对比">4.8 方法对比
+</h3><pre tabindex="0"><code>┌────────┬────────┬────────┬────────┬──────────────┐
+│  方法  │  幂等  │  安全  │ 可缓存 │    用途      │
+├────────┼────────┼────────┼────────┼──────────────┤
+│  GET   │   ✅   │   ✅   │   ✅   │  查询        │
+│  POST  │   ❌   │   ❌   │   ❌   │  创建        │
+│  PUT   │   ✅   │   ❌   │   ❌   │  完整更新    │
+│  PATCH │   ❌   │   ❌   │   ❌   │  部分更新    │
+│  DELETE│   ✅   │   ❌   │   ❌   │  删除        │
+│  HEAD  │   ✅   │   ✅   │   ✅   │  获取头部    │
+│ OPTIONS│   ✅   │   ✅   │   ❌   │  查询方法    │
+└────────┴────────┴────────┴────────┴──────────────┘
+
+幂等性：多次请求结果相同
+安全性：不修改服务器状态
+</code></pre><hr>
+<h2 id="5-cookie和session">5. Cookie和Session
+</h2><h3 id="51-为什么需要cookie">5.1 为什么需要Cookie？
+</h3><pre tabindex="0"><code>问题：
+HTTP是无状态的
+→ 服务器无法识别用户
+→ 无法保持登录状态
+
+解决方案：
+Cookie = 客户端存储的小数据
+
+工作流程：
+1. 用户登录成功
+2. 服务器返回Set-Cookie头
+3. 浏览器保存Cookie
+4. 后续请求自动带上Cookie
+5. 服务器识别用户
+</code></pre><h3 id="52-cookie详解">5.2 Cookie详解
+</h3><p><strong>设置Cookie</strong>：</p>
+<pre tabindex="0"><code>服务器响应：
+HTTP/1.1 200 OK
+Set-Cookie: session_id=abc123; Path=/; HttpOnly; Secure
+Set-Cookie: user=Alice; Max-Age=86400
+
+客户端后续请求：
+GET /api/profile HTTP/1.1
+Cookie: session_id=abc123; user=Alice
+</code></pre><p><strong>Cookie属性</strong>：</p>
+<pre tabindex="0"><code>Name=Value
+  - Cookie的键值对
+
+Expires=Wed, 21 Oct 2025 07:28:00 GMT
+  - 过期时间（绝对时间）
+
+Max-Age=3600
+  - 有效期（秒数，相对时间）
+
+Domain=.example.com
+  - 生效域名
+  - .example.com：所有子域名都生效
+
+Path=/
+  - 生效路径
+  - /：所有路径
+  - /api：只在/api路径下生效
+
+Secure
+  - 只在HTTPS下传输
+
+HttpOnly
+  - 禁止JavaScript访问
+  - 防止XSS攻击
+
+SameSite=Strict
+  - Strict：完全禁止跨站发送
+  - Lax：大部分情况禁止
+  - None：允许跨站（需要Secure）
+  - 防止CSRF攻击
+</code></pre><p><strong>Cookie示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 设置普通Cookie</span>
+</span></span><span style="display:flex;"><span>Set<span style="color:#f92672">-</span>Cookie: user<span style="color:#f92672">=</span>Alice
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 设置过期Cookie（30天）</span>
+</span></span><span style="display:flex;"><span>Set<span style="color:#f92672">-</span>Cookie: user<span style="color:#f92672">=</span>Alice; Max<span style="color:#f92672">-</span>Age<span style="color:#f92672">=</span><span style="color:#ae81ff">2592000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 设置安全Cookie</span>
+</span></span><span style="display:flex;"><span>Set<span style="color:#f92672">-</span>Cookie: session_id<span style="color:#f92672">=</span>abc123; HttpOnly; Secure; SameSite<span style="color:#f92672">=</span>Strict
+</span></span></code></pre></div><h3 id="53-session详解">5.3 Session详解
+</h3><p><strong>Session工作原理</strong>：</p>
+<pre tabindex="0"><code>流程：
+
+1. 用户登录
+   ─────────────&gt;
+   POST /api/login
+   {&#34;username&#34;: &#34;Alice&#34;, &#34;password&#34;: &#34;***&#34;}
+
+2. 服务器验证成功
+   - 创建Session（服务器内存/数据库）
+   - Session ID: abc123
+   - Session数据: {user_id: 1, username: &#34;Alice&#34;}
+
+3. 返回Session ID
+   &lt;─────────────
+   Set-Cookie: session_id=abc123; HttpOnly
+
+4. 后续请求带上Cookie
+   ─────────────&gt;
+   GET /api/profile
+   Cookie: session_id=abc123
+
+5. 服务器查找Session
+   - 根据session_id查找Session数据
+   - 获取用户信息
+   - 返回用户资料
+</code></pre><p><strong>Cookie vs Session</strong>：</p>
+<pre tabindex="0"><code>┌────────────┬────────────────┬────────────────┐
+│   特性     │     Cookie     │     Session    │
+├────────────┼────────────────┼────────────────┤
+│  存储位置  │   客户端       │   服务器       │
+│  安全性    │   较低         │   较高         │
+│  容量限制  │   4KB          │   无限制       │
+│  性能      │   无压力       │   占用内存     │
+│  生命周期  │   可持久化     │   关闭浏览器失效│
+└────────────┴────────────────┴────────────────┘
+
+实际应用：
+Cookie存储Session ID
+Session存储用户数据
+</code></pre><hr>
+<h2 id="6-http版本演进">6. HTTP版本演进
+</h2><h3 id="61-http10">6.1 HTTP/1.0
+</h3><pre tabindex="0"><code>特点：
+- 每个请求都要建立新的TCP连接
+- 请求完成后立即关闭连接
+
+问题：
+- 性能差（TCP三次握手开销）
+- 无法复用连接
+
+示例：
+客户端 → 服务器：建立连接
+客户端 → 服务器：GET /page1.html
+服务器 → 客户端：返回page1.html
+断开连接
+
+客户端 → 服务器：建立连接
+客户端 → 服务器：GET /page2.html
+服务器 → 客户端：返回page2.html
+断开连接
+</code></pre><h3 id="62-http11">6.2 HTTP/1.1
+</h3><pre tabindex="0"><code>改进：
+✅ 持久连接（Connection: keep-alive）
+✅ 管道化（Pipelining）
+✅ 分块传输（Chunked Transfer）
+✅ 缓存控制增强
+✅ Host头部（支持虚拟主机）
+
+持久连接：
+客户端 → 服务器：建立连接
+客户端 → 服务器：GET /page1.html
+服务器 → 客户端：返回page1.html
+客户端 → 服务器：GET /page2.html
+服务器 → 客户端：返回page2.html
+... 保持连接 ...
+
+问题：
+- 队头阻塞（Head-of-Line Blocking）
+- 一个请求慢会阻塞后续请求
+</code></pre><h3 id="63-http2">6.3 HTTP/2
+</h3><pre tabindex="0"><code>改进：
+✅ 二进制协议（不再是文本）
+✅ 多路复用（Multiplexing）
+✅ 头部压缩（HPACK）
+✅ 服务器推送（Server Push）
+✅ 流优先级
+
+多路复用：
+一个TCP连接，多个请求并行
+
+┌─────────────────────────┐
+│      TCP连接             │
+├─────────────────────────┤
+│ Stream 1: GET /page1    │
+│ Stream 2: GET /style.css│
+│ Stream 3: GET /script.js│
+│ Stream 4: GET /image.jpg│
+└─────────────────────────┘
+
+优点：
+- 解决队头阻塞
+- 减少延迟
+- 提高性能
+</code></pre><h3 id="64-http3">6.4 HTTP/3
+</h3><pre tabindex="0"><code>改进：
+✅ 基于QUIC（UDP）
+✅ 更快的连接建立
+✅ 更好的拥塞控制
+✅ 连接迁移（IP变化不断线）
+
+为什么用UDP？
+- TCP队头阻塞无法彻底解决
+- UDP更灵活
+- QUIC在应用层实现可靠传输
+
+对比：
+HTTP/1.1：文本 + TCP
+HTTP/2：二进制 + TCP
+HTTP/3：二进制 + QUIC(UDP)
+</code></pre><h3 id="65-版本对比">6.5 版本对比
+</h3><pre tabindex="0"><code>┌────────────┬──────────┬──────────┬──────────┐
+│   特性     │ HTTP/1.1 │  HTTP/2  │  HTTP/3  │
+├────────────┼──────────┼──────────┼──────────┤
+│  协议      │   文本   │  二进制  │  二进制  │
+│  传输层    │   TCP    │   TCP    │  QUIC    │
+│  多路复用  │    ❌    │    ✅    │    ✅    │
+│  头部压缩  │    ❌    │    ✅    │    ✅    │
+│  服务器推送│    ❌    │    ✅    │    ✅    │
+│  连接建立  │   慢     │   中等   │   快     │
+└────────────┴──────────┴──────────┴──────────┘
+</code></pre><hr>
+<h2 id="7-实战项目简单http服务器">7. 实战项目：简单HTTP服务器
+</h2><h3 id="71-项目需求">7.1 项目需求
+</h3><pre tabindex="0"><code>功能需求：
+1. 支持GET/POST请求
+2. 解析HTTP请求
+3. 返回HTTP响应
+4. 支持静态文件服务
+5. 支持JSON API
+6. 日志记录
+
+技术要求：
+- 使用Socket实现
+- 遵循HTTP/1.1协议
+- 支持Content-Type识别
+- 支持基本的错误处理
+</code></pre><h3 id="72-工具演示">7.2 工具演示
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 启动HTTP服务器</span>
+</span></span><span style="display:flex;"><span>python day19_http_server.py --host 0.0.0.0 --port <span style="color:#ae81ff">8080</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 测试HTTP客户端</span>
+</span></span><span style="display:flex;"><span>python day19_http_client.py --url http://127.0.0.1:8080/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 浏览器访问</span>
+</span></span><span style="display:flex;"><span>open http://127.0.0.1:8080/
+</span></span></code></pre></div><hr>
+<h2 id="8-今日练习">8. 今日练习
+</h2><h3 id="练习1手动构建http请求">练习1：手动构建HTTP请求
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 使用socket发送原始HTTP请求</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 连接到www.baidu.com:80</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 发送GET请求</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 解析响应</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 打印状态码和头部</span>
+</span></span></code></pre></div><h3 id="练习2实现http客户端">练习2：实现HTTP客户端
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 实现一个简单的HTTP客户端</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 支持：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. GET请求</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. POST请求（JSON）</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 自动处理重定向</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. Cookie管理</span>
+</span></span></code></pre></div><h3 id="练习3分析http流量">练习3：分析HTTP流量
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 使用Wireshark或tcpdump</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 捕获HTTP流量</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 分析请求和响应</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 识别状态码和头部</span>
+</span></span></code></pre></div><h3 id="练习4扩展http服务器">练习4：扩展HTTP服务器
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 为HTTP服务器添加功能：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 支持PUT/DELETE方法</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Session管理</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 文件上传</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 访问控制（Basic Auth）</span>
+</span></span></code></pre></div><hr>
+<h2 id="9-常见问题">9. 常见问题
+</h2><p><strong>Q1：GET和POST的本质区别是什么？</strong></p>
+<p>A：</p>
+<ul>
+<li>语义：GET用于获取，POST用于提交</li>
+<li>参数：GET在URL，POST在请求体</li>
+<li>幂等性：GET幂等，POST不幂等</li>
+<li>缓存：GET可缓存，POST不可</li>
+<li>安全性：GET参数可见，POST相对隐藏</li>
+</ul>
+<p><strong>Q2：为什么有状态码304？</strong></p>
+<p>A：</p>
+<ul>
+<li>节省带宽</li>
+<li>利用浏览器缓存</li>
+<li>服务器返回&quot;资源未修改&quot;</li>
+<li>浏览器使用本地缓存</li>
+</ul>
+<p><strong>Q3：Cookie和Session哪个更安全？</strong></p>
+<p>A：</p>
+<ul>
+<li>Session更安全（数据在服务器）</li>
+<li>Cookie易被窃取和篡改</li>
+<li>实际使用：Cookie存Session ID</li>
+</ul>
+<p><strong>Q4：HTTP/2比HTTP/1.1快多少？</strong></p>
+<p>A：</p>
+<ul>
+<li>理论上：30%-50%</li>
+<li>实际：取决于网络和资源数量</li>
+<li>资源越多，优势越明显</li>
+</ul>
+<p><strong>Q5：什么时候用POST，什么时候用PUT？</strong></p>
+<p>A：</p>
+<ul>
+<li>POST：创建新资源（ID由服务器生成）</li>
+<li>PUT：更新已存在资源（ID已知）</li>
+<li>POST非幂等，PUT幂等</li>
+</ul>
+<hr>
+<h2 id="10-总结">10. 总结
+</h2><p>今天我们学习了：</p>
+<h3 id="核心知识点">核心知识点
+</h3><ol>
+<li>
+<p><strong>HTTP基础</strong>：</p>
+<ul>
+<li>应用层协议</li>
+<li>无状态、明文传输</li>
+<li>请求-响应模式</li>
+</ul>
+</li>
+<li>
+<p><strong>请求格式</strong>：</p>
+<ul>
+<li>请求行（方法 URI 版本）</li>
+<li>请求头</li>
+<li>空行</li>
+<li>请求体（可选）</li>
+</ul>
+</li>
+<li>
+<p><strong>响应格式</strong>：</p>
+<ul>
+<li>状态行（版本 状态码 描述）</li>
+<li>响应头</li>
+<li>空行</li>
+<li>响应体</li>
+</ul>
+</li>
+<li>
+<p><strong>HTTP方法</strong>：</p>
+<ul>
+<li>GET：查询</li>
+<li>POST：创建</li>
+<li>PUT：更新</li>
+<li>DELETE：删除</li>
+</ul>
+</li>
+<li>
+<p><strong>状态码</strong>：</p>
+<ul>
+<li>2xx：成功</li>
+<li>3xx：重定向</li>
+<li>4xx：客户端错误</li>
+<li>5xx：服务器错误</li>
+</ul>
+</li>
+<li>
+<p><strong>Cookie/Session</strong>：</p>
+<ul>
+<li>Cookie：客户端存储</li>
+<li>Session：服务器存储</li>
+<li>配合使用</li>
+</ul>
+</li>
+<li>
+<p><strong>版本演进</strong>：</p>
+<ul>
+<li>HTTP/1.1：持久连接</li>
+<li>HTTP/2：多路复用</li>
+<li>HTTP/3：QUIC</li>
+</ul>
+</li>
+</ol>
+<h3 id="重点回顾">重点回顾
+</h3><pre tabindex="0"><code>HTTP请求 = 请求行 + 请求头 + 空行 + 请求体
+HTTP响应 = 状态行 + 响应头 + 空行 + 响应体
+
+常用状态码：
+200 OK
+301 永久重定向
+302 临时重定向
+304 未修改
+400 请求错误
+401 未认证
+403 禁止
+404 未找到
+500 服务器错误
+
+HTTP/2核心：
+多路复用 + 头部压缩 + 二进制协议
+</code></pre><h3 id="明天预告">明天预告
+</h3><p><strong>第20天：HTTPS和安全</strong></p>
+<p>内容预览：</p>
+<ul>
+<li>TLS/SSL协议</li>
+<li>数字证书</li>
+<li>对称加密和非对称加密</li>
+<li>HTTPS握手过程</li>
+<li>证书验证</li>
+<li>常见攻击和防御</li>
+</ul>
+<hr>
+<p><strong>继续加油！</strong> 🚀</p>
+<p>今天我们学习了HTTP协议的基础知识，这是Web开发的核心。理解HTTP协议对于开发Web应用、调试网络问题都至关重要。明天我们将学习HTTPS，了解如何保护HTTP通信的安全！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/18%E5%A4%A9socket%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">18天：Socket编程进阶</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/17%E5%A4%A9udp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">17天：UDP协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/16%E5%A4%A9tcp%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E6%9C%BA%E5%88%B6/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">16天：TCP可靠传输机制</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/15%E5%A4%A9tcp%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">15天：TCP协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%93%E4%BC%A0%E8%BE%93%E5%B1%82%E5%92%8C%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">三周总结：传输层和应用层协议</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

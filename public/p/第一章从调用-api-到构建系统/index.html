@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第一章：从调用 API 到构建系统 &ldquo;工具是你使用的东西；系统是你构建的东西；智能体是代替你工作的东西。&rdquo;\n1.1 一个失败的下午 2024 年初，很多工程师都经历过这样一个下午。\n">
+<title>第一章：从调用 API 到构建系统</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/%E7%AC%AC%E4%B8%80%E7%AB%A0%E4%BB%8E%E8%B0%83%E7%94%A8-api-%E5%88%B0%E6%9E%84%E5%BB%BA%E7%B3%BB%E7%BB%9F/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="第一章：从调用 API 到构建系统">
+<meta property='og:description' content="第一章：从调用 API 到构建系统 &ldquo;工具是你使用的东西；系统是你构建的东西；智能体是代替你工作的东西。&rdquo;\n1.1 一个失败的下午 2024 年初，很多工程师都经历过这样一个下午。\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/%E7%AC%AC%E4%B8%80%E7%AB%A0%E4%BB%8E%E8%B0%83%E7%94%A8-api-%E5%88%B0%E6%9E%84%E5%BB%BA%E7%B3%BB%E7%BB%9F/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='AI' /><meta property='article:tag' content='Agent' /><meta property='article:tag' content='Python' /><meta property='article:tag' content='Claude' /><meta property='article:tag' content='SDK' /><meta property='article:published_time' content='2026-03-05T10:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-03-05T10:00:00&#43;00:00'/>
+<meta name="twitter:title" content="第一章：从调用 API 到构建系统">
+<meta name="twitter:description" content="第一章：从调用 API 到构建系统 &ldquo;工具是你使用的东西；系统是你构建的东西；智能体是代替你工作的东西。&rdquo;\n1.1 一个失败的下午 2024 年初，很多工程师都经历过这样一个下午。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#11-一个失败的下午">1.1 一个失败的下午</a></li>
+    <li><a href="#12-两种范式的本质差异">1.2 两种范式的本质差异</a>
+      <ul>
+        <li><a href="#范式-aapi-调用">范式 A：API 调用</a></li>
+        <li><a href="#范式-bagent-sdk-调用">范式 B：Agent SDK 调用</a></li>
+      </ul>
+    </li>
+    <li><a href="#13-auto-claude-解决的真正问题">1.3 Auto-Claude 解决的真正问题</a></li>
+    <li><a href="#14-五步工作流全貌与细节">1.4 五步工作流：全貌与细节</a></li>
+    <li><a href="#15-orchestrator-first协调者的职责边界">1.5 Orchestrator-First：协调者的职责边界</a>
+      <ul>
+        <li><a href="#上下文窗口是稀缺资源">上下文窗口是稀缺资源</a></li>
+        <li><a href="#什么时候委托什么时候直接做">什么时候委托，什么时候直接做</a></li>
+      </ul>
+    </li>
+    <li><a href="#16-智能体的四个核心能力">1.6 智能体的四个核心能力</a>
+      <ul>
+        <li><a href="#能力一工具tools">能力一：工具（Tools）</a></li>
+        <li><a href="#能力二记忆memory">能力二：记忆（Memory）</a></li>
+        <li><a href="#能力三反馈循环feedback-loop">能力三：反馈循环（Feedback Loop）</a></li>
+        <li><a href="#能力四隔离isolation">能力四：隔离（Isolation）</a></li>
+      </ul>
+    </li>
+    <li><a href="#17-一个真实的执行轨迹">1.7 一个真实的执行轨迹</a></li>
+    <li><a href="#18-本书的学习路径">1.8 本书的学习路径</a></li>
+    <li><a href="#本章小结">本章小结</a></li>
+    <li><a href="#lab-11感受两种范式的差异">Lab 1.1：感受两种范式的差异</a>
+      <ul>
+        <li><a href="#part-aapi-调用版10-分钟">Part A：API 调用版（10 分钟）</a></li>
+        <li><a href="#part-bagent-sdk-版20-分钟">Part B：Agent SDK 版（20 分钟）</a></li>
+        <li><a href="#part-c对比与思考">Part C：对比与思考</a></li>
+        <li><a href="#验证标准">验证标准</a></li>
+        <li><a href="#进阶挑战">进阶挑战</a></li>
+        <li><a href="#参考part-b-的一种实现">参考：Part B 的一种实现</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/agents/" style="background-color: hsl(111, 60%, 84%); color: hsl(111, 60%, 15%);">
+                Agents
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E7%AC%AC%E4%B8%80%E7%AB%A0%E4%BB%8E%E8%B0%83%E7%94%A8-api-%E5%88%B0%E6%9E%84%E5%BB%BA%E7%B3%BB%E7%BB%9F/">第一章：从调用 API 到构建系统</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2026-03-05T10:00:00Z'>Thursday, March 5, 2026</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#11-一个失败的下午">1.1 一个失败的下午</a></li>
+    <li><a href="#12-两种范式的本质差异">1.2 两种范式的本质差异</a>
+      <ul>
+        <li><a href="#范式-aapi-调用">范式 A：API 调用</a></li>
+        <li><a href="#范式-bagent-sdk-调用">范式 B：Agent SDK 调用</a></li>
+      </ul>
+    </li>
+    <li><a href="#13-auto-claude-解决的真正问题">1.3 Auto-Claude 解决的真正问题</a></li>
+    <li><a href="#14-五步工作流全貌与细节">1.4 五步工作流：全貌与细节</a></li>
+    <li><a href="#15-orchestrator-first协调者的职责边界">1.5 Orchestrator-First：协调者的职责边界</a>
+      <ul>
+        <li><a href="#上下文窗口是稀缺资源">上下文窗口是稀缺资源</a></li>
+        <li><a href="#什么时候委托什么时候直接做">什么时候委托，什么时候直接做</a></li>
+      </ul>
+    </li>
+    <li><a href="#16-智能体的四个核心能力">1.6 智能体的四个核心能力</a>
+      <ul>
+        <li><a href="#能力一工具tools">能力一：工具（Tools）</a></li>
+        <li><a href="#能力二记忆memory">能力二：记忆（Memory）</a></li>
+        <li><a href="#能力三反馈循环feedback-loop">能力三：反馈循环（Feedback Loop）</a></li>
+        <li><a href="#能力四隔离isolation">能力四：隔离（Isolation）</a></li>
+      </ul>
+    </li>
+    <li><a href="#17-一个真实的执行轨迹">1.7 一个真实的执行轨迹</a></li>
+    <li><a href="#18-本书的学习路径">1.8 本书的学习路径</a></li>
+    <li><a href="#本章小结">本章小结</a></li>
+    <li><a href="#lab-11感受两种范式的差异">Lab 1.1：感受两种范式的差异</a>
+      <ul>
+        <li><a href="#part-aapi-调用版10-分钟">Part A：API 调用版（10 分钟）</a></li>
+        <li><a href="#part-bagent-sdk-版20-分钟">Part B：Agent SDK 版（20 分钟）</a></li>
+        <li><a href="#part-c对比与思考">Part C：对比与思考</a></li>
+        <li><a href="#验证标准">验证标准</a></li>
+        <li><a href="#进阶挑战">进阶挑战</a></li>
+        <li><a href="#参考part-b-的一种实现">参考：Part B 的一种实现</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第一章从调用-api-到构建系统">第一章：从调用 API 到构建系统
+</h1>
+    <blockquote>
+        <p>&ldquo;工具是你使用的东西；系统是你构建的东西；智能体是代替你工作的东西。&rdquo;</p>
+
+    </blockquote>
+<hr>
+<h2 id="11-一个失败的下午">1.1 一个失败的下午
+</h2><p>2024 年初，很多工程师都经历过这样一个下午。</p>
+<p>你打开浏览器，把一段复杂的遗留代码粘贴进 ChatGPT 或 Claude 的对话框，问道：&ldquo;帮我重构这段代码，添加错误处理，然后写测试。&rdquo;</p>
+<p>模型给出了漂亮的回答。代码格式工整，注释详细，逻辑看起来完全正确。你满心期待地把它复制进编辑器——然后花了接下来两个小时修复导入错误、类型不匹配、以及那个模型根本不知道你项目里已经有 <code>base_handler.py</code> 的事实。</p>
+<p>这不是模型的问题。这是<strong>使用方式</strong>的问题。</p>
+<p>你把一个需要系统工程的任务，用了单次对话框的方式来处理。就像你试图用聊天来驾驶一辆汽车：你说&quot;左转&quot;，汽车确实转了，但下一条路怎么走，它不知道；前方有红灯，它不知道；你说完&quot;停车&quot;之后，车钥匙该交给谁，它更不知道。</p>
+<p><strong>本书讲的，就是如何从&quot;对话框用户&quot;升级为&quot;AI 系统工程师&quot;。</strong></p>
+<hr>
+<h2 id="12-两种范式的本质差异">1.2 两种范式的本质差异
+</h2><p>先做一个实验。下面两段代码，都在调用 Claude，但它们是完全不同的东西：</p>
+<h3 id="范式-aapi-调用">范式 A：API 调用
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> anthropic
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>client <span style="color:#f92672">=</span> anthropic<span style="color:#f92672">.</span>Anthropic()
+</span></span><span style="display:flex;"><span>response <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>messages<span style="color:#f92672">.</span>create(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;claude-sonnet-4-6&#34;</span>,
+</span></span><span style="display:flex;"><span>    max_tokens<span style="color:#f92672">=</span><span style="color:#ae81ff">1024</span>,
+</span></span><span style="display:flex;"><span>    messages<span style="color:#f92672">=</span>[
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;role&#34;</span>: <span style="color:#e6db74">&#34;user&#34;</span>, <span style="color:#e6db74">&#34;content&#34;</span>: <span style="color:#e6db74">&#34;帮我重构这段代码，添加错误处理&#34;</span>}
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>print(response<span style="color:#f92672">.</span>content[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span>text)
+</span></span></code></pre></div><p>运行时间：1-3 秒。输出：一段文本。你不知道它是否真的可以运行。</p>
+<h3 id="范式-bagent-sdk-调用">范式 B：Agent SDK 调用
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> claude_agent_sdk <span style="color:#f92672">import</span> ClaudeSDKClient, ClaudeAgentOptions
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pathlib <span style="color:#f92672">import</span> Path
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>client <span style="color:#f92672">=</span> ClaudeSDKClient(options<span style="color:#f92672">=</span>ClaudeAgentOptions(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;claude-sonnet-4-6&#34;</span>,
+</span></span><span style="display:flex;"><span>    system_prompt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;你是一名专业的 Python 工程师，工作目录是 /project&#34;</span>,
+</span></span><span style="display:flex;"><span>    allowed_tools<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;Read&#34;</span>, <span style="color:#e6db74">&#34;Write&#34;</span>, <span style="color:#e6db74">&#34;Edit&#34;</span>, <span style="color:#e6db74">&#34;Bash&#34;</span>],
+</span></span><span style="display:flex;"><span>    cwd<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/project&#34;</span>,
+</span></span><span style="display:flex;"><span>    max_turns<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>,
+</span></span><span style="display:flex;"><span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">for</span> message <span style="color:#f92672">in</span> client<span style="color:#f92672">.</span>process_query(<span style="color:#e6db74">&#34;重构 handler.py，添加错误处理，确保测试通过&#34;</span>):
+</span></span><span style="display:flex;"><span>    print(message)
+</span></span></code></pre></div><p>运行时间：2-10 分钟。输出：真实被修改的文件、真实运行通过的测试。</p>
+<hr>
+<p>这两段代码的<strong>表面差距很小</strong>，但<strong>工程含义天壤之别</strong>：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>维度</th>
+          <th>API 调用</th>
+          <th>Agent SDK</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>LLM 的角色</td>
+          <td>文本生成器</td>
+          <td>执行主体</td>
+      </tr>
+      <tr>
+          <td>你的代码做什么</td>
+          <td>传入问题，接收回答</td>
+          <td>给 LLM 提供工具和环境</td>
+      </tr>
+      <tr>
+          <td>结果</td>
+          <td>字符串（可能可用）</td>
+          <td>文件修改（真实发生）</td>
+      </tr>
+      <tr>
+          <td>错误处理</td>
+          <td>你判断输出是否正确</td>
+          <td>LLM 自己运行测试并修复</td>
+      </tr>
+      <tr>
+          <td>上下文</td>
+          <td>你手动构建</td>
+          <td>LLM 自主读取文件</td>
+      </tr>
+      <tr>
+          <td>迭代</td>
+          <td>每次要你干预</td>
+          <td>自动循环直到任务完成</td>
+      </tr>
+  </tbody>
+</table></div>
+<p><strong>API 调用解决的是&quot;生成&quot;问题；Agent SDK 解决的是&quot;执行&quot;问题。</strong></p>
+<p>这个区别，是本书所有内容的出发点。</p>
+<hr>
+<h2 id="13-auto-claude-解决的真正问题">1.3 Auto-Claude 解决的真正问题
+</h2><p>让我们以 Auto-Claude 为例，看看一个工业级 AI 应用面对的真实挑战。</p>
+<p>Auto-Claude 是一个&quot;自主多智能体编码框架&quot;。你告诉它&quot;帮我实现用户权限管理功能&quot;，它会：</p>
+<ol>
+<li>分析你的代码库，理解你的技术栈</li>
+<li>编写一份详细的功能规格说明（Spec）</li>
+<li>把任务分解成有依赖关系的子任务列表</li>
+<li>启动独立的 Coder Agent 依次完成每个子任务</li>
+<li>在 Git Worktree 中隔离所有改动（你的主分支始终安全）</li>
+<li>让 QA Agent 验证每个子任务的结果</li>
+<li>用 AI 解决代码合并冲突</li>
+<li>最后呈现给你一个可以直接 merge 的 PR</li>
+</ol>
+<p>整个过程，你只需要描述目标——你可以去睡觉。</p>
+<p>这不是科幻。这是 Auto-Claude v2.7.6 今天就能做到的事。</p>
+<p>但要构建这样一个系统，需要回答四个工程问题：</p>
+<pre tabindex="0"><code>问题 1：谁来决策？  → 规划智能体（Planner Agent）
+问题 2：谁来执行？  → 编码智能体（Coder Agent）
+问题 3：谁来验证？  → QA 智能体（QA Agent）
+问题 4：谁来记忆？  → 记忆系统（Memory System）
+</code></pre><p>每个问题都是一个独立的工程领域。本书每一部分，对应其中一个领域。</p>
+<hr>
+<h2 id="14-五步工作流全貌与细节">1.4 五步工作流：全貌与细节
+</h2><p>在深入每个组件之前，先建立整体认知。Auto-Claude 的核心工作流是：</p>
+<pre tabindex="0"><code>用户描述目标
+      │
+      ▼
+┌─────────────┐
+│  Spec 创建  │ ← AI 分析代码库、理解需求、写规格说明
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Planner    │ ← 把 Spec 分解为带依赖的子任务列表
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐     ┌─────────────┐
+│  Coder #1   │     │  Coder #2   │ ← 并行执行独立子任务
+└──────┬──────┘     └──────┬──────┘
+       │                   │
+       └────────┬──────────┘
+                │
+                ▼
+┌───────────────────────────┐
+│  QA Reviewer → QA Fixer  │ ← 验证 → 修复的迭代循环
+└───────────────────────────┘
+                │
+                ▼
+┌─────────────────────────────┐
+│  AI Merge → 用户审查 → Merge │
+└─────────────────────────────┘
+</code></pre><p>让我们打开 Auto-Claude 的入口文件 <code>run.py</code>，看看系统启动时发生了什么：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># apps/backend/run.py</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 启动前的三道门：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. Python 版本检查（3.10+ 才支持 match 语法和新型 union types）</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> sys<span style="color:#f92672">.</span>version_info <span style="color:#f92672">&lt;</span> (<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">10</span>):
+</span></span><span style="display:flex;"><span>    sys<span style="color:#f92672">.</span>exit(<span style="color:#e6db74">&#34;Error: Auto Claude requires Python 3.10 or higher.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Windows 编码修复（处理 UTF-8 输出在 Windows 的乱码问题）</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> sys<span style="color:#f92672">.</span>platform <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;win32&#34;</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 双重策略：先尝试 reconfigure，失败则用 TextIOWrapper 包装</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 平台依赖验证（在导入任何模块前检查，防止 Windows 特有的 pywintypes 导入链崩溃）</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> core.dependency_validator <span style="color:#f92672">import</span> validate_platform_dependencies
+</span></span><span style="display:flex;"><span>validate_platform_dependencies()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 最后才进入业务逻辑</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> cli <span style="color:#f92672">import</span> main
+</span></span></code></pre></div><p>注意这三道&quot;门&quot;。每一道都对应一个<strong>真实踩过的坑</strong>：</p>
+<ul>
+<li>版本检查：Auto-Claude 使用了 Python 3.10 的 <code>match</code> 语句，没有这个检查，用户会在运行时遇到神秘的 <code>SyntaxError</code></li>
+<li>Windows 编码：Electron 通过管道（pipe）读取 Python 子进程的输出，默认编码不是 UTF-8，中文路径会乱码</li>
+<li>平台依赖：Windows 上某些包的导入链会触发 <code>pywintypes</code> 加载，如果它不存在，整个进程崩溃，且错误信息完全看不出是哪里的问题</li>
+</ul>
+<p><strong>这才是 AI 应用工程师要做的事：</strong> 不是调用 API，而是处理所有 API 调用之外的系统性问题。</p>
+<hr>
+<h2 id="15-orchestrator-first协调者的职责边界">1.5 Orchestrator-First：协调者的职责边界
+</h2><p>Auto-Claude 的 <code>CLAUDE.md</code> 里有一段话，是整个系统的设计哲学核心：</p>
+
+    <blockquote>
+        <p>&ldquo;You are an orchestrator. Your primary role is to understand what needs to be done, break it into workstreams, and delegate execution to agent teams. This keeps your context window focused on coordination and decision-making rather than filling up with implementation details.&rdquo;</p>
+
+    </blockquote>
+<p><strong>协调者（Orchestrator）不应该亲自实现</strong>。这条规则背后有深刻的工程原因：</p>
+<h3 id="上下文窗口是稀缺资源">上下文窗口是稀缺资源
+</h3><p>即使是 Claude Sonnet 4.6 的 200K token 上下文，也会在真实项目中被耗尽：</p>
+<ul>
+<li>读了 10 个文件：~20K tokens</li>
+<li>对话历史积累：~30K tokens</li>
+<li>中间思考过程：~50K tokens</li>
+<li>剩余可用：不到 100K</li>
+</ul>
+<p>当协调者的上下文快满时，它开始&quot;遗忘&quot;之前的细节——就像一个同时记太多事情的人开始犯糊涂。</p>
+<p><strong>解决方案是：让协调者只做决策，把所有实现细节下放给&quot;新鲜上下文&quot;的执行者。</strong></p>
+<p>这就是为什么 Auto-Claude 的每个 Coder Agent 都是独立进程，拥有完全干净的上下文窗口。</p>
+<h3 id="什么时候委托什么时候直接做">什么时候委托，什么时候直接做
+</h3><pre tabindex="0"><code>直接做：
+  - 单文件修改
+  - 简单查找（Grep/Glob）
+  - 快速决策
+
+委托给子智能体：
+  - 多文件修改
+  - 代码库全局分析
+  - 可并行的独立任务
+  - 会消耗大量上下文的实现工作
+</code></pre><p>这个判断标准，也是你在构建自己的 AI 系统时需要做出的第一个架构决策。</p>
+<hr>
+<h2 id="16-智能体的四个核心能力">1.6 智能体的四个核心能力
+</h2><p>任何有实用价值的智能体，都必须具备这四种能力。缺少其中任何一种，它都只是一个&quot;聊天机器人&quot;。</p>
+<h3 id="能力一工具tools">能力一：工具（Tools）
+</h3><p>工具让 LLM 从&quot;回答者&quot;变成&quot;执行者&quot;。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 没有工具的 LLM：只能告诉你应该怎么做</span>
+</span></span><span style="display:flex;"><span>response <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;你应该创建一个 users.py 文件，内容如下：...&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 有了 Write 工具的 LLM：直接把文件写进去</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># LLM 内部会调用：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Write(file_path=&#34;users.py&#34;, content=&#34;...&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 文件真实被创建</span>
+</span></span></code></pre></div><p>Auto-Claude 的 Coder Agent 拥有的工具包括：<code>Read</code>、<code>Write</code>、<code>Edit</code>、<code>Bash</code>、<code>Glob</code>、<code>Grep</code>，以及各种 MCP 工具（第 6 章详述）。</p>
+<h3 id="能力二记忆memory">能力二：记忆（Memory）
+</h3><p>LLM 天生没有记忆——每次对话都是白板。解决方案是把&quot;记忆&quot;外化到文件系统或数据库：</p>
+<pre tabindex="0"><code># Auto-Claude 的记忆文件结构
+.auto-claude/specs/001-my-feature/memory/
+├── codebase_map.json      # &#34;auth.py 是处理登录的文件&#34;
+├── patterns.md            # &#34;所有 API 端点都用 @require_auth 装饰器&#34;
+├── gotchas.md             # &#34;数据库连接必须手动关闭，否则泄漏&#34;
+└── session_insights/
+    ├── session_001.json   # 第一次执行时发现了什么
+    └── session_002.json   # 第二次继续时的补充
+</code></pre><p>每次新的 Agent 会话开始时，它的第一步就是读取这些文件，&ldquo;回忆&quot;之前的上下文。</p>
+<h3 id="能力三反馈循环feedback-loop">能力三：反馈循环（Feedback Loop）
+</h3><p>单次执行的智能体是脆弱的。只有形成&quot;执行 → 验证 → 修复&quot;的循环，才能处理真实世界的不确定性：</p>
+<pre tabindex="0"><code>                    ┌─────────┐
+                    │ 执行子任务 │
+                    └────┬────┘
+                         │
+                    ┌────▼────┐
+                    │ 运行验证  │  ← &#34;pytest 测试通过了吗？&#34;
+                    └────┬────┘
+                         │
+              ┌──────────▼──────────┐
+              │    验证通过了吗？    │
+              └──────────┬──────────┘
+          通过           │         失败
+          ▼              │              ▼
+    标记 completed  ─────┘      修复问题，重新验证
+</code></pre><p>Auto-Claude 的 QA 阶段，就是这个循环的具体实现。</p>
+<h3 id="能力四隔离isolation">能力四：隔离（Isolation）
+</h3><p><strong>这是最被低估的能力。</strong></p>
+<p>Auto-Claude 的每个构建任务，都在独立的 Git Worktree 中执行。这意味着：</p>
+<ul>
+<li>AI 搞坏了代码？主分支安然无恙</li>
+<li>两个任务并行开发？互不干扰</li>
+<li>用户想放弃这次构建？一个命令删除 Worktree，干净无残留</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 一个正在构建的项目，目录结构可能是这样的：</span>
+</span></span><span style="display:flex;"><span>my-project/
+</span></span><span style="display:flex;"><span>├── src/                           <span style="color:#75715e"># 主分支代码（干净）</span>
+</span></span><span style="display:flex;"><span>└── .auto-claude/
+</span></span><span style="display:flex;"><span>    └── worktrees/
+</span></span><span style="display:flex;"><span>        └── tasks/
+</span></span><span style="display:flex;"><span>            ├── 001-user-auth/     <span style="color:#75715e"># 任务 1 的隔离 Worktree</span>
+</span></span><span style="display:flex;"><span>            └── 002-dashboard/     <span style="color:#75715e"># 任务 2 的隔离 Worktree</span>
+</span></span></code></pre></div><p>这四种能力，在接下来的章节中，我们会逐一深入实现。</p>
+<hr>
+<h2 id="17-一个真实的执行轨迹">1.7 一个真实的执行轨迹
+</h2><p>理论讲完了，让我们看一次真实的 Agent 执行过程中发生了什么。</p>
+<p>Auto-Claude 使用 <code>phase_event.py</code> 在不同执行阶段向前端发送结构化事件：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># apps/backend/core/phase_event.py</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ExecutionPhase</span>(str, Enum):
+</span></span><span style="display:flex;"><span>    PLANNING    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;planning&#34;</span>      <span style="color:#75715e"># 规划阶段</span>
+</span></span><span style="display:flex;"><span>    CODING      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;coding&#34;</span>        <span style="color:#75715e"># 编码阶段</span>
+</span></span><span style="display:flex;"><span>    QA_REVIEW   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;qa_review&#34;</span>     <span style="color:#75715e"># QA 审查</span>
+</span></span><span style="display:flex;"><span>    QA_FIXING   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;qa_fixing&#34;</span>     <span style="color:#75715e"># QA 修复</span>
+</span></span><span style="display:flex;"><span>    COMPLETE    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;complete&#34;</span>      <span style="color:#75715e"># 完成</span>
+</span></span><span style="display:flex;"><span>    FAILED      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;failed&#34;</span>        <span style="color:#75715e"># 失败</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 智能暂停状态</span>
+</span></span><span style="display:flex;"><span>    RATE_LIMIT_PAUSED   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rate_limit_paused&#34;</span>   <span style="color:#75715e"># 被限速，等待恢复</span>
+</span></span><span style="display:flex;"><span>    AUTH_FAILURE_PAUSED <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;auth_failure_paused&#34;</span>  <span style="color:#75715e"># 认证失败，需要人工介入</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">emit_phase</span>(phase: ExecutionPhase, message: str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#f92672">**</span>kwargs) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;向 stdout 输出结构化阶段事件，供 Electron 前端解析&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    payload <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;phase&#34;</span>: phase<span style="color:#f92672">.</span>value, <span style="color:#e6db74">&#34;message&#34;</span>: message, <span style="color:#f92672">**</span>kwargs}
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;__EXEC_PHASE__:</span><span style="color:#e6db74">{</span>json<span style="color:#f92672">.</span>dumps(payload)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>, flush<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><p>注意 <code>__EXEC_PHASE__:</code> 这个前缀。Python 进程通过 stdout 与 Electron 的 Main Process 通信——这是跨语言跨进程通信最简单可靠的方式：<strong>把结构化数据打印到标准输出，让父进程解析</strong>。</p>
+<p>当一个 Agent 执行时，这些事件以时间顺序流出：</p>
+<pre tabindex="0"><code>__EXEC_PHASE__:{&#34;phase&#34;:&#34;planning&#34;,&#34;message&#34;:&#34;分析代码库结构...&#34;,&#34;progress&#34;:10}
+__EXEC_PHASE__:{&#34;phase&#34;:&#34;coding&#34;,&#34;subtask&#34;:&#34;subtask-1-1&#34;,&#34;message&#34;:&#34;实现数据模型&#34;,&#34;progress&#34;:25}
+__EXEC_PHASE__:{&#34;phase&#34;:&#34;coding&#34;,&#34;subtask&#34;:&#34;subtask-1-2&#34;,&#34;message&#34;:&#34;创建 API 端点&#34;,&#34;progress&#34;:50}
+__EXEC_PHASE__:{&#34;phase&#34;:&#34;qa_review&#34;,&#34;message&#34;:&#34;验证实现质量...&#34;,&#34;progress&#34;:70}
+__EXEC_PHASE__:{&#34;phase&#34;:&#34;qa_fixing&#34;,&#34;message&#34;:&#34;修复 2 个问题&#34;,&#34;progress&#34;:85}
+__EXEC_PHASE__:{&#34;phase&#34;:&#34;complete&#34;,&#34;message&#34;:&#34;所有子任务完成&#34;,&#34;progress&#34;:100}
+</code></pre><p>同时，<code>session.py</code> 中的 <code>post_session_processing()</code> 在每个 Agent 会话结束后运行，处理：</p>
+<ul>
+<li>分析本次会话的 git commit，提取修改了哪些文件</li>
+<li>把发现的模式和踩到的坑写入记忆文件</li>
+<li>通知 Linear（如果集成了项目管理工具）</li>
+<li>如果发生了错误，触发恢复流程</li>
+</ul>
+<p><strong>这就是&quot;AI 应用工程&quot;的日常：</strong> 不是让模型生成代码，而是设计围绕模型的完整数据流、状态机、反馈机制和错误处理。</p>
+<hr>
+<h2 id="18-本书的学习路径">1.8 本书的学习路径
+</h2><pre tabindex="0"><code>第一部分（第 1-3 章）
+  AI 应用工程的思维转变
+  └─ 你现在在这里
+
+第二部分（第 4-8 章）
+  Claude Agent SDK 深度实战
+  └─ 学会构建生产级 Agent
+
+第三部分（第 9-13 章）
+  Python 智能体系统工程
+  └─ 学会设计多智能体系统
+
+第四部分（第 14-17 章）
+  Electron 桌面应用工程
+  └─ 学会构建 AI 原生桌面界面
+
+第五部分（第 18-19 章）
+  测试与可观测性
+  └─ 学会让 AI 系统变得可靠
+
+第六部分（第 20-21 章）
+  综合实战
+  └─ 从零构建你自己的 Auto-Claude
+</code></pre><p>每一章都有<strong>可运行的 Lab</strong>。Lab 的参考实现都在本书的 GitHub 仓库中，但强烈建议你先自己实现，再对比参考代码——差异之处，正是最有价值的学习点。</p>
+<hr>
+<h2 id="本章小结">本章小结
+</h2><pre tabindex="0"><code>★ Insight ─────────────────────────────────────────────
+• API 调用 vs Agent SDK：前者是问答，后者是委托执行
+  区别不在 API，在于你是否给了 LLM 工具和反馈环境
+
+• 智能体的四项核心能力：
+  工具（能做事）、记忆（跨会话知道发生了什么）
+  反馈循环（能从失败中恢复）、隔离（失败时不影响主系统）
+
+• 协调者的铁律：
+  协调者只做决策，把实现细节委托给拥有&#34;新鲜上下文&#34;的执行智能体
+  这不是风格问题，是应对上下文窗口限制的工程必需
+
+• run.py 的三道门告诉我们：
+  AI 应用的大部分 Bug，不在模型里，在系统层
+  版本检查、编码处理、平台差异——这些都是你的工程责任
+─────────────────────────────────────────────────────────
+</code></pre><hr>
+<h2 id="lab-11感受两种范式的差异">Lab 1.1：感受两种范式的差异
+</h2><p><strong>目标：</strong> 用实验感受 API 调用与 Agent SDK 的工程差异，建立直觉。</p>
+<p><strong>前置条件：</strong></p>
+<ul>
+<li>Python 3.10+</li>
+<li><code>pip install anthropic claude-agent-sdk</code></li>
+<li>有效的 <code>ANTHROPIC_API_KEY</code> 或 <code>CLAUDE_CODE_OAUTH_TOKEN</code></li>
+</ul>
+<hr>
+<h3 id="part-aapi-调用版10-分钟">Part A：API 调用版（10 分钟）
+</h3><p>在任意目录创建 <code>lab1_api.py</code>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Lab 1.1 Part A - API 调用版
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">目标：体验 API 调用的能力边界
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> anthropic
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">analyze_code_via_api</span>(code: str) <span style="color:#f92672">-&gt;</span> str:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;用 API 调用分析代码，返回改进建议&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> anthropic<span style="color:#f92672">.</span>Anthropic()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>messages<span style="color:#f92672">.</span>create(
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;claude-haiku-4-5-20251001&#34;</span>,  <span style="color:#75715e"># 用 Haiku 节约费用</span>
+</span></span><span style="display:flex;"><span>        max_tokens<span style="color:#f92672">=</span><span style="color:#ae81ff">1024</span>,
+</span></span><span style="display:flex;"><span>        messages<span style="color:#f92672">=</span>[{
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;role&#34;</span>: <span style="color:#e6db74">&#34;user&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;content&#34;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;分析这段代码，指出问题并给出改进建议：</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">{</span>code<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        }]
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> response<span style="color:#f92672">.</span>content[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span>text
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 测试代码</span>
+</span></span><span style="display:flex;"><span>sample_code <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">def get_user(user_id):
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    conn = connect_db()
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    result = conn.execute(f&#34;SELECT * FROM users WHERE id = </span><span style="color:#e6db74">{user_id}</span><span style="color:#e6db74">&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    return result.fetchone()
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> analyze_code_via_api(sample_code)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;=== API 调用结果 ===&#34;</span>)
+</span></span><span style="display:flex;"><span>print(result)
+</span></span><span style="display:flex;"><span>print()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;注意：模型只是告诉了你应该怎么做，但没有实际修改任何文件&#34;</span>)
+</span></span></code></pre></div><p>运行并记录：</p>
+<ol>
+<li>模型发现了哪些问题？（SQL 注入？连接未关闭？）</li>
+<li>它给出的修复建议，你需要做什么才能应用？</li>
+<li>如果代码在 <code>/project/db/users.py</code> 里，模型能直接去读那个文件吗？</li>
+</ol>
+<hr>
+<h3 id="part-bagent-sdk-版20-分钟">Part B：Agent SDK 版（20 分钟）
+</h3><p><strong>骨架代码</strong>——你需要补全 <code>TODO</code> 部分：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Lab 1.1 Part B - Agent SDK 版
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">目标：让 Agent 实际读取并修复一个真实文件
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> asyncio
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pathlib <span style="color:#f92672">import</span> Path
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> claude_agent_sdk <span style="color:#f92672">import</span> ClaudeSDKClient, ClaudeAgentOptions
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># --- 准备工作 ---</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 在当前目录创建一个有问题的 Python 文件</span>
+</span></span><span style="display:flex;"><span>WORK_DIR <span style="color:#f92672">=</span> Path(<span style="color:#e6db74">&#34;./lab1_workspace&#34;</span>)
+</span></span><span style="display:flex;"><span>WORK_DIR<span style="color:#f92672">.</span>mkdir(exist_ok<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BAD_CODE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;&#39;</span><span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">def get_user(user_id):
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;从数据库获取用户（有 bug）&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    conn = connect_db()
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    # 问题1：SQL 注入漏洞
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    result = conn.execute(f&#34;SELECT * FROM users WHERE id = </span><span style="color:#e6db74">{user_id}</span><span style="color:#e6db74">&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    # 问题2：连接没有关闭
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    return result.fetchone()
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">def divide(a, b):
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;除法（没有除零保护）&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    return a / b
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>target_file <span style="color:#f92672">=</span> WORK_DIR <span style="color:#f92672">/</span> <span style="color:#e6db74">&#34;users.py&#34;</span>
+</span></span><span style="display:flex;"><span>target_file<span style="color:#f92672">.</span>write_text(BAD_CODE)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;已创建有问题的文件：</span><span style="color:#e6db74">{</span>target_file<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># --- 核心部分：创建 Agent 并执行修复 ---</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run_fixer_agent</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    TODO：创建一个 Agent，让它：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    1. 读取 lab1_workspace/users.py
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    2. 找出所有安全问题和 bug
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    3. 修复它们，直接写回文件
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    4. 打印修复总结
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    提示：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - 使用 ClaudeAgentOptions 配置 allowed_tools
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - allowed_tools 至少需要包含：[&#34;Read&#34;, &#34;Write&#34;, &#34;Edit&#34;]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - cwd 设置为 WORK_DIR 的字符串路径
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - max_turns=20 足够用于这个简单任务
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># TODO 1：创建 ClaudeAgentOptions</span>
+</span></span><span style="display:flex;"><span>    options <span style="color:#f92672">=</span> ClaudeAgentOptions(
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;claude-haiku-4-5-20251001&#34;</span>,
+</span></span><span style="display:flex;"><span>        system_prompt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;&#34;你是一名代码安全专家。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        当你发现代码中的安全问题或 bug 时，你会直接修复它们。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        修复后，简要说明你做了什么改变。&#34;&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># TODO：填写 allowed_tools 和 cwd</span>
+</span></span><span style="display:flex;"><span>        allowed_tools<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;Read&#34;</span>, <span style="color:#e6db74">&#34;Write&#34;</span>, <span style="color:#e6db74">&#34;Edit&#34;</span>],  <span style="color:#75715e"># 你认为还需要哪些工具？</span>
+</span></span><span style="display:flex;"><span>        cwd<span style="color:#f92672">=</span>str(WORK_DIR),
+</span></span><span style="display:flex;"><span>        max_turns<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span>,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> ClaudeSDKClient(options<span style="color:#f92672">=</span>options)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># TODO 2：构造 prompt</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 提示：告诉 Agent 文件在哪里，让它读取、分析并修复</span>
+</span></span><span style="display:flex;"><span>    prompt <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    请检查并修复 users.py 中的所有问题。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    修复完成后，告诉我你改了什么。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># TODO 3：运行 Agent 并打印输出</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">=== Agent 开始执行 ===&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">for</span> message <span style="color:#f92672">in</span> client<span style="color:#f92672">.</span>process_query(prompt):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 提示：message 对象有不同的类型，打印它的类型和内容</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">{</span>type(message)<span style="color:#f92672">.</span>__name__<span style="color:#e6db74">}</span><span style="color:#e6db74">] </span><span style="color:#e6db74">{</span>message<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 验证：读取修复后的文件</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">=== 修复后的文件内容 ===&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(target_file<span style="color:#f92672">.</span>read_text())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>asyncio<span style="color:#f92672">.</span>run(run_fixer_agent())
+</span></span></code></pre></div><hr>
+<h3 id="part-c对比与思考">Part C：对比与思考
+</h3><p>完成 Part B 后，对比两个版本的结果，思考以下问题：</p>
+<ol>
+<li>
+<p><strong>Part A 的建议</strong> vs <strong>Part B 的实际修复</strong>——哪个更接近你想要的？</p>
+</li>
+<li>
+<p><strong>Agent 实际读取了文件吗？</strong> 查看 Part B 的输出，找到 <code>ToolUseBlock</code> 类型的消息，你能看到它调用了哪些工具吗？</p>
+</li>
+<li>
+<p><strong>如果文件有 10 个问题，Part A 能批量修复吗？Part B 呢？</strong></p>
+</li>
+<li>
+<p><strong>思考：</strong> 如果你要处理整个项目（50 个文件），两种方式的成本和效果会有什么不同？</p>
+</li>
+</ol>
+<hr>
+<h3 id="验证标准">验证标准
+</h3><ul>
+<li><input disabled="" type="checkbox"> <code>lab1_workspace/users.py</code> 的 SQL 注入漏洞已被修复（使用参数化查询）</li>
+<li><input disabled="" type="checkbox"> 数据库连接有了关闭逻辑（<code>try/finally</code> 或 <code>with</code> 语句）</li>
+<li><input disabled="" type="checkbox"> <code>divide</code> 函数有了除零保护</li>
+<li><input disabled="" type="checkbox"> Agent 的输出中可以找到 <code>Read</code> 和 <code>Write</code> 工具的调用记录</li>
+</ul>
+<hr>
+<h3 id="进阶挑战">进阶挑战
+</h3><p>如果基础版做完了，尝试：</p>
+<ol>
+<li><strong>添加验证步骤：</strong> 修复后，让 Agent 自己编写一个简单的测试文件，验证修复是否正确</li>
+<li><strong>批量处理：</strong> 在 <code>lab1_workspace</code> 里创建 3 个有不同问题的文件，让 Agent 一次性修复所有文件</li>
+<li><strong>与 Part A 对比成本：</strong> 用 Anthropic 的 Token 计量 API，分别统计两种方式处理同一个问题的 Token 消耗</li>
+</ol>
+<hr>
+<h3 id="参考part-b-的一种实现">参考：Part B 的一种实现
+</h3><p>如果你卡住了，下面是一个可以正常运行的参考实现（尝试自己做完再看）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run_fixer_agent</span>():
+</span></span><span style="display:flex;"><span>    options <span style="color:#f92672">=</span> ClaudeAgentOptions(
+</span></span><span style="display:flex;"><span>        model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;claude-haiku-4-5-20251001&#34;</span>,
+</span></span><span style="display:flex;"><span>        system_prompt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;&#34;你是一名代码安全专家。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        当你发现代码中的安全问题或 bug 时，你会直接修复它们。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        修复后，简要说明你做了什么改变。&#34;&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>        allowed_tools<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;Read&#34;</span>, <span style="color:#e6db74">&#34;Write&#34;</span>, <span style="color:#e6db74">&#34;Edit&#34;</span>, <span style="color:#e6db74">&#34;Bash&#34;</span>],
+</span></span><span style="display:flex;"><span>        cwd<span style="color:#f92672">=</span>str(WORK_DIR),
+</span></span><span style="display:flex;"><span>        max_turns<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span>,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    client <span style="color:#f92672">=</span> ClaudeSDKClient(options<span style="color:#f92672">=</span>options)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    prompt <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;请读取 users.py，找出所有安全漏洞和 bug，直接修复文件，然后告诉我做了哪些改变。&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">=== Agent 开始执行 ===&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">for</span> message <span style="color:#f92672">in</span> client<span style="color:#f92672">.</span>process_query(prompt):
+</span></span><span style="display:flex;"><span>        msg_type <span style="color:#f92672">=</span> type(message)<span style="color:#f92672">.</span>__name__
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> hasattr(message, <span style="color:#e6db74">&#39;type&#39;</span>):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> message<span style="color:#f92672">.</span>type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;tool_use&#39;</span>:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  [工具调用] </span><span style="color:#e6db74">{</span>message<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">(</span><span style="color:#e6db74">{</span>list(message<span style="color:#f92672">.</span>input<span style="color:#f92672">.</span>keys())<span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> message<span style="color:#f92672">.</span>type <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;text&#39;</span>:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  [文本] </span><span style="color:#e6db74">{</span>message<span style="color:#f92672">.</span>text[:<span style="color:#ae81ff">100</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">...&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  [</span><span style="color:#e6db74">{</span>msg_type<span style="color:#e6db74">}</span><span style="color:#e6db74">] </span><span style="color:#e6db74">{</span>str(message)[:<span style="color:#ae81ff">100</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">=== 修复后的文件 ===&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(target_file<span style="color:#f92672">.</span>read_text())
+</span></span></code></pre></div><hr>
+<p><strong>下一章预告：</strong> 现在你已经感受到了单智能体的能力边界。接下来，我们要思考：当一个任务需要多个智能体协作时，如何设计它们之间的关系？</p>
+<hr>
+<p><em>本章对应的完整代码：<a class="link" href="" >GitHub 仓库 / chapter_01 / lab1/</a></em></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/ai/">AI</a>
+        
+            <a href="/tags/agent/">Agent</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+            <a href="/tags/claude/">Claude</a>
+        
+            <a href="/tags/sdk/">SDK</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E5%85%AD%E5%91%A8%E5%90%8E%E7%BB%AD%E5%86%85%E5%AE%B9%E6%80%BB%E7%BB%93/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">六周后续内容总结</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E5%85%AD%E5%91%A8%E6%80%BB%E7%BB%93dns%E5%92%8C%E5%85%B6%E4%BB%96%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">六周总结：DNS和其他应用层协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/35%E5%A4%A9dns%E6%B7%B1%E5%85%A5-%E9%80%92%E5%BD%92%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%9F%A5%E8%AF%A2/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">35天：DNS深入 - 递归与迭代查询</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%BA%94%E5%91%A8%E5%AE%9E%E6%88%98%E6%80%BB%E7%BB%93/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">五周实战总结</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/31%E5%A4%A9websocket%E5%AE%9E%E6%97%B6%E9%80%9A%E4%BF%A1/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">31天：WebSocket实时通信</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

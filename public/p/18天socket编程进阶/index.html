@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第18天：Socket编程进阶 今日目标 理解阻塞和非阻塞Socket 掌握IO多路复用技术（select/poll/epoll） 学习Socket选项配置 了解高性能服务器设计模式 实现多客户端并发服务器 构建实战项目：多人聊天室 1. 阻塞与非阻塞Socket 1.1 什么是阻塞？ 阻塞（Blocking）：\n">
+<title>18天：Socket编程进阶</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/18%E5%A4%A9socket%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="18天：Socket编程进阶">
+<meta property='og:description' content="第18天：Socket编程进阶 今日目标 理解阻塞和非阻塞Socket 掌握IO多路复用技术（select/poll/epoll） 学习Socket选项配置 了解高性能服务器设计模式 实现多客户端并发服务器 构建实战项目：多人聊天室 1. 阻塞与非阻塞Socket 1.1 什么是阻塞？ 阻塞（Blocking）：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/18%E5%A4%A9socket%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:24:38&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:24:38&#43;00:00'/>
+<meta name="twitter:title" content="18天：Socket编程进阶">
+<meta name="twitter:description" content="第18天：Socket编程进阶 今日目标 理解阻塞和非阻塞Socket 掌握IO多路复用技术（select/poll/epoll） 学习Socket选项配置 了解高性能服务器设计模式 实现多客户端并发服务器 构建实战项目：多人聊天室 1. 阻塞与非阻塞Socket 1.1 什么是阻塞？ 阻塞（Blocking）：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-阻塞与非阻塞socket">1. 阻塞与非阻塞Socket</a>
+      <ul>
+        <li><a href="#11-什么是阻塞">1.1 什么是阻塞？</a></li>
+        <li><a href="#12-非阻塞socket">1.2 非阻塞Socket</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-io多路复用">2. IO多路复用</a>
+      <ul>
+        <li><a href="#21-什么是io多路复用">2.1 什么是IO多路复用？</a></li>
+        <li><a href="#22-select">2.2 select</a></li>
+        <li><a href="#23-poll">2.3 poll</a></li>
+        <li><a href="#24-epolllinux专用">2.4 epoll（Linux专用）</a></li>
+        <li><a href="#25-selectpollepoll对比">2.5 select/poll/epoll对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-socket选项">3. Socket选项</a>
+      <ul>
+        <li><a href="#31-常用socket选项">3.1 常用Socket选项</a></li>
+        <li><a href="#32-获取socket选项">3.2 获取Socket选项</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-高性能服务器设计模式">4. 高性能服务器设计模式</a>
+      <ul>
+        <li><a href="#41-常见架构模式">4.1 常见架构模式</a></li>
+        <li><a href="#42-c10k问题">4.2 C10K问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-实战项目多人聊天室">5. 实战项目：多人聊天室</a>
+      <ul>
+        <li><a href="#51-项目需求">5.1 项目需求</a></li>
+        <li><a href="#52-协议设计">5.2 协议设计</a></li>
+        <li><a href="#53-工具演示">5.3 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-今日练习">6. 今日练习</a>
+      <ul>
+        <li><a href="#练习1阻塞vs非阻塞">练习1：阻塞vs非阻塞</a></li>
+        <li><a href="#练习2实现select服务器">练习2：实现select服务器</a></li>
+        <li><a href="#练习3性能测试">练习3：性能测试</a></li>
+        <li><a href="#练习4聊天室扩展">练习4：聊天室扩展</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-常见问题">7. 常见问题</a></li>
+    <li><a href="#8-总结">8. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/18%E5%A4%A9socket%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6/">18天：Socket编程进阶</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:24:38Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-阻塞与非阻塞socket">1. 阻塞与非阻塞Socket</a>
+      <ul>
+        <li><a href="#11-什么是阻塞">1.1 什么是阻塞？</a></li>
+        <li><a href="#12-非阻塞socket">1.2 非阻塞Socket</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-io多路复用">2. IO多路复用</a>
+      <ul>
+        <li><a href="#21-什么是io多路复用">2.1 什么是IO多路复用？</a></li>
+        <li><a href="#22-select">2.2 select</a></li>
+        <li><a href="#23-poll">2.3 poll</a></li>
+        <li><a href="#24-epolllinux专用">2.4 epoll（Linux专用）</a></li>
+        <li><a href="#25-selectpollepoll对比">2.5 select/poll/epoll对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-socket选项">3. Socket选项</a>
+      <ul>
+        <li><a href="#31-常用socket选项">3.1 常用Socket选项</a></li>
+        <li><a href="#32-获取socket选项">3.2 获取Socket选项</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-高性能服务器设计模式">4. 高性能服务器设计模式</a>
+      <ul>
+        <li><a href="#41-常见架构模式">4.1 常见架构模式</a></li>
+        <li><a href="#42-c10k问题">4.2 C10K问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-实战项目多人聊天室">5. 实战项目：多人聊天室</a>
+      <ul>
+        <li><a href="#51-项目需求">5.1 项目需求</a></li>
+        <li><a href="#52-协议设计">5.2 协议设计</a></li>
+        <li><a href="#53-工具演示">5.3 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-今日练习">6. 今日练习</a>
+      <ul>
+        <li><a href="#练习1阻塞vs非阻塞">练习1：阻塞vs非阻塞</a></li>
+        <li><a href="#练习2实现select服务器">练习2：实现select服务器</a></li>
+        <li><a href="#练习3性能测试">练习3：性能测试</a></li>
+        <li><a href="#练习4聊天室扩展">练习4：聊天室扩展</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-常见问题">7. 常见问题</a></li>
+    <li><a href="#8-总结">8. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第18天socket编程进阶">第18天：Socket编程进阶
+</h1><h2 id="今日目标">今日目标
+</h2><ul>
+<li>理解阻塞和非阻塞Socket</li>
+<li>掌握IO多路复用技术（select/poll/epoll）</li>
+<li>学习Socket选项配置</li>
+<li>了解高性能服务器设计模式</li>
+<li>实现多客户端并发服务器</li>
+<li>构建实战项目：多人聊天室</li>
+</ul>
+<hr>
+<h2 id="1-阻塞与非阻塞socket">1. 阻塞与非阻塞Socket
+</h2><h3 id="11-什么是阻塞">1.1 什么是阻塞？
+</h3><p><strong>阻塞（Blocking）</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>生活类比<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>你去银行取钱<span style="color:#960050;background-color:#1e0010">（</span>阻塞模式<span style="color:#960050;background-color:#1e0010">）：</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1.</span> 排队等待
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2.</span> 叫到你的号之前<span style="color:#960050;background-color:#1e0010">，</span>你只能等待
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3.</span> 什么也做不了
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">4.</span> 叫到号了才能办理业务
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>阻塞Socket<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">↓</span>
+</span></span><span style="display:flex;"><span>如果没有数据<span style="color:#960050;background-color:#1e0010">，</span>就一直等待
+</span></span><span style="display:flex;"><span>什么也做不了
+</span></span><span style="display:flex;"><span>直到有数据到达
+</span></span></code></pre></div><p><strong>阻塞Socket示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 默认是阻塞模式</span>
+</span></span><span style="display:flex;"><span>sock <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>connect((<span style="color:#e6db74">&#39;www.baidu.com&#39;</span>, <span style="color:#ae81ff">80</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 发送请求</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>send(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;GET / HTTP/1.1</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Host: www.baidu.com</span><span style="color:#ae81ff">\r\n\r\n</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 阻塞在这里，直到收到数据</span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)  <span style="color:#75715e"># ⏸️ 阻塞等待</span>
+</span></span><span style="display:flex;"><span>print(data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>close()
+</span></span></code></pre></div><p><strong>阻塞的问题</strong>：</p>
+<pre tabindex="0"><code>单线程服务器：
+
+while True:
+    client_sock, addr = server_sock.accept()  # 阻塞1
+    data = client_sock.recv(1024)             # 阻塞2
+    client_sock.send(response)
+    client_sock.close()
+
+问题：
+- accept()阻塞 → 只能等待一个客户端
+- recv()阻塞 → 处理一个客户端时，其他客户端无法连接
+- 无法同时服务多个客户端 ❌
+</code></pre><h3 id="12-非阻塞socket">1.2 非阻塞Socket
+</h3><p><strong>非阻塞（Non-blocking）</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>生活类比<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>你去银行取钱<span style="color:#960050;background-color:#1e0010">（</span>非阻塞模式<span style="color:#960050;background-color:#1e0010">）：</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1.</span> 取号
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2.</span> 没叫到号<span style="color:#960050;background-color:#1e0010">，</span>去旁边玩手机
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3.</span> 每隔几分钟看一眼叫号屏幕
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">4.</span> 叫到号了再去办理
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>非阻塞Socket<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setblocking(<span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">BlockingIOError</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 没有数据，立即返回</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 可以做其他事情</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pass</span>
+</span></span></code></pre></div><p><strong>非阻塞Socket示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> errno
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sock <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 设置为非阻塞</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setblocking(<span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    sock<span style="color:#f92672">.</span>connect((<span style="color:#e6db74">&#39;www.baidu.com&#39;</span>, <span style="color:#ae81ff">80</span>))
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">BlockingIOError</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 连接正在进行中</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 发送数据</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    sock<span style="color:#f92672">.</span>send(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;GET / HTTP/1.1</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Host: www.baidu.com</span><span style="color:#ae81ff">\r\n\r\n</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">BlockingIOError</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 缓冲区满，暂时无法发送</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 接收数据</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>    print(data)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">BlockingIOError</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 没有数据可读</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;暂时没有数据&#34;</span>)
+</span></span></code></pre></div><p><strong>非阻塞的问题</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 需要不断轮询</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> data:
+</span></span><span style="display:flex;"><span>            process(data)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">BlockingIOError</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>  <span style="color:#75715e"># 继续轮询</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># CPU 100%！不断循环检查 ❌</span>
+</span></span></code></pre></div><hr>
+<h2 id="2-io多路复用">2. IO多路复用
+</h2><h3 id="21-什么是io多路复用">2.1 什么是IO多路复用？
+</h3><p><strong>IO多路复用（I/O Multiplexing）</strong>：</p>
+<pre tabindex="0"><code>问题：
+如何同时监听多个Socket，而不需要为每个Socket创建线程？
+
+解决方案：
+IO多路复用 = 一个线程监听多个Socket
+
+生活类比：
+你是一个老师，要照顾30个学生：
+
+方案1：阻塞（不现实）
+- 盯着第1个学生，直到他提问
+- 其他29个学生被忽略
+
+方案2：轮询（CPU浪费）
+- 不停地问每个学生：&#34;有问题吗？&#34;
+- 大部分时间都在问，很累
+
+方案3：IO多路复用（最优）
+- 坐在讲台上
+- 谁举手（有数据），就处理谁
+- 没人举手，就休息（阻塞在select上）
+</code></pre><h3 id="22-select">2.2 select
+</h3><p><strong>select原理</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> select
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 要监听的socket列表</span>
+</span></span><span style="display:flex;"><span>read_list <span style="color:#f92672">=</span> [sock1, sock2, sock3]
+</span></span><span style="display:flex;"><span>write_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>error_list <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 阻塞等待，直到有socket就绪</span>
+</span></span><span style="display:flex;"><span>readable, writable, exceptional <span style="color:#f92672">=</span> select<span style="color:#f92672">.</span>select(
+</span></span><span style="display:flex;"><span>    read_list,
+</span></span><span style="display:flex;"><span>    write_list,
+</span></span><span style="display:flex;"><span>    error_list,
+</span></span><span style="display:flex;"><span>    timeout  <span style="color:#75715e"># 超时时间，None表示一直阻塞</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 处理就绪的socket</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> sock <span style="color:#f92672">in</span> readable:
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>    process(data)
+</span></span></code></pre></div><p><strong>select服务器示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> select
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>server <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>bind((<span style="color:#e6db74">&#39;0.0.0.0&#39;</span>, <span style="color:#ae81ff">8888</span>))
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>listen(<span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>setblocking(<span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 要监听的socket列表</span>
+</span></span><span style="display:flex;"><span>inputs <span style="color:#f92672">=</span> [server]
+</span></span><span style="display:flex;"><span>outputs <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> inputs:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 等待至少一个socket就绪</span>
+</span></span><span style="display:flex;"><span>    readable, writable, exceptional <span style="color:#f92672">=</span> select<span style="color:#f92672">.</span>select(
+</span></span><span style="display:flex;"><span>        inputs, outputs, inputs, <span style="color:#ae81ff">1.0</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 处理可读的socket</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> sock <span style="color:#f92672">in</span> readable:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> sock <span style="color:#f92672">is</span> server:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 服务器socket就绪：有新连接</span>
+</span></span><span style="display:flex;"><span>            client, addr <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>accept()
+</span></span><span style="display:flex;"><span>            client<span style="color:#f92672">.</span>setblocking(<span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>            inputs<span style="color:#f92672">.</span>append(client)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;新连接: </span><span style="color:#e6db74">{</span>addr<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 客户端socket就绪：有数据</span>
+</span></span><span style="display:flex;"><span>            data <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> data:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;收到数据: </span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 发送响应</span>
+</span></span><span style="display:flex;"><span>                sock<span style="color:#f92672">.</span>send(data)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 客户端断开</span>
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">&#34;客户端断开&#34;</span>)
+</span></span><span style="display:flex;"><span>                inputs<span style="color:#f92672">.</span>remove(sock)
+</span></span><span style="display:flex;"><span>                sock<span style="color:#f92672">.</span>close()
+</span></span></code></pre></div><p><strong>select的限制</strong>：</p>
+<pre tabindex="0"><code>1. 监听数量限制
+   - Linux默认：1024个socket
+   - 由FD_SETSIZE定义
+   - 无法修改（编译时确定）
+
+2. 性能问题
+   - 每次调用select都要把fd_set从用户空间拷贝到内核
+   - 内核需要遍历所有fd，检查是否就绪
+   - O(n)复杂度
+
+3. 不支持边缘触发
+   - 只支持水平触发（Level Trigger）
+
+4. 返回后需要遍历
+   - select只告诉你&#34;有socket就绪&#34;
+   - 不告诉你&#34;哪些socket就绪&#34;
+   - 需要自己遍历所有socket检查
+</code></pre><h3 id="23-poll">2.3 poll
+</h3><p><strong>poll改进</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> select
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建poll对象</span>
+</span></span><span style="display:flex;"><span>poll_obj <span style="color:#f92672">=</span> select<span style="color:#f92672">.</span>poll()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 注册socket</span>
+</span></span><span style="display:flex;"><span>poll_obj<span style="color:#f92672">.</span>register(sock1, select<span style="color:#f92672">.</span>POLLIN)
+</span></span><span style="display:flex;"><span>poll_obj<span style="color:#f92672">.</span>register(sock2, select<span style="color:#f92672">.</span>POLLIN <span style="color:#f92672">|</span> select<span style="color:#f92672">.</span>POLLOUT)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 等待事件</span>
+</span></span><span style="display:flex;"><span>events <span style="color:#f92672">=</span> poll_obj<span style="color:#f92672">.</span>poll(timeout)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 处理事件</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> fd, event <span style="color:#f92672">in</span> events:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> event <span style="color:#f92672">&amp;</span> select<span style="color:#f92672">.</span>POLLIN:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 可读</span>
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> sockets[fd]<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> event <span style="color:#f92672">&amp;</span> select<span style="color:#f92672">.</span>POLLOUT:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 可写</span>
+</span></span><span style="display:flex;"><span>        sockets[fd]<span style="color:#f92672">.</span>send(data)
+</span></span></code></pre></div><p><strong>poll vs select</strong>：</p>
+<pre tabindex="0"><code>poll的优点：
+✅ 没有最大文件描述符限制
+✅ 使用pollfd结构体数组，不需要每次都拷贝整个集合
+
+poll的缺点：
+❌ 仍然是O(n)复杂度
+❌ 仍需要从用户空间拷贝到内核空间
+❌ Windows不支持
+
+共同点：
+- 都是水平触发
+- 都需要遍历所有fd
+</code></pre><h3 id="24-epolllinux专用">2.4 epoll（Linux专用）
+</h3><p><strong>epoll的优势</strong>：</p>
+<pre tabindex="0"><code>epoll = 高性能的IO多路复用
+
+优点：
+✅ 没有最大文件描述符限制
+✅ O(1)复杂度（只返回就绪的fd）
+✅ 支持边缘触发（Edge Trigger）
+✅ 使用内存映射（mmap），减少拷贝
+
+epoll是Linux下高性能网络编程的首选！
+</code></pre><p><strong>epoll使用</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> select
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建epoll对象</span>
+</span></span><span style="display:flex;"><span>epoll <span style="color:#f92672">=</span> select<span style="color:#f92672">.</span>epoll()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 注册socket</span>
+</span></span><span style="display:flex;"><span>epoll<span style="color:#f92672">.</span>register(sock<span style="color:#f92672">.</span>fileno(), select<span style="color:#f92672">.</span>EPOLLIN)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 等待事件</span>
+</span></span><span style="display:flex;"><span>events <span style="color:#f92672">=</span> epoll<span style="color:#f92672">.</span>poll(timeout)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># events是已就绪的fd列表（不需要遍历所有fd）</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> fd, event <span style="color:#f92672">in</span> events:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> event <span style="color:#f92672">&amp;</span> select<span style="color:#f92672">.</span>EPOLLIN:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 可读</span>
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> sockets[fd]<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> event <span style="color:#f92672">&amp;</span> select<span style="color:#f92672">.</span>EPOLLOUT:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 可写</span>
+</span></span><span style="display:flex;"><span>        sockets[fd]<span style="color:#f92672">.</span>send(data)
+</span></span></code></pre></div><p><strong>epoll服务器示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> select
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>server <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_REUSEADDR, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>bind((<span style="color:#e6db74">&#39;0.0.0.0&#39;</span>, <span style="color:#ae81ff">8888</span>))
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>listen(<span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>server<span style="color:#f92672">.</span>setblocking(<span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>epoll <span style="color:#f92672">=</span> select<span style="color:#f92672">.</span>epoll()
+</span></span><span style="display:flex;"><span>epoll<span style="color:#f92672">.</span>register(server<span style="color:#f92672">.</span>fileno(), select<span style="color:#f92672">.</span>EPOLLIN)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>connections <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>requests <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>responses <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>        events <span style="color:#f92672">=</span> epoll<span style="color:#f92672">.</span>poll(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> fileno, event <span style="color:#f92672">in</span> events:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> fileno <span style="color:#f92672">==</span> server<span style="color:#f92672">.</span>fileno():
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 新连接</span>
+</span></span><span style="display:flex;"><span>                client, addr <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span>accept()
+</span></span><span style="display:flex;"><span>                client<span style="color:#f92672">.</span>setblocking(<span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>                epoll<span style="color:#f92672">.</span>register(client<span style="color:#f92672">.</span>fileno(), select<span style="color:#f92672">.</span>EPOLLIN)
+</span></span><span style="display:flex;"><span>                connections[client<span style="color:#f92672">.</span>fileno()] <span style="color:#f92672">=</span> client
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;新连接: </span><span style="color:#e6db74">{</span>addr<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> event <span style="color:#f92672">&amp;</span> select<span style="color:#f92672">.</span>EPOLLIN:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 可读</span>
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> connections[fileno]<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> data:
+</span></span><span style="display:flex;"><span>                    requests[fileno] <span style="color:#f92672">=</span> data
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e"># 修改为等待可写</span>
+</span></span><span style="display:flex;"><span>                    epoll<span style="color:#f92672">.</span>modify(fileno, select<span style="color:#f92672">.</span>EPOLLOUT)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e"># 断开连接</span>
+</span></span><span style="display:flex;"><span>                    epoll<span style="color:#f92672">.</span>unregister(fileno)
+</span></span><span style="display:flex;"><span>                    connections[fileno]<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">del</span> connections[fileno]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> event <span style="color:#f92672">&amp;</span> select<span style="color:#f92672">.</span>EPOLLOUT:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 可写</span>
+</span></span><span style="display:flex;"><span>                response <span style="color:#f92672">=</span> requests[fileno]
+</span></span><span style="display:flex;"><span>                connections[fileno]<span style="color:#f92672">.</span>send(response)
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 修改为等待可读</span>
+</span></span><span style="display:flex;"><span>                epoll<span style="color:#f92672">.</span>modify(fileno, select<span style="color:#f92672">.</span>EPOLLIN)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">del</span> requests[fileno]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">finally</span>:
+</span></span><span style="display:flex;"><span>    epoll<span style="color:#f92672">.</span>unregister(server<span style="color:#f92672">.</span>fileno())
+</span></span><span style="display:flex;"><span>    epoll<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>    server<span style="color:#f92672">.</span>close()
+</span></span></code></pre></div><p><strong>epoll触发模式</strong>：</p>
+<pre tabindex="0"><code>水平触发（Level Trigger，LT）：
+- 默认模式
+- 只要fd就绪，就会一直通知
+- 安全但可能有性能损失
+
+示例：
+socket缓冲区有100字节数据
+你只读了50字节
+下次epoll_wait还会通知你（还有50字节未读）
+
+边缘触发（Edge Trigger，ET）：
+- 高性能模式
+- 只在fd状态变化时通知一次
+- 必须一次性处理完所有数据
+
+示例：
+socket缓冲区有100字节数据
+你只读了50字节
+下次epoll_wait不会通知你（直到有新数据到达）
+必须循环读取直到EAGAIN错误
+
+选择：
+- LT：简单安全，适合大多数场景
+- ET：高性能，需要小心处理
+</code></pre><h3 id="25-selectpollepoll对比">2.5 select/poll/epoll对比
+</h3><pre tabindex="0"><code>┌──────────────┬──────────┬──────────┬──────────┐
+│   特性       │  select  │   poll   │  epoll   │
+├──────────────┼──────────┼──────────┼──────────┤
+│ 最大连接数   │   1024   │   无限制 │  无限制  │
+│ 复杂度       │   O(n)   │   O(n)   │   O(1)   │
+│ 跨平台       │    ✅    │  部分✅  │    ❌    │
+│ 性能         │    低    │    中    │    高    │
+│ 边缘触发     │    ❌    │    ❌    │    ✅    │
+│ 适用场景     │ 少量连接 │ 中等连接 │ 大量连接 │
+└──────────────┴──────────┴──────────┴──────────┘
+
+推荐使用：
+- Linux：epoll（最优）
+- Windows：IOCP（完成端口，不是select）
+- 跨平台：poll（或高级框架如asyncio、Twisted）
+</code></pre><hr>
+<h2 id="3-socket选项">3. Socket选项
+</h2><h3 id="31-常用socket选项">3.1 常用Socket选项
+</h3><p><strong>SO_REUSEADDR</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 允许地址重用</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_REUSEADDR, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>作用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1.</span> 允许在TIME_WAIT状态下重新绑定端口
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2.</span> 多个socket绑定到同一个端口<span style="color:#960050;background-color:#1e0010">（</span>不同接口<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>场景<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>服务器重启时<span style="color:#960050;background-color:#1e0010">，</span>之前的连接可能还在TIME_WAIT状态
+</span></span><span style="display:flex;"><span>如果不设置此选项<span style="color:#960050;background-color:#1e0010">，</span>bind()会失败<span style="color:#960050;background-color:#1e0010">：</span><span style="color:#e6db74">&#34;Address already in use&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>推荐<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>服务器应该总是设置此选项
+</span></span></code></pre></div><p><strong>SO_REUSEPORT</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 允许端口重用（负载均衡）</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_REUSEPORT, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>作用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>多个进程可以绑定到同一个端口
+</span></span><span style="display:flex;"><span>内核会自动负载均衡<span style="color:#960050;background-color:#1e0010">（</span>分发连接<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>使用场景<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>多进程服务器<span style="color:#960050;background-color:#1e0010">，</span>每个进程监听同一端口
+</span></span></code></pre></div><p><strong>TCP_NODELAY</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 禁用Nagle算法</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>IPPROTO_TCP, socket<span style="color:#f92672">.</span>TCP_NODELAY, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Nagle算法<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 小数据包会被延迟发送<span style="color:#960050;background-color:#1e0010">，</span>等待合并
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 减少网络包数量
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 但增加延迟
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>禁用场景<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 交互式应用<span style="color:#960050;background-color:#1e0010">（</span>SSH<span style="color:#960050;background-color:#1e0010">、</span>Telnet<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 低延迟要求<span style="color:#960050;background-color:#1e0010">（</span>游戏<span style="color:#960050;background-color:#1e0010">、</span>VoIP<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 已经做了应用层缓冲
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>保留场景<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 批量数据传输
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 对延迟不敏感
+</span></span></code></pre></div><p><strong>SO_KEEPALIVE</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 启用TCP保活机制</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_KEEPALIVE, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>作用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>定期发送探测包<span style="color:#960050;background-color:#1e0010">，</span>检测连接是否还活着
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>参数<span style="color:#960050;background-color:#1e0010">（</span>Linux<span style="color:#960050;background-color:#1e0010">）：</span>
+</span></span><span style="display:flex;"><span>TCP_KEEPIDLE: 空闲多久后开始探测<span style="color:#960050;background-color:#1e0010">（</span>默认2小时<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>TCP_KEEPINTVL: 探测间隔<span style="color:#960050;background-color:#1e0010">（</span>默认75秒<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>TCP_KEEPCNT: 探测次数<span style="color:#960050;background-color:#1e0010">（</span>默认9次<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>示例<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>IPPROTO_TCP, socket<span style="color:#f92672">.</span>TCP_KEEPIDLE, <span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>IPPROTO_TCP, socket<span style="color:#f92672">.</span>TCP_KEEPINTVL, <span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>IPPROTO_TCP, socket<span style="color:#f92672">.</span>TCP_KEEPCNT, <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 60秒后开始探测，每10秒一次，失败3次后关闭连接</span>
+</span></span></code></pre></div><p><strong>SO_RCVBUF / SO_SNDBUF</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 设置接收/发送缓冲区大小</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_RCVBUF, <span style="color:#ae81ff">128</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>)  <span style="color:#75715e"># 128KB</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_SNDBUF, <span style="color:#ae81ff">128</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>作用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>调整socket缓冲区大小
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>场景<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 高带宽网络<span style="color:#960050;background-color:#1e0010">：</span>增大缓冲区
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 低延迟要求<span style="color:#960050;background-color:#1e0010">：</span>减小缓冲区
+</span></span></code></pre></div><p><strong>SO_LINGER</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 设置关闭时的行为</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> struct
+</span></span><span style="display:flex;"><span>linger <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>pack(<span style="color:#e6db74">&#39;ii&#39;</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">10</span>)  <span style="color:#75715e"># 启用，等待10秒</span>
+</span></span><span style="display:flex;"><span>sock<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_LINGER, linger)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>参数<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>l_onoff: <span style="color:#ae81ff">0</span><span style="color:#f92672">=</span>禁用, <span style="color:#ae81ff">1</span><span style="color:#f92672">=</span>启用
+</span></span><span style="display:flex;"><span>l_linger: 等待时间<span style="color:#960050;background-color:#1e0010">（</span>秒<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>行为<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>l_onoff<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>: close()立即返回<span style="color:#960050;background-color:#1e0010">，</span>后台继续发送
+</span></span><span style="display:flex;"><span>l_onoff<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, l_linger<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">0</span>: close()等待数据发送完或超时
+</span></span><span style="display:flex;"><span>l_onoff<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, l_linger<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>: close()立即返回<span style="color:#960050;background-color:#1e0010">，</span>发送RST<span style="color:#960050;background-color:#1e0010">（</span>丢弃数据<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>使用场景<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>一般不设置<span style="color:#960050;background-color:#1e0010">，</span>使用默认行为
+</span></span></code></pre></div><h3 id="32-获取socket选项">3.2 获取Socket选项
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 获取选项值</span>
+</span></span><span style="display:flex;"><span>value <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>getsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_REUSEADDR)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;SO_REUSEADDR: </span><span style="color:#e6db74">{</span>value<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 获取缓冲区大小</span>
+</span></span><span style="display:flex;"><span>rcvbuf <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>getsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_RCVBUF)
+</span></span><span style="display:flex;"><span>sndbuf <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>getsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_SNDBUF)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;接收缓冲区: </span><span style="color:#e6db74">{</span>rcvbuf<span style="color:#e6db74">}</span><span style="color:#e6db74"> 字节&#34;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;发送缓冲区: </span><span style="color:#e6db74">{</span>sndbuf<span style="color:#e6db74">}</span><span style="color:#e6db74"> 字节&#34;</span>)
+</span></span></code></pre></div><hr>
+<h2 id="4-高性能服务器设计模式">4. 高性能服务器设计模式
+</h2><h3 id="41-常见架构模式">4.1 常见架构模式
+</h3><p><strong>1. 单线程阻塞（最简单）</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>    client, addr <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span>accept()  <span style="color:#75715e"># 阻塞</span>
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)        <span style="color:#75715e"># 阻塞</span>
+</span></span><span style="display:flex;"><span>    client<span style="color:#f92672">.</span>send(response)
+</span></span><span style="display:flex;"><span>    client<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>优点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 代码简单
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>缺点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 同一时间只能服务一个客户端
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 性能极差
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>适用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 学习demo
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 极少并发的场景
+</span></span></code></pre></div><p><strong>2. 多线程（简单但有限制）</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">handle_client</span>(client_sock):
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> client_sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>    client_sock<span style="color:#f92672">.</span>send(response)
+</span></span><span style="display:flex;"><span>    client_sock<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>    client, addr <span style="color:#f92672">=</span> server<span style="color:#f92672">.</span>accept()
+</span></span><span style="display:flex;"><span>    thread <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>handle_client, args<span style="color:#f92672">=</span>(client,))
+</span></span><span style="display:flex;"><span>    thread<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>优点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 可以同时处理多个客户端
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 代码相对简单
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>缺点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 线程开销大<span style="color:#960050;background-color:#1e0010">（</span>内存<span style="color:#960050;background-color:#1e0010">、</span>上下文切换<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 最多几千个线程
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> C10K问题<span style="color:#960050;background-color:#1e0010">（</span><span style="color:#ae81ff">10000</span>并发<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>适用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 中小规模应用
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 每个连接处理时间较长
+</span></span></code></pre></div><p><strong>3. 多进程（进程池）</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> multiprocessing <span style="color:#f92672">import</span> Process
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">worker</span>(server_sock):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>        client, addr <span style="color:#f92672">=</span> server_sock<span style="color:#f92672">.</span>accept()
+</span></span><span style="display:flex;"><span>        handle_client(client)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建多个工作进程</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">4</span>):
+</span></span><span style="display:flex;"><span>    p <span style="color:#f92672">=</span> Process(target<span style="color:#f92672">=</span>worker, args<span style="color:#f92672">=</span>(server,))
+</span></span><span style="display:flex;"><span>    p<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>优点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 利用多核CPU
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 进程隔离<span style="color:#960050;background-color:#1e0010">，</span>稳定性好
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>缺点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 进程开销更大
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 进程数量有限
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 进程间通信复杂
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>适用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> CPU密集型任务
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 需要进程隔离
+</span></span></code></pre></div><p><strong>4. IO多路复用 + 单线程（高性能）</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>epoll <span style="color:#f92672">=</span> select<span style="color:#f92672">.</span>epoll()
+</span></span><span style="display:flex;"><span>epoll<span style="color:#f92672">.</span>register(server<span style="color:#f92672">.</span>fileno(), select<span style="color:#f92672">.</span>EPOLLIN)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>    events <span style="color:#f92672">=</span> epoll<span style="color:#f92672">.</span>poll()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> fd, event <span style="color:#f92672">in</span> events:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 处理事件</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>优点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 高性能<span style="color:#960050;background-color:#1e0010">（</span>C10K<span style="color:#960050;background-color:#1e0010">、</span>C100K<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 资源占用少
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 单线程<span style="color:#960050;background-color:#1e0010">，</span>无锁
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>缺点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 代码复杂
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">❌</span> 回调地狱
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>适用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> IO密集型
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 大量并发连接
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 高性能要求
+</span></span></code></pre></div><p><strong>5. IO多路复用 + 线程池（推荐）</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> concurrent.futures <span style="color:#f92672">import</span> ThreadPoolExecutor
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>executor <span style="color:#f92672">=</span> ThreadPoolExecutor(max_workers<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>epoll <span style="color:#f92672">=</span> select<span style="color:#f92672">.</span>epoll()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>    events <span style="color:#f92672">=</span> epoll<span style="color:#f92672">.</span>poll()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> fd, event <span style="color:#f92672">in</span> events:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 提交到线程池处理</span>
+</span></span><span style="display:flex;"><span>        executor<span style="color:#f92672">.</span>submit(handle_event, fd, event)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>优点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 高并发<span style="color:#960050;background-color:#1e0010">（</span>epoll<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 利用多核<span style="color:#960050;background-color:#1e0010">（</span>线程池<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">✅</span> 代码相对简单
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>缺点<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">⚠️</span> 需要处理线程安全
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>适用<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> 生产环境推荐
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-</span> IO <span style="color:#f92672">+</span> CPU混合负载
+</span></span></code></pre></div><p><strong>6. Reactor模式（事件驱动）</strong></p>
+<pre tabindex="0"><code>Reactor模式（Twisted、asyncio）：
+
+组件：
+1. Reactor: 事件循环
+2. Handler: 事件处理器
+3. Acceptor: 接受新连接
+
+流程：
+1. Reactor监听事件
+2. 事件到达 → 调用对应Handler
+3. Handler处理 → 返回Reactor
+
+优点：
+✅ 高性能
+✅ 框架成熟
+
+适用：
+- 使用异步框架
+- asyncio、Twisted、Tornado
+</code></pre><h3 id="42-c10k问题">4.2 C10K问题
+</h3><pre tabindex="0"><code>C10K = 10000个并发连接
+
+历史：
+- 2000年前：Apache使用多线程/多进程
+- 问题：10000个线程 → 内存耗尽、上下文切换频繁
+
+解决方案：
+1. Nginx: IO多路复用 + 事件驱动
+2. 使用epoll（Linux）或kqueue（BSD）
+3. 非阻塞IO + 状态机
+
+现在：
+- C10K已经不是问题
+- C100K、C1000K（百万并发）成为新目标
+- 需要更多优化：内核参数、零拷贝等
+</code></pre><hr>
+<h2 id="5-实战项目多人聊天室">5. 实战项目：多人聊天室
+</h2><h3 id="51-项目需求">5.1 项目需求
+</h3><pre tabindex="0"><code>功能需求：
+1. 支持多用户同时在线
+2. 用户可以设置昵称
+3. 消息广播给所有用户
+4. 显示用户上线/下线通知
+5. 查看在线用户列表
+6. 私聊功能
+7. 房间/频道功能
+
+技术要求：
+- 使用TCP协议
+- 使用IO多路复用（epoll/select）
+- 服务器单线程
+- 支持至少100个并发连接
+</code></pre><h3 id="52-协议设计">5.2 协议设计
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>消息格式<span style="color:#960050;background-color:#1e0010">（</span>JSON<span style="color:#960050;background-color:#1e0010">）：</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1.</span> 加入聊天室
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;join&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;nickname&#34;</span>: <span style="color:#e6db74">&#34;Alice&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2.</span> 普通消息
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;message&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;content&#34;</span>: <span style="color:#e6db74">&#34;Hello everyone!&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3.</span> 私聊
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;private&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Bob&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;content&#34;</span>: <span style="color:#e6db74">&#34;Hi Bob!&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">4.</span> 列出用户
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;list_users&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">5.</span> 退出
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;quit&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>服务器响应<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;broadcast&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;Alice&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;content&#34;</span>: <span style="color:#e6db74">&#34;Hello everyone!&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;2024-01-15 10:30:00&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="53-工具演示">5.3 工具演示
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 启动聊天室服务器</span>
+</span></span><span style="display:flex;"><span>python day18_chat_server.py --host 0.0.0.0 --port <span style="color:#ae81ff">8888</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 启动聊天室客户端</span>
+</span></span><span style="display:flex;"><span>python day18_chat_client.py --host 127.0.0.1 --port <span style="color:#ae81ff">8888</span> --nickname Alice
+</span></span></code></pre></div><hr>
+<h2 id="6-今日练习">6. 今日练习
+</h2><h3 id="练习1阻塞vs非阻塞">练习1：阻塞vs非阻塞
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 编写程序比较阻塞和非阻塞socket的行为</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 创建阻塞socket，测量recv()的等待时间</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 创建非阻塞socket，测量recv()的返回时间</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 对比差异</span>
+</span></span></code></pre></div><h3 id="练习2实现select服务器">练习2：实现select服务器
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 使用select实现简单的回显服务器</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 要求：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 支持多客户端同时连接</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 每个客户端发送的数据原样返回</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 显示连接/断开信息</span>
+</span></span></code></pre></div><h3 id="练习3性能测试">练习3：性能测试
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 编写压力测试工具</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 创建100个并发连接</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 每个连接发送100条消息</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 测量总耗时和QPS</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 对比不同IO模型的性能</span>
+</span></span></code></pre></div><h3 id="练习4聊天室扩展">练习4：聊天室扩展
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 为聊天室添加功能：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 用户认证（登录）</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 消息历史记录</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 文件传输</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 表情支持</span>
+</span></span></code></pre></div><hr>
+<h2 id="7-常见问题">7. 常见问题
+</h2><p><strong>Q1：阻塞和非阻塞的本质区别是什么？</strong></p>
+<p>A：</p>
+<ul>
+<li>阻塞：系统调用会等待，直到条件满足</li>
+<li>非阻塞：系统调用立即返回，如果未就绪返回错误</li>
+</ul>
+<p><strong>Q2：select/poll/epoll应该选哪个？</strong></p>
+<p>A：</p>
+<ul>
+<li>Linux生产环境：epoll（性能最好）</li>
+<li>跨平台开发：select或poll</li>
+<li>少量连接：select够用</li>
+<li>大量连接：必须epoll</li>
+</ul>
+<p><strong>Q3：为什么epoll比select快？</strong></p>
+<p>A：</p>
+<ol>
+<li>select需要遍历所有fd（O(n)），epoll只返回就绪的（O(1)）</li>
+<li>select每次调用都要拷贝fd_set，epoll使用mmap</li>
+<li>epoll支持边缘触发，减少系统调用</li>
+</ol>
+<p><strong>Q4：什么时候用多线程，什么时候用IO多路复用？</strong></p>
+<p>A：</p>
+<ul>
+<li>IO密集型：IO多路复用</li>
+<li>CPU密集型：多线程/多进程</li>
+<li>混合型：IO多路复用 + 线程池</li>
+</ul>
+<p><strong>Q5：异步IO和IO多路复用有什么区别？</strong></p>
+<p>A：</p>
+<ul>
+<li>IO多路复用：同步非阻塞，select/epoll通知就绪</li>
+<li>异步IO：真正的异步，系统完成IO后通知</li>
+<li>Linux的AIO支持不完善，实际多用IO多路复用</li>
+</ul>
+<hr>
+<h2 id="8-总结">8. 总结
+</h2><p>今天我们学习了：</p>
+<h3 id="核心知识点">核心知识点
+</h3><ol>
+<li>
+<p><strong>阻塞vs非阻塞</strong>：</p>
+<ul>
+<li>阻塞：等待直到就绪</li>
+<li>非阻塞：立即返回，未就绪返回错误</li>
+</ul>
+</li>
+<li>
+<p><strong>IO多路复用</strong>：</p>
+<ul>
+<li>select：跨平台，有限制</li>
+<li>poll：改进的select</li>
+<li>epoll：Linux高性能（推荐）</li>
+</ul>
+</li>
+<li>
+<p><strong>Socket选项</strong>：</p>
+<ul>
+<li>SO_REUSEADDR：地址重用</li>
+<li>TCP_NODELAY：禁用Nagle</li>
+<li>SO_KEEPALIVE：保活机制</li>
+</ul>
+</li>
+<li>
+<p><strong>服务器架构</strong>：</p>
+<ul>
+<li>单线程阻塞：简单但慢</li>
+<li>多线程：简单但有限</li>
+<li>IO多路复用：高性能推荐</li>
+<li>Reactor模式：事件驱动</li>
+</ul>
+</li>
+<li>
+<p><strong>实战技巧</strong>：</p>
+<ul>
+<li>选择合适的IO模型</li>
+<li>配置Socket选项</li>
+<li>处理并发连接</li>
+</ul>
+</li>
+</ol>
+<h3 id="重点回顾">重点回顾
+</h3><pre tabindex="0"><code>高性能网络编程 = IO多路复用 + 非阻塞Socket
+
+Linux推荐：
+epoll + 非阻塞 + 边缘触发
+
+架构选择：
+IO密集 → epoll单线程
+CPU密集 → 多进程
+混合 → epoll + 线程池
+</code></pre><h3 id="明天预告">明天预告
+</h3><p><strong>第19天：HTTP协议基础</strong></p>
+<p>内容预览：</p>
+<ul>
+<li>HTTP协议概述</li>
+<li>HTTP请求和响应格式</li>
+<li>HTTP方法详解</li>
+<li>HTTP状态码</li>
+<li>Cookie和Session</li>
+<li>实现简单的HTTP服务器</li>
+</ul>
+<hr>
+<p><strong>继续加油！</strong> 🚀</p>
+<p>今天我们学习了高级Socket编程技术，理解了如何构建高性能服务器。这些知识是现代网络编程的核心，也是很多Web框架的底层实现原理。明天我们将学习应用层的HTTP协议！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/17%E5%A4%A9udp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">17天：UDP协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/16%E5%A4%A9tcp%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E6%9C%BA%E5%88%B6/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">16天：TCP可靠传输机制</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/15%E5%A4%A9tcp%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">15天：TCP协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%93%E4%BC%A0%E8%BE%93%E5%B1%82%E5%92%8C%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">三周总结：传输层和应用层协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%BA%8C%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%B1%82%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">二周总结：网络层深入理解</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

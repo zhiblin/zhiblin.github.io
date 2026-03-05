@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Day 36-40: 第六周后续内容总结 Day 36: DNS安全（DNSSEC） 核心内容：\nDNS安全威胁（缓存投毒、劫持） DNSSEC原理 数字签名验证 DNS over HTTPS (DoH) DNS over TLS (DoT) 关键知识点：\n">
+<title>六周后续内容总结</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/%E5%85%AD%E5%91%A8%E5%90%8E%E7%BB%AD%E5%86%85%E5%AE%B9%E6%80%BB%E7%BB%93/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="六周后续内容总结">
+<meta property='og:description' content="Day 36-40: 第六周后续内容总结 Day 36: DNS安全（DNSSEC） 核心内容：\nDNS安全威胁（缓存投毒、劫持） DNSSEC原理 数字签名验证 DNS over HTTPS (DoH) DNS over TLS (DoT) 关键知识点：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/%E5%85%AD%E5%91%A8%E5%90%8E%E7%BB%AD%E5%86%85%E5%AE%B9%E6%80%BB%E7%BB%93/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:26:36&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:26:36&#43;00:00'/>
+<meta name="twitter:title" content="六周后续内容总结">
+<meta name="twitter:description" content="Day 36-40: 第六周后续内容总结 Day 36: DNS安全（DNSSEC） 核心内容：\nDNS安全威胁（缓存投毒、劫持） DNSSEC原理 数字签名验证 DNS over HTTPS (DoH) DNS over TLS (DoT) 关键知识点：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#day-36-dns安全dnssec">Day 36: DNS安全（DNSSEC）</a></li>
+    <li><a href="#day-37-实战---dns服务器实现">Day 37: 实战 - DNS服务器实现</a></li>
+    <li><a href="#day-38-ftpsftp协议">Day 38: FTP/SFTP协议</a></li>
+    <li><a href="#day-39-smtppop3imap邮件协议">Day 39: SMTP/POP3/IMAP邮件协议</a></li>
+    <li><a href="#day-40-应用层协议总结">Day 40: 应用层协议总结</a>
+      <ul>
+        <li><a href="#学过的应用层协议总结">学过的应用层协议总结</a></li>
+        <li><a href="#应用层协议设计模式">应用层协议设计模式</a></li>
+        <li><a href="#协议选择指南">协议选择指南</a></li>
+        <li><a href="#性能优化总结">性能优化总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#第六周学习成果">第六周学习成果</a>
+      <ul>
+        <li><a href="#掌握的技能">掌握的技能</a></li>
+        <li><a href="#实战项目">实战项目</a></li>
+        <li><a href="#核心知识点">核心知识点</a></li>
+      </ul>
+    </li>
+    <li><a href="#下周预告">下周预告</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E5%85%AD%E5%91%A8%E5%90%8E%E7%BB%AD%E5%86%85%E5%AE%B9%E6%80%BB%E7%BB%93/">六周后续内容总结</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:26:36Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#day-36-dns安全dnssec">Day 36: DNS安全（DNSSEC）</a></li>
+    <li><a href="#day-37-实战---dns服务器实现">Day 37: 实战 - DNS服务器实现</a></li>
+    <li><a href="#day-38-ftpsftp协议">Day 38: FTP/SFTP协议</a></li>
+    <li><a href="#day-39-smtppop3imap邮件协议">Day 39: SMTP/POP3/IMAP邮件协议</a></li>
+    <li><a href="#day-40-应用层协议总结">Day 40: 应用层协议总结</a>
+      <ul>
+        <li><a href="#学过的应用层协议总结">学过的应用层协议总结</a></li>
+        <li><a href="#应用层协议设计模式">应用层协议设计模式</a></li>
+        <li><a href="#协议选择指南">协议选择指南</a></li>
+        <li><a href="#性能优化总结">性能优化总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#第六周学习成果">第六周学习成果</a>
+      <ul>
+        <li><a href="#掌握的技能">掌握的技能</a></li>
+        <li><a href="#实战项目">实战项目</a></li>
+        <li><a href="#核心知识点">核心知识点</a></li>
+      </ul>
+    </li>
+    <li><a href="#下周预告">下周预告</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="day-36-40-第六周后续内容总结">Day 36-40: 第六周后续内容总结
+</h1><h2 id="day-36-dns安全dnssec">Day 36: DNS安全（DNSSEC）
+</h2><p><strong>核心内容</strong>：</p>
+<ul>
+<li>DNS安全威胁（缓存投毒、劫持）</li>
+<li>DNSSEC原理</li>
+<li>数字签名验证</li>
+<li>DNS over HTTPS (DoH)</li>
+<li>DNS over TLS (DoT)</li>
+</ul>
+<p><strong>关键知识点</strong>：</p>
+<pre tabindex="0"><code>DNS安全威胁：
+- 缓存投毒：攻击者注入虚假DNS记录
+- DNS劫持：重定向到恶意网站
+- 中间人攻击：窃听DNS查询
+
+DNSSEC防护：
+- 数字签名：验证DNS记录真实性
+- 信任链：从根到叶的验证链
+- 记录类型：RRSIG, DNSKEY, DS, NSEC
+</code></pre><hr>
+<h2 id="day-37-实战---dns服务器实现">Day 37: 实战 - DNS服务器实现
+</h2><p><strong>核心内容</strong>：</p>
+<ul>
+<li>实现简单的DNS服务器</li>
+<li>处理DNS查询请求</li>
+<li>返回DNS响应</li>
+<li>本地DNS缓存</li>
+</ul>
+<p><strong>项目功能</strong>：</p>
+<ul>
+<li>接收UDP DNS查询</li>
+<li>解析查询报文</li>
+<li>查找本地记录</li>
+<li>构造并返回响应</li>
+<li>支持A、AAAA、CNAME记录</li>
+</ul>
+<p><strong>代码框架</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SimpleDNSServer</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self, port<span style="color:#f92672">=</span><span style="color:#ae81ff">53</span>):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>records <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>cache <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add_record</span>(self, domain, rtype, rdata):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;添加DNS记录&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">handle_query</span>(self, query_data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;处理DNS查询&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">build_response</span>(self, query, answers):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;构造DNS响应&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">start</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;启动DNS服务器&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span></code></pre></div><hr>
+<h2 id="day-38-ftpsftp协议">Day 38: FTP/SFTP协议
+</h2><p><strong>核心内容</strong>：</p>
+<ul>
+<li>FTP协议原理</li>
+<li>主动模式 vs 被动模式</li>
+<li>SFTP（SSH文件传输）</li>
+<li>文件传输实现</li>
+</ul>
+<p><strong>FTP工作模式</strong>：</p>
+<pre tabindex="0"><code>主动模式（PORT）：
+客户端 → 控制连接（21端口）→ 服务器
+服务器 → 数据连接（20端口）→ 客户端
+
+被动模式（PASV）：
+客户端 → 控制连接（21端口）→ 服务器
+客户端 → 数据连接（动态端口）→ 服务器
+
+SFTP：
+- 基于SSH（22端口）
+- 加密传输
+- 更安全
+</code></pre><hr>
+<h2 id="day-39-smtppop3imap邮件协议">Day 39: SMTP/POP3/IMAP邮件协议
+</h2><p><strong>核心内容</strong>：</p>
+<ul>
+<li>SMTP发送邮件</li>
+<li>POP3接收邮件</li>
+<li>IMAP邮件管理</li>
+<li>邮件格式（MIME）</li>
+</ul>
+<p><strong>协议对比</strong>：</p>
+<pre tabindex="0"><code>┌──────────┬──────┬────────────┬──────────┐
+│ 协议     │ 端口 │ 用途       │ 特点     │
+├──────────┼──────┼────────────┼──────────┤
+│ SMTP     │ 25   │ 发送邮件   │ 推送协议 │
+│ POP3     │ 110  │ 接收邮件   │ 下载删除 │
+│ IMAP     │ 143  │ 管理邮件   │ 服务器存 │
+└──────────┴──────┴────────────┴──────────┘
+
+SMTP流程：
+客户端 → SMTP服务器 → 收件服务器 → 收件人
+
+POP3 vs IMAP：
+POP3: 下载到本地，服务器删除
+IMAP: 邮件保留在服务器，支持多设备同步
+</code></pre><p><strong>代码示例</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># SMTP发送邮件</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> smtplib
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> email.mime.text <span style="color:#f92672">import</span> MIMEText
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>msg <span style="color:#f92672">=</span> MIMEText(<span style="color:#e6db74">&#39;邮件内容&#39;</span>)
+</span></span><span style="display:flex;"><span>msg[<span style="color:#e6db74">&#39;Subject&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;主题&#39;</span>
+</span></span><span style="display:flex;"><span>msg[<span style="color:#e6db74">&#39;From&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sender@example.com&#39;</span>
+</span></span><span style="display:flex;"><span>msg[<span style="color:#e6db74">&#39;To&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;receiver@example.com&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>smtp <span style="color:#f92672">=</span> smtplib<span style="color:#f92672">.</span>SMTP(<span style="color:#e6db74">&#39;smtp.example.com&#39;</span>, <span style="color:#ae81ff">25</span>)
+</span></span><span style="display:flex;"><span>smtp<span style="color:#f92672">.</span>send_message(msg)
+</span></span><span style="display:flex;"><span>smtp<span style="color:#f92672">.</span>quit()
+</span></span></code></pre></div><hr>
+<h2 id="day-40-应用层协议总结">Day 40: 应用层协议总结
+</h2><h3 id="学过的应用层协议总结">学过的应用层协议总结
+</h3><p><strong>HTTP家族</strong>：</p>
+<ul>
+<li>HTTP/1.1: 传统Web协议</li>
+<li>HTTP/2: 二进制分帧、多路复用</li>
+<li>HTTP/3: 基于QUIC，0-RTT连接</li>
+<li>HTTPS: TLS加密的HTTP</li>
+<li>WebSocket: 全双工实时通信</li>
+</ul>
+<p><strong>DNS</strong>：</p>
+<ul>
+<li>域名解析</li>
+<li>递归查询 vs 迭代查询</li>
+<li>DNS缓存</li>
+<li>DNSSEC安全</li>
+</ul>
+<p><strong>邮件协议</strong>：</p>
+<ul>
+<li>SMTP: 发送邮件（25, 587）</li>
+<li>POP3: 接收邮件（110, 995）</li>
+<li>IMAP: 管理邮件（143, 993）</li>
+</ul>
+<p><strong>文件传输</strong>：</p>
+<ul>
+<li>FTP: 文件传输（20, 21）</li>
+<li>SFTP: 安全文件传输（22）</li>
+</ul>
+<p><strong>其他</strong>：</p>
+<ul>
+<li>DHCP: 自动配置IP（67, 68）</li>
+<li>SSH: 安全远程登录（22）</li>
+<li>Telnet: 远程登录（23）</li>
+</ul>
+<h3 id="应用层协议设计模式">应用层协议设计模式
+</h3><p><strong>客户端-服务器模型</strong>：</p>
+<pre tabindex="0"><code>客户端 ←→ 服务器
+- HTTP, FTP, SMTP, DNS
+- 服务器提供服务
+- 客户端请求服务
+</code></pre><p><strong>P2P模型</strong>：</p>
+<pre tabindex="0"><code>对等节点 ←→ 对等节点
+- BitTorrent
+- 每个节点既是客户端又是服务器
+</code></pre><h3 id="协议选择指南">协议选择指南
+</h3><pre tabindex="0"><code>场景          → 推荐协议
+─────────────────────────────
+网页浏览      → HTTP/HTTPS
+实时通信      → WebSocket
+文件传输      → FTP/SFTP
+邮件发送      → SMTP
+邮件接收      → IMAP（推荐）或POP3
+域名解析      → DNS
+远程登录      → SSH
+API设计       → RESTful over HTTP
+</code></pre><h3 id="性能优化总结">性能优化总结
+</h3><p><strong>减少延迟</strong>：</p>
+<ul>
+<li>使用HTTP/2或HTTP/3</li>
+<li>启用缓存</li>
+<li>使用CDN</li>
+<li>减少往返次数</li>
+</ul>
+<p><strong>提高安全性</strong>：</p>
+<ul>
+<li>使用HTTPS/TLS</li>
+<li>启用DNSSEC</li>
+<li>使用SFTP而非FTP</li>
+<li>实施认证和授权</li>
+</ul>
+<p><strong>提升可靠性</strong>：</p>
+<ul>
+<li>实现重试机制</li>
+<li>超时控制</li>
+<li>错误处理</li>
+<li>健康检查</li>
+</ul>
+<hr>
+<h2 id="第六周学习成果">第六周学习成果
+</h2><h3 id="掌握的技能">掌握的技能
+</h3><ul>
+<li>✅ 深入理解DNS工作原理</li>
+<li>✅ 掌握递归和迭代查询</li>
+<li>✅ 了解DNS安全威胁和防护</li>
+<li>✅ 理解邮件协议工作流程</li>
+<li>✅ 掌握文件传输协议</li>
+<li>✅ 能够实现简单的应用层协议</li>
+</ul>
+<h3 id="实战项目">实战项目
+</h3><ol>
+<li>DNS查询工具</li>
+<li>DNS服务器（简化版）</li>
+<li>FTP客户端</li>
+<li>SMTP邮件发送工具</li>
+</ol>
+<h3 id="核心知识点">核心知识点
+</h3><pre tabindex="0"><code>应用层协议栈：
+
+应用层
+├── HTTP/HTTPS (Web)
+├── DNS (域名解析)
+├── SMTP/POP3/IMAP (邮件)
+├── FTP/SFTP (文件传输)
+└── SSH (远程登录)
+</code></pre><hr>
+<h2 id="下周预告">下周预告
+</h2><p><strong>第七周：TCP深入分析（Day 41-47）</strong></p>
+<p>主要内容：</p>
+<ul>
+<li>Day 41: TCP三次握手深入</li>
+<li>Day 42: TCP四次挥手和状态机</li>
+<li>Day 43: TCP流量控制（滑动窗口）</li>
+<li>Day 44: TCP拥塞控制算法</li>
+<li>Day 45: TCP性能优化</li>
+<li>Day 46: 实战：TCP性能测试</li>
+<li>Day 47: 第七周总结</li>
+</ul>
+<p>学习重点：</p>
+<ul>
+<li>深入理解TCP可靠传输机制</li>
+<li>掌握TCP性能优化技巧</li>
+<li>理解拥塞控制算法</li>
+<li>分析TCP性能瓶颈</li>
+</ul>
+<hr>
+<p><strong>进度：40/120天（33.3%）</strong></p>
+<p>第六周完成！你已经完成了应用层协议的学习。</p>
+<p>下周我们将深入传输层，学习TCP协议的高级特性！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E5%85%AD%E5%91%A8%E6%80%BB%E7%BB%93dns%E5%92%8C%E5%85%B6%E4%BB%96%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">六周总结：DNS和其他应用层协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/35%E5%A4%A9dns%E6%B7%B1%E5%85%A5-%E9%80%92%E5%BD%92%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%9F%A5%E8%AF%A2/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">35天：DNS深入 - 递归与迭代查询</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%BA%94%E5%91%A8%E5%AE%9E%E6%88%98%E6%80%BB%E7%BB%93/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">五周实战总结</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/31%E5%A4%A9websocket%E5%AE%9E%E6%97%B6%E9%80%9A%E4%BF%A1/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">31天：WebSocket实时通信</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/30%E5%A4%A9restful-api%E8%AE%BE%E8%AE%A1/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">30天：RESTful API设计</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

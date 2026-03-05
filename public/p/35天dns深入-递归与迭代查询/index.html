@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第35天：DNS深入 - 递归与迭代查询 &ldquo;DNS就像互联网的电话簿，将域名翻译成IP地址！&rdquo;\n📚 今日目标 深入理解DNS工作原理 掌握递归查询和迭代查询 学习DNS记录类型 理解DNS缓存机制 实现DNS查询工具 1. DNS基础回顾 1.1 DNS是什么？ DNS (Domain Name System) - 域名系统 作用：将人类可读的域名转换为机器可读的IP地址 示例： www.example.com → 93.184.216.34 生活化类比： DNS = 电话簿 域名 = 人名（张三） IP地址 = 电话号码（138-xxxx-xxxx） 你记得住&#34;张三&#34;，但记不住他的电话号码 DNS帮你把&#34;张三&#34;翻译成具体的电话号码 1.2 为什么需要DNS？ 问题：如果没有DNS 访问网站需要记住IP地址： - 访问百度：39.156.66.10 - 访问谷歌：172.217.160.68 - 访问GitHub：20.205.243.166 缺点： ❌ IP地址难记 ❌ IP地址会变化 ❌ 无法使用有意义的名称 有了DNS： ✅ 记住域名即可：www.baidu.com ✅ IP变化对用户透明 ✅ 域名有意义且易记 2. DNS层级结构 2.1 DNS树状结构 DNS命名空间是一个树状层级结构： 根域 (.) | ┌─────────────────┼─────────────────┐ | | | com org cn | | | ┌───┴───┐ ┌───┴───┐ ┌───┴───┐ | | | | | | example google wikipedia ietf baidu 163 | www 完整域名（FQDN）：www.example.com. - www: 主机名 - example: 二级域名 - com: 顶级域名（TLD） - .: 根域（通常省略） 域名层级（从右到左）： 1. 根域 (Root): . 2. 顶级域 (TLD): com, org, cn, net 3. 二级域 (SLD): example, google, baidu 4. 子域 (Subdomain): www, mail, ftp 常见顶级域名： 通用顶级域（gTLD）： - .com: 商业 - .org: 组织 - .net: 网络 - .edu: 教育 - .gov: 政府 国家顶级域（ccTLD）： - .cn: 中国 - .us: 美国 - .uk: 英国 - .jp: 日本 2.2 DNS服务器层级 DNS服务器架构： ┌─────────────────────────────────────────┐ │ 根DNS服务器 (Root DNS Servers) │ │ - 全球13个根服务器集群 │ │ - 知道所有TLD服务器的位置 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 顶级域DNS服务器 (TLD DNS Servers) │ │ - .com, .org, .cn等的权威服务器 │ │ - 知道各自域下的权威服务器位置 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 权威DNS服务器 (Authoritative Servers) │ │ - 存储域名的实际DNS记录 │ │ - example.com的权威服务器 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 本地DNS服务器 (Local/Recursive Servers) │ │ - ISP提供或自己配置 │ │ - 执行实际的DNS查询 │ │ - 缓存查询结果 │ └─────────────────────────────────────────┘ 3. DNS查询类型 3.1 递归查询（Recursive Query） 递归查询流程： 客户端只需要问一次，DNS服务器负责完成所有查询 ┌──────────┐ │ 客户端 │ └────┬─────┘ │ 1. 查询 www.example.com ↓ ┌────────────────┐ │ 本地DNS服务器 │ ← 递归查询的核心 └────┬───────────┘ │ 2. 查询根服务器 ↓ ┌────────────────┐ │ 根DNS服务器 │ └────┬───────────┘ │ 3. 返回.com服务器地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 4. 查询.com服务器 ↓ ┌────────────────┐ │ .com DNS服务器 │ └────┬───────────┘ │ 5. 返回example.com服务器地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 6. 查询example.com服务器 ↓ ┌─────────────────────┐ │ example.com服务器 │ └────┬────────────────┘ │ 7. 返回www的IP地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 8. 返回最终答案 ↓ ┌──────────┐ │ 客户端 │ ← 得到IP地址 └──────────┘ 特点： ✅ 客户端简单，只问一次 ✅ 服务器负责所有查询工作 ✅ 结果可以被缓存 ❌ 服务器负担重 生活化类比： 递归查询 = 找秘书帮忙 你：&#34;帮我查一下张三的电话&#34; 秘书：&#34;好的，我帮你查&#34; 秘书查遍所有通讯录，然后告诉你结果 3.2 迭代查询（Iterative Query） 迭代查询流程： 每次查询返回下一步应该问谁 ┌──────────┐ │ 客户端 │ （本地DNS服务器对客户端是递归） └────┬─────┘ │ 1. 查询 www.example.com ↓ ┌────────────────┐ │ 本地DNS服务器 │ ← 从这里开始是迭代查询 └────┬───────────┘ │ 2. 查询根服务器 ↓ ┌────────────────┐ │ 根DNS服务器 │ └────┬───────────┘ │ 3. 返回：&#34;我不知道，但你可以问.com服务器(192.x.x.x)&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 4. 查询.com服务器(192.x.x.x) ↓ ┌────────────────┐ │ .com DNS服务器 │ └────┬───────────┘ │ 5. 返回：&#34;我不知道，但你可以问example.com服务器(93.x.x.x)&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 6. 查询example.com服务器(93.x.x.x) ↓ ┌─────────────────────┐ │ example.com服务器 │ └────┬────────────────┘ │ 7. 返回：&#34;www.example.com的IP是93.184.216.34&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 8. 返回最终答案 ↓ ┌──────────┐ │ 客户端 │ └──────────┘ 特点： ✅ 每个服务器只负责回答或指引 ✅ 服务器负担轻 ❌ 需要多次查询 ❌ 客户端需要多次请求 生活化类比： 迭代查询 = 问路 你：&#34;请问图书馆怎么走？&#34; 路人甲：&#34;我不知道，但你可以问前面的警察&#34; 你走到警察处：&#34;请问图书馆怎么走？&#34; 警察：&#34;直走500米左转&#34; 3.3 查询对比 实际DNS查询过程： 客户端 → 本地DNS: 递归查询 本地DNS → 其他DNS: 迭代查询 为什么这样设计？ 1. 简化客户端 2. 减轻根服务器负担 3. 利用本地DNS缓存 完整查询示例： 时间线： T0: 客户端请求 www.example.com ├─ 客户端 → 本地DNS [递归查询] T1: 本地DNS开始工作 ├─ 检查缓存（未命中） ├─ 本地DNS → 根服务器 [迭代查询] └─ 根返回：请查询.com服务器(a.gtld-servers.net) T2: 本地DNS继续 ├─ 本地DNS → .com服务器 [迭代查询] └─ .com返回：请查询ns1.example.com T3: 本地DNS最后查询 ├─ 本地DNS → ns1.example.com [迭代查询] └─ ns1返回：93.184.216.34 T4: 结果返回 ├─ 本地DNS缓存结果（TTL=300秒） └─ 本地DNS → 客户端 [返回答案] 总耗时：约50-100ms（首次查询） 4. DNS记录类型 4.1 常见DNS记录 DNS资源记录（Resource Records, RR）格式： 名称 TTL 类 类型 数据 主要记录类型： 1. A记录 (Address) - 域名 → IPv4地址 - 示例：www.example.com. 300 IN A 93.184.216.34 - 用途：最常用，将域名指向IPv4 2. AAAA记录 - 域名 → IPv6地址 - 示例：www.example.com. 300 IN AAAA 2606:2800:220:1:248:1893:25c8:1946 - 用途：将域名指向IPv6 3. CNAME记录 (Canonical Name) - 域名 → 另一个域名（别名） - 示例：www.example.com. 300 IN CNAME example.com. - 用途：创建域名别名 - 注意：CNAME不能与其他记录共存 4. MX记录 (Mail Exchange) - 域名 → 邮件服务器 - 示例：example.com. 300 IN MX 10 mail.example.com. - 优先级：数字越小优先级越高 - 用途：指定邮件服务器 5. NS记录 (Name Server) - 域名 → 权威DNS服务器 - 示例：example.com. 300 IN NS ns1.example.com. - 用途：指定域名的DNS服务器 6. TXT记录 - 域名 → 文本信息 - 示例：example.com. 300 IN TXT &#34;v=spf1 include:_spf.example.com ~all&#34; - 用途：SPF、DKIM、域名验证等 7. PTR记录 (Pointer) - IP地址 → 域名（反向解析） - 示例：34.216.184.93.in-addr.arpa. 300 IN PTR www.example.com. - 用途：IP反向查询 8. SOA记录 (Start of Authority) - 域的权威信息 - 包含：主DNS服务器、管理员邮箱、序列号、刷新时间等 - 示例： example.com. 3600 IN SOA ns1.example.com. admin.example.com. ( 2024010601 ; 序列号 3600 ; 刷新时间 1800 ; 重试时间 604800 ; 过期时间 86400 ; 最小TTL ) 9. SRV记录 (Service) - 服务位置记录 - 示例：_http._tcp.example.com. 300 IN SRV 10 5 80 www.example.com. - 用途：指定服务的位置 4.2 DNS记录示例 完整的DNS区域文件示例： ; example.com DNS区域文件 ; SOA记录 example.com. 3600 IN SOA ns1.example.com. admin.example.com. ( 2024010601 ; Serial 3600 ; Refresh 1800 ; Retry 604800 ; Expire 86400 ) ; Minimum TTL ; NS记录 example.com. 3600 IN NS ns1.example.com. example.com. 3600 IN NS ns2.example.com. ; A记录 example.com. 300 IN A 93.184.216.34 www.example.com. 300 IN A 93.184.216.34 mail.example.com. 300 IN A 93.184.216.35 ftp.example.com. 300 IN A 93.184.216.36 ; AAAA记录 www.example.com. 300 IN AAAA 2606:2800:220:1:248:1893:25c8:1946 ; MX记录 example.com. 300 IN MX 10 mail.example.com. example.com. 300 IN MX 20 mail2.example.com. ; CNAME记录 blog.example.com. 300 IN CNAME www.example.com. shop.example.com. 300 IN CNAME www.example.com. ; TXT记录 example.com. 300 IN TXT &#34;v=spf1 mx ~all&#34; _dmarc.example.com. 300 IN TXT &#34;v=DMARC1; p=none; rua=mailto:dmarc@example.com&#34; 记录解读： - TTL 300: 缓存5分钟 - TTL 3600: 缓存1小时 - IN: Internet类 - 优先级10 &lt; 20: mail.example.com优先 5. DNS缓存机制 5.1 缓存层级 DNS缓存的多个层级： 1. 浏览器缓存 - 最快，但容量小 - Chrome: chrome://net-internals/#dns - TTL: 通常60秒 2. 操作系统缓存 - Windows: ipconfig /displaydns - Linux: systemd-resolved - macOS: dscacheutil -cachedump 3. 本地DNS服务器缓存 - ISP的DNS服务器 - 或自己配置的DNS（如8.8.8.8） - TTL: 由记录的TTL决定 4. 其他DNS服务器缓存 - 中间DNS服务器 - 根据TTL缓存 缓存工作流程： 查询 www.example.com Level 1: 浏览器缓存 ├─ 命中 → 直接返回 ✅ └─ 未命中 → 继续 Level 2: OS缓存 ├─ 命中 → 返回 ✅ └─ 未命中 → 继续 Level 3: 本地DNS缓存 ├─ 命中 → 返回 ✅ └─ 未命中 → 开始递归/迭代查询 Level 4: 实际DNS查询 └─ 查询权威服务器 → 获取答案 → 各层缓存 5.2 TTL（生存时间） TTL (Time To Live) - 缓存有效期 示例： www.example.com. 300 IN A 93.184.216.34 ↑ TTL=300秒（5分钟） TTL的作用： 1. 控制缓存时间 2. 平衡性能和新鲜度 3. 减轻DNS服务器负担 TTL设置策略： 短TTL（60-300秒）： ✅ 变更生效快 ✅ 适合频繁变更的记录 ❌ 查询多，服务器压力大 长TTL（3600-86400秒）： ✅ 减少查询，降低延迟 ✅ 减轻服务器负担 ❌ 变更生效慢 推荐设置： - 常用记录（www）: 300-3600秒 - 稳定记录（NS）: 3600-86400秒 - 邮件记录（MX）: 3600秒 - 变更前临时降低TTL 6. 实战项目：DNS查询工具 6.1 代码实现 # day35_dns_query_tool.py # 功能：DNS查询工具 import socket import struct from typing import List, Tuple, Dict import time class DNSQuery: &#34;&#34;&#34; DNS查询工具 功能： 1. 构造DNS查询报文 2. 发送查询 3. 解析响应 4. 支持多种记录类型 &#34;&#34;&#34; # DNS记录类型 QTYPE = { &#39;A&#39;: 1, # IPv4地址 &#39;NS&#39;: 2, # 域名服务器 &#39;CNAME&#39;: 5, # 规范名称 &#39;SOA&#39;: 6, # 授权开始 &#39;PTR&#39;: 12, # 指针记录 &#39;MX&#39;: 15, # 邮件交换 &#39;TXT&#39;: 16, # 文本 &#39;AAAA&#39;: 28, # IPv6地址 &#39;ANY&#39;: 255 # 所有记录 } def __init__(self, dns_server=&#39;8.8.8.8&#39;, port=53): &#34;&#34;&#34; 初始化DNS查询器 参数： dns_server: DNS服务器地址 port: DNS端口（默认53） &#34;&#34;&#34; self.dns_server = dns_server self.port = port def build_query(self, domain: str, qtype: str = &#39;A&#39;) -&gt; bytes: &#34;&#34;&#34; 构造DNS查询报文 参数： domain: 要查询的域名 qtype: 查询类型（A, AAAA, MX等） 返回： DNS查询报文（字节） DNS报文格式： +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Header | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Question | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Answer | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Authority | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Additional | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ &#34;&#34;&#34; # 1. 构造Header（12字节） transaction_id = 0x1234 # 事务ID flags = 0x0100 # 标准查询，期望递归 questions = 1 # 问题数 answers = 0 # 回答数 authority = 0 # 权威记录数 additional = 0 # 附加记录数 header = struct.pack( &#39;!HHHHHH&#39;, transaction_id, flags, questions, answers, authority, additional ) # 2. 构造Question # 域名编码：将 www.example.com 编码为 \\x03www\\x07example\\x03com\\x00 qname = b&#39;&#39; for part in domain.split(&#39;.&#39;): qname += bytes([len(part)]) + part.encode() qname += b&#39;\\x00&#39; # 结束标记 qtype_value = self.QTYPE.get(qtype.upper(), 1) qclass = 1 # IN (Internet) question = qname + struct.pack(&#39;!HH&#39;, qtype_value, qclass) return header + question def parse_response(self, response: bytes) -&gt; Dict: &#34;&#34;&#34; 解析DNS响应 参数： response: DNS响应报文 返回： 解析后的结果字典 &#34;&#34;&#34; result = { &#39;header&#39;: {}, &#39;questions&#39;: [], &#39;answers&#39;: [], &#39;authority&#39;: [], &#39;additional&#39;: [] } # 解析Header header = struct.unpack(&#39;!HHHHHH&#39;, response[:12]) result[&#39;header&#39;] = { &#39;id&#39;: header[0], &#39;flags&#39;: header[1], &#39;questions&#39;: header[2], &#39;answers&#39;: header[3], &#39;authority&#39;: header[4], &#39;additional&#39;: header[5] } # 解析Answer部分（简化版本） offset = 12 # 跳过Question部分 while response[offset] != 0: offset += 1 offset += 5 # 跳过结束符和QTYPE、QCLASS # 解析Answer for _ in range(result[&#39;header&#39;][&#39;answers&#39;]): # 简化：直接提取IP地址（假设是A记录） if offset + 12 &lt;= len(response): # 跳过名称（指针） offset += 2 # 读取类型、类、TTL、数据长度 rtype, rclass, ttl, rdlength = struct.unpack( &#39;!HHIH&#39;, response[offset:offset+10] ) offset += 10 # 读取数据 rdata = response[offset:offset+rdlength] offset += rdlength if rtype == 1 and rdlength == 4: # A记录 ip = &#39;.&#39;.join(str(b) for b in rdata) result[&#39;answers&#39;].append({ &#39;type&#39;: &#39;A&#39;, &#39;ttl&#39;: ttl, &#39;data&#39;: ip }) return result def query(self, domain: str, qtype: str = &#39;A&#39;, verbose: bool = True) -&gt; Dict: &#34;&#34;&#34; 执行DNS查询 参数： domain: 域名 qtype: 查询类型 verbose: 是否显示详细信息 返回： 查询结果 &#34;&#34;&#34; if verbose: print(f&#34;\\n正在查询: {domain} ({qtype}记录)&#34;) print(f&#34;DNS服务器: {self.dns_server}:{self.port}&#34;) # 构造查询 query_data = self.build_query(domain, qtype) # 创建UDP socket sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) sock.settimeout(3) try: # 发送查询 start_time = time.time() sock.sendto(query_data, (self.dns_server, self.port)) # 接收响应 response, _ = sock.recvfrom(512) query_time = (time.time() - start_time) * 1000 # 解析响应 result = self.parse_response(response) result[&#39;query_time&#39;] = query_time if verbose: print(f&#34;查询时间: {query_time:.2f}ms&#34;) print(f&#34;回答数量: {result[&#39;header&#39;][&#39;answers&#39;]}&#34;) if result[&#39;answers&#39;]: print(&#34;\\n结果:&#34;) for answer in result[&#39;answers&#39;]: print(f&#34; 类型: {answer[&#39;type&#39;]}&#34;) print(f&#34; TTL: {answer[&#39;ttl&#39;]}秒&#34;) print(f&#34; 数据: {answer[&#39;data&#39;]}&#34;) return result except socket.timeout: if verbose: print(&#34;❌ 查询超时&#34;) return {&#39;error&#39;: &#39;timeout&#39;} except Exception as e: if verbose: print(f&#34;❌ 查询失败: {e}&#34;) return {&#39;error&#39;: str(e)} finally: sock.close() def query_with_system(self, domain: str, verbose: bool = True): &#34;&#34;&#34; 使用系统DNS查询（对比） 参数： domain: 域名 verbose: 是否显示详细信息 &#34;&#34;&#34; if verbose: print(f&#34;\\n使用系统DNS查询: {domain}&#34;) try: start_time = time.time() result = socket.getaddrinfo(domain, None) query_time = (time.time() - start_time) * 1000 if verbose: print(f&#34;查询时间: {query_time:.2f}ms&#34;) print(&#34;\\n结果:&#34;) for item in result: if item[0] == socket.AF_INET: # IPv4 print(f&#34; IPv4: {item[4][0]}&#34;) elif item[0] == socket.AF_INET6: # IPv6 print(f&#34; IPv6: {item[4][0]}&#34;) return {&#39;results&#39;: result, &#39;query_time&#39;: query_time} except Exception as e: if verbose: print(f&#34;❌ 查询失败: {e}&#34;) return {&#39;error&#39;: str(e)} def compare_dns_servers(): &#34;&#34;&#34;对比不同DNS服务器的性能&#34;&#34;&#34; print(&#34;\\n&#34; + &#34;=&#34;*60) print(&#34; DNS服务器性能对比&#34;) print(&#34;=&#34;*60) dns_servers = [ (&#39;Google DNS&#39;, &#39;8.8.8.8&#39;), (&#39;Cloudflare DNS&#39;, &#39;1.1.1.1&#39;), (&#39;114 DNS&#39;, &#39;114.114.114.114&#39;), ] test_domains = [ &#39;www.baidu.com&#39;, &#39;www.google.com&#39;, &#39;www.github.com&#39; ] print(f&#34;\\n测试域名: {&#39;, &#39;.join(test_domains)}\\n&#34;) for name, server in dns_servers: print(f&#34;\\n{name} ({server}):&#34;) print(&#34;-&#34; * 60) query_tool = DNSQuery(server) total_time = 0 success_count = 0 for domain in test_domains: result = query_tool.query(domain, verbose=False) if &#39;query_time&#39; in result: total_time += result[&#39;query_time&#39;] success_count += 1 print(f&#34; {domain}: {result[&#39;query_time&#39;]:.2f}ms&#34;) if success_count &gt; 0: avg_time = total_time / success_count print(f&#34;\\n 平均查询时间: {avg_time:.2f}ms&#34;) def main(): &#34;&#34;&#34;主程序&#34;&#34;&#34; print(&#34;&#34;&#34; ╔══════════════════════════════════════════════════════════╗ ║ DNS查询工具 v1.0 ║ ║ DNS Query Tool ║ ╚══════════════════════════════════════════════════════════╝ &#34;&#34;&#34;) # 创建DNS查询器 dns_query = DNSQuery(dns_server=&#39;8.8.8.8&#39;) # 演示1：基本查询 print(&#34;\\n【演示1：基本DNS查询】&#34;) dns_query.query(&#39;www.baidu.com&#39;, &#39;A&#39;) input(&#34;\\n按Enter继续...&#34;) # 演示2：系统查询对比 print(&#34;\\n【演示2：自定义vs系统DNS查询对比】&#34;) dns_query.query_with_system(&#39;www.baidu.com&#39;) input(&#34;\\n按Enter继续...&#34;) # 演示3：DNS服务器性能对比 print(&#34;\\n【演示3：不同DNS服务器性能对比】&#34;) compare_dns_servers() print(&#34;&#34;&#34; \\n总结： DNS查询过程包括： 1. 构造查询报文 2. 发送UDP查询（端口53） 3. 接收响应 4. 解析结果 优化建议： - 使用快速DNS服务器 - 合理设置TTL - 启用DNS缓存 - 考虑使用DNS over HTTPS (DoH) 明天我们将学习DNS安全（DNSSEC）！ &#34;&#34;&#34;) if __name__ == &#34;__main__&#34;: main() ">
+<title>35天：DNS深入 - 递归与迭代查询</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/35%E5%A4%A9dns%E6%B7%B1%E5%85%A5-%E9%80%92%E5%BD%92%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%9F%A5%E8%AF%A2/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="35天：DNS深入 - 递归与迭代查询">
+<meta property='og:description' content="第35天：DNS深入 - 递归与迭代查询 &ldquo;DNS就像互联网的电话簿，将域名翻译成IP地址！&rdquo;\n📚 今日目标 深入理解DNS工作原理 掌握递归查询和迭代查询 学习DNS记录类型 理解DNS缓存机制 实现DNS查询工具 1. DNS基础回顾 1.1 DNS是什么？ DNS (Domain Name System) - 域名系统 作用：将人类可读的域名转换为机器可读的IP地址 示例： www.example.com → 93.184.216.34 生活化类比： DNS = 电话簿 域名 = 人名（张三） IP地址 = 电话号码（138-xxxx-xxxx） 你记得住&#34;张三&#34;，但记不住他的电话号码 DNS帮你把&#34;张三&#34;翻译成具体的电话号码 1.2 为什么需要DNS？ 问题：如果没有DNS 访问网站需要记住IP地址： - 访问百度：39.156.66.10 - 访问谷歌：172.217.160.68 - 访问GitHub：20.205.243.166 缺点： ❌ IP地址难记 ❌ IP地址会变化 ❌ 无法使用有意义的名称 有了DNS： ✅ 记住域名即可：www.baidu.com ✅ IP变化对用户透明 ✅ 域名有意义且易记 2. DNS层级结构 2.1 DNS树状结构 DNS命名空间是一个树状层级结构： 根域 (.) | ┌─────────────────┼─────────────────┐ | | | com org cn | | | ┌───┴───┐ ┌───┴───┐ ┌───┴───┐ | | | | | | example google wikipedia ietf baidu 163 | www 完整域名（FQDN）：www.example.com. - www: 主机名 - example: 二级域名 - com: 顶级域名（TLD） - .: 根域（通常省略） 域名层级（从右到左）： 1. 根域 (Root): . 2. 顶级域 (TLD): com, org, cn, net 3. 二级域 (SLD): example, google, baidu 4. 子域 (Subdomain): www, mail, ftp 常见顶级域名： 通用顶级域（gTLD）： - .com: 商业 - .org: 组织 - .net: 网络 - .edu: 教育 - .gov: 政府 国家顶级域（ccTLD）： - .cn: 中国 - .us: 美国 - .uk: 英国 - .jp: 日本 2.2 DNS服务器层级 DNS服务器架构： ┌─────────────────────────────────────────┐ │ 根DNS服务器 (Root DNS Servers) │ │ - 全球13个根服务器集群 │ │ - 知道所有TLD服务器的位置 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 顶级域DNS服务器 (TLD DNS Servers) │ │ - .com, .org, .cn等的权威服务器 │ │ - 知道各自域下的权威服务器位置 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 权威DNS服务器 (Authoritative Servers) │ │ - 存储域名的实际DNS记录 │ │ - example.com的权威服务器 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 本地DNS服务器 (Local/Recursive Servers) │ │ - ISP提供或自己配置 │ │ - 执行实际的DNS查询 │ │ - 缓存查询结果 │ └─────────────────────────────────────────┘ 3. DNS查询类型 3.1 递归查询（Recursive Query） 递归查询流程： 客户端只需要问一次，DNS服务器负责完成所有查询 ┌──────────┐ │ 客户端 │ └────┬─────┘ │ 1. 查询 www.example.com ↓ ┌────────────────┐ │ 本地DNS服务器 │ ← 递归查询的核心 └────┬───────────┘ │ 2. 查询根服务器 ↓ ┌────────────────┐ │ 根DNS服务器 │ └────┬───────────┘ │ 3. 返回.com服务器地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 4. 查询.com服务器 ↓ ┌────────────────┐ │ .com DNS服务器 │ └────┬───────────┘ │ 5. 返回example.com服务器地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 6. 查询example.com服务器 ↓ ┌─────────────────────┐ │ example.com服务器 │ └────┬────────────────┘ │ 7. 返回www的IP地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 8. 返回最终答案 ↓ ┌──────────┐ │ 客户端 │ ← 得到IP地址 └──────────┘ 特点： ✅ 客户端简单，只问一次 ✅ 服务器负责所有查询工作 ✅ 结果可以被缓存 ❌ 服务器负担重 生活化类比： 递归查询 = 找秘书帮忙 你：&#34;帮我查一下张三的电话&#34; 秘书：&#34;好的，我帮你查&#34; 秘书查遍所有通讯录，然后告诉你结果 3.2 迭代查询（Iterative Query） 迭代查询流程： 每次查询返回下一步应该问谁 ┌──────────┐ │ 客户端 │ （本地DNS服务器对客户端是递归） └────┬─────┘ │ 1. 查询 www.example.com ↓ ┌────────────────┐ │ 本地DNS服务器 │ ← 从这里开始是迭代查询 └────┬───────────┘ │ 2. 查询根服务器 ↓ ┌────────────────┐ │ 根DNS服务器 │ └────┬───────────┘ │ 3. 返回：&#34;我不知道，但你可以问.com服务器(192.x.x.x)&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 4. 查询.com服务器(192.x.x.x) ↓ ┌────────────────┐ │ .com DNS服务器 │ └────┬───────────┘ │ 5. 返回：&#34;我不知道，但你可以问example.com服务器(93.x.x.x)&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 6. 查询example.com服务器(93.x.x.x) ↓ ┌─────────────────────┐ │ example.com服务器 │ └────┬────────────────┘ │ 7. 返回：&#34;www.example.com的IP是93.184.216.34&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 8. 返回最终答案 ↓ ┌──────────┐ │ 客户端 │ └──────────┘ 特点： ✅ 每个服务器只负责回答或指引 ✅ 服务器负担轻 ❌ 需要多次查询 ❌ 客户端需要多次请求 生活化类比： 迭代查询 = 问路 你：&#34;请问图书馆怎么走？&#34; 路人甲：&#34;我不知道，但你可以问前面的警察&#34; 你走到警察处：&#34;请问图书馆怎么走？&#34; 警察：&#34;直走500米左转&#34; 3.3 查询对比 实际DNS查询过程： 客户端 → 本地DNS: 递归查询 本地DNS → 其他DNS: 迭代查询 为什么这样设计？ 1. 简化客户端 2. 减轻根服务器负担 3. 利用本地DNS缓存 完整查询示例： 时间线： T0: 客户端请求 www.example.com ├─ 客户端 → 本地DNS [递归查询] T1: 本地DNS开始工作 ├─ 检查缓存（未命中） ├─ 本地DNS → 根服务器 [迭代查询] └─ 根返回：请查询.com服务器(a.gtld-servers.net) T2: 本地DNS继续 ├─ 本地DNS → .com服务器 [迭代查询] └─ .com返回：请查询ns1.example.com T3: 本地DNS最后查询 ├─ 本地DNS → ns1.example.com [迭代查询] └─ ns1返回：93.184.216.34 T4: 结果返回 ├─ 本地DNS缓存结果（TTL=300秒） └─ 本地DNS → 客户端 [返回答案] 总耗时：约50-100ms（首次查询） 4. DNS记录类型 4.1 常见DNS记录 DNS资源记录（Resource Records, RR）格式： 名称 TTL 类 类型 数据 主要记录类型： 1. A记录 (Address) - 域名 → IPv4地址 - 示例：www.example.com. 300 IN A 93.184.216.34 - 用途：最常用，将域名指向IPv4 2. AAAA记录 - 域名 → IPv6地址 - 示例：www.example.com. 300 IN AAAA 2606:2800:220:1:248:1893:25c8:1946 - 用途：将域名指向IPv6 3. CNAME记录 (Canonical Name) - 域名 → 另一个域名（别名） - 示例：www.example.com. 300 IN CNAME example.com. - 用途：创建域名别名 - 注意：CNAME不能与其他记录共存 4. MX记录 (Mail Exchange) - 域名 → 邮件服务器 - 示例：example.com. 300 IN MX 10 mail.example.com. - 优先级：数字越小优先级越高 - 用途：指定邮件服务器 5. NS记录 (Name Server) - 域名 → 权威DNS服务器 - 示例：example.com. 300 IN NS ns1.example.com. - 用途：指定域名的DNS服务器 6. TXT记录 - 域名 → 文本信息 - 示例：example.com. 300 IN TXT &#34;v=spf1 include:_spf.example.com ~all&#34; - 用途：SPF、DKIM、域名验证等 7. PTR记录 (Pointer) - IP地址 → 域名（反向解析） - 示例：34.216.184.93.in-addr.arpa. 300 IN PTR www.example.com. - 用途：IP反向查询 8. SOA记录 (Start of Authority) - 域的权威信息 - 包含：主DNS服务器、管理员邮箱、序列号、刷新时间等 - 示例： example.com. 3600 IN SOA ns1.example.com. admin.example.com. ( 2024010601 ; 序列号 3600 ; 刷新时间 1800 ; 重试时间 604800 ; 过期时间 86400 ; 最小TTL ) 9. SRV记录 (Service) - 服务位置记录 - 示例：_http._tcp.example.com. 300 IN SRV 10 5 80 www.example.com. - 用途：指定服务的位置 4.2 DNS记录示例 完整的DNS区域文件示例： ; example.com DNS区域文件 ; SOA记录 example.com. 3600 IN SOA ns1.example.com. admin.example.com. ( 2024010601 ; Serial 3600 ; Refresh 1800 ; Retry 604800 ; Expire 86400 ) ; Minimum TTL ; NS记录 example.com. 3600 IN NS ns1.example.com. example.com. 3600 IN NS ns2.example.com. ; A记录 example.com. 300 IN A 93.184.216.34 www.example.com. 300 IN A 93.184.216.34 mail.example.com. 300 IN A 93.184.216.35 ftp.example.com. 300 IN A 93.184.216.36 ; AAAA记录 www.example.com. 300 IN AAAA 2606:2800:220:1:248:1893:25c8:1946 ; MX记录 example.com. 300 IN MX 10 mail.example.com. example.com. 300 IN MX 20 mail2.example.com. ; CNAME记录 blog.example.com. 300 IN CNAME www.example.com. shop.example.com. 300 IN CNAME www.example.com. ; TXT记录 example.com. 300 IN TXT &#34;v=spf1 mx ~all&#34; _dmarc.example.com. 300 IN TXT &#34;v=DMARC1; p=none; rua=mailto:dmarc@example.com&#34; 记录解读： - TTL 300: 缓存5分钟 - TTL 3600: 缓存1小时 - IN: Internet类 - 优先级10 &lt; 20: mail.example.com优先 5. DNS缓存机制 5.1 缓存层级 DNS缓存的多个层级： 1. 浏览器缓存 - 最快，但容量小 - Chrome: chrome://net-internals/#dns - TTL: 通常60秒 2. 操作系统缓存 - Windows: ipconfig /displaydns - Linux: systemd-resolved - macOS: dscacheutil -cachedump 3. 本地DNS服务器缓存 - ISP的DNS服务器 - 或自己配置的DNS（如8.8.8.8） - TTL: 由记录的TTL决定 4. 其他DNS服务器缓存 - 中间DNS服务器 - 根据TTL缓存 缓存工作流程： 查询 www.example.com Level 1: 浏览器缓存 ├─ 命中 → 直接返回 ✅ └─ 未命中 → 继续 Level 2: OS缓存 ├─ 命中 → 返回 ✅ └─ 未命中 → 继续 Level 3: 本地DNS缓存 ├─ 命中 → 返回 ✅ └─ 未命中 → 开始递归/迭代查询 Level 4: 实际DNS查询 └─ 查询权威服务器 → 获取答案 → 各层缓存 5.2 TTL（生存时间） TTL (Time To Live) - 缓存有效期 示例： www.example.com. 300 IN A 93.184.216.34 ↑ TTL=300秒（5分钟） TTL的作用： 1. 控制缓存时间 2. 平衡性能和新鲜度 3. 减轻DNS服务器负担 TTL设置策略： 短TTL（60-300秒）： ✅ 变更生效快 ✅ 适合频繁变更的记录 ❌ 查询多，服务器压力大 长TTL（3600-86400秒）： ✅ 减少查询，降低延迟 ✅ 减轻服务器负担 ❌ 变更生效慢 推荐设置： - 常用记录（www）: 300-3600秒 - 稳定记录（NS）: 3600-86400秒 - 邮件记录（MX）: 3600秒 - 变更前临时降低TTL 6. 实战项目：DNS查询工具 6.1 代码实现 # day35_dns_query_tool.py # 功能：DNS查询工具 import socket import struct from typing import List, Tuple, Dict import time class DNSQuery: &#34;&#34;&#34; DNS查询工具 功能： 1. 构造DNS查询报文 2. 发送查询 3. 解析响应 4. 支持多种记录类型 &#34;&#34;&#34; # DNS记录类型 QTYPE = { &#39;A&#39;: 1, # IPv4地址 &#39;NS&#39;: 2, # 域名服务器 &#39;CNAME&#39;: 5, # 规范名称 &#39;SOA&#39;: 6, # 授权开始 &#39;PTR&#39;: 12, # 指针记录 &#39;MX&#39;: 15, # 邮件交换 &#39;TXT&#39;: 16, # 文本 &#39;AAAA&#39;: 28, # IPv6地址 &#39;ANY&#39;: 255 # 所有记录 } def __init__(self, dns_server=&#39;8.8.8.8&#39;, port=53): &#34;&#34;&#34; 初始化DNS查询器 参数： dns_server: DNS服务器地址 port: DNS端口（默认53） &#34;&#34;&#34; self.dns_server = dns_server self.port = port def build_query(self, domain: str, qtype: str = &#39;A&#39;) -&gt; bytes: &#34;&#34;&#34; 构造DNS查询报文 参数： domain: 要查询的域名 qtype: 查询类型（A, AAAA, MX等） 返回： DNS查询报文（字节） DNS报文格式： +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Header | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Question | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Answer | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Authority | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Additional | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ &#34;&#34;&#34; # 1. 构造Header（12字节） transaction_id = 0x1234 # 事务ID flags = 0x0100 # 标准查询，期望递归 questions = 1 # 问题数 answers = 0 # 回答数 authority = 0 # 权威记录数 additional = 0 # 附加记录数 header = struct.pack( &#39;!HHHHHH&#39;, transaction_id, flags, questions, answers, authority, additional ) # 2. 构造Question # 域名编码：将 www.example.com 编码为 \\x03www\\x07example\\x03com\\x00 qname = b&#39;&#39; for part in domain.split(&#39;.&#39;): qname += bytes([len(part)]) + part.encode() qname += b&#39;\\x00&#39; # 结束标记 qtype_value = self.QTYPE.get(qtype.upper(), 1) qclass = 1 # IN (Internet) question = qname + struct.pack(&#39;!HH&#39;, qtype_value, qclass) return header + question def parse_response(self, response: bytes) -&gt; Dict: &#34;&#34;&#34; 解析DNS响应 参数： response: DNS响应报文 返回： 解析后的结果字典 &#34;&#34;&#34; result = { &#39;header&#39;: {}, &#39;questions&#39;: [], &#39;answers&#39;: [], &#39;authority&#39;: [], &#39;additional&#39;: [] } # 解析Header header = struct.unpack(&#39;!HHHHHH&#39;, response[:12]) result[&#39;header&#39;] = { &#39;id&#39;: header[0], &#39;flags&#39;: header[1], &#39;questions&#39;: header[2], &#39;answers&#39;: header[3], &#39;authority&#39;: header[4], &#39;additional&#39;: header[5] } # 解析Answer部分（简化版本） offset = 12 # 跳过Question部分 while response[offset] != 0: offset += 1 offset += 5 # 跳过结束符和QTYPE、QCLASS # 解析Answer for _ in range(result[&#39;header&#39;][&#39;answers&#39;]): # 简化：直接提取IP地址（假设是A记录） if offset + 12 &lt;= len(response): # 跳过名称（指针） offset += 2 # 读取类型、类、TTL、数据长度 rtype, rclass, ttl, rdlength = struct.unpack( &#39;!HHIH&#39;, response[offset:offset+10] ) offset += 10 # 读取数据 rdata = response[offset:offset+rdlength] offset += rdlength if rtype == 1 and rdlength == 4: # A记录 ip = &#39;.&#39;.join(str(b) for b in rdata) result[&#39;answers&#39;].append({ &#39;type&#39;: &#39;A&#39;, &#39;ttl&#39;: ttl, &#39;data&#39;: ip }) return result def query(self, domain: str, qtype: str = &#39;A&#39;, verbose: bool = True) -&gt; Dict: &#34;&#34;&#34; 执行DNS查询 参数： domain: 域名 qtype: 查询类型 verbose: 是否显示详细信息 返回： 查询结果 &#34;&#34;&#34; if verbose: print(f&#34;\\n正在查询: {domain} ({qtype}记录)&#34;) print(f&#34;DNS服务器: {self.dns_server}:{self.port}&#34;) # 构造查询 query_data = self.build_query(domain, qtype) # 创建UDP socket sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) sock.settimeout(3) try: # 发送查询 start_time = time.time() sock.sendto(query_data, (self.dns_server, self.port)) # 接收响应 response, _ = sock.recvfrom(512) query_time = (time.time() - start_time) * 1000 # 解析响应 result = self.parse_response(response) result[&#39;query_time&#39;] = query_time if verbose: print(f&#34;查询时间: {query_time:.2f}ms&#34;) print(f&#34;回答数量: {result[&#39;header&#39;][&#39;answers&#39;]}&#34;) if result[&#39;answers&#39;]: print(&#34;\\n结果:&#34;) for answer in result[&#39;answers&#39;]: print(f&#34; 类型: {answer[&#39;type&#39;]}&#34;) print(f&#34; TTL: {answer[&#39;ttl&#39;]}秒&#34;) print(f&#34; 数据: {answer[&#39;data&#39;]}&#34;) return result except socket.timeout: if verbose: print(&#34;❌ 查询超时&#34;) return {&#39;error&#39;: &#39;timeout&#39;} except Exception as e: if verbose: print(f&#34;❌ 查询失败: {e}&#34;) return {&#39;error&#39;: str(e)} finally: sock.close() def query_with_system(self, domain: str, verbose: bool = True): &#34;&#34;&#34; 使用系统DNS查询（对比） 参数： domain: 域名 verbose: 是否显示详细信息 &#34;&#34;&#34; if verbose: print(f&#34;\\n使用系统DNS查询: {domain}&#34;) try: start_time = time.time() result = socket.getaddrinfo(domain, None) query_time = (time.time() - start_time) * 1000 if verbose: print(f&#34;查询时间: {query_time:.2f}ms&#34;) print(&#34;\\n结果:&#34;) for item in result: if item[0] == socket.AF_INET: # IPv4 print(f&#34; IPv4: {item[4][0]}&#34;) elif item[0] == socket.AF_INET6: # IPv6 print(f&#34; IPv6: {item[4][0]}&#34;) return {&#39;results&#39;: result, &#39;query_time&#39;: query_time} except Exception as e: if verbose: print(f&#34;❌ 查询失败: {e}&#34;) return {&#39;error&#39;: str(e)} def compare_dns_servers(): &#34;&#34;&#34;对比不同DNS服务器的性能&#34;&#34;&#34; print(&#34;\\n&#34; + &#34;=&#34;*60) print(&#34; DNS服务器性能对比&#34;) print(&#34;=&#34;*60) dns_servers = [ (&#39;Google DNS&#39;, &#39;8.8.8.8&#39;), (&#39;Cloudflare DNS&#39;, &#39;1.1.1.1&#39;), (&#39;114 DNS&#39;, &#39;114.114.114.114&#39;), ] test_domains = [ &#39;www.baidu.com&#39;, &#39;www.google.com&#39;, &#39;www.github.com&#39; ] print(f&#34;\\n测试域名: {&#39;, &#39;.join(test_domains)}\\n&#34;) for name, server in dns_servers: print(f&#34;\\n{name} ({server}):&#34;) print(&#34;-&#34; * 60) query_tool = DNSQuery(server) total_time = 0 success_count = 0 for domain in test_domains: result = query_tool.query(domain, verbose=False) if &#39;query_time&#39; in result: total_time += result[&#39;query_time&#39;] success_count += 1 print(f&#34; {domain}: {result[&#39;query_time&#39;]:.2f}ms&#34;) if success_count &gt; 0: avg_time = total_time / success_count print(f&#34;\\n 平均查询时间: {avg_time:.2f}ms&#34;) def main(): &#34;&#34;&#34;主程序&#34;&#34;&#34; print(&#34;&#34;&#34; ╔══════════════════════════════════════════════════════════╗ ║ DNS查询工具 v1.0 ║ ║ DNS Query Tool ║ ╚══════════════════════════════════════════════════════════╝ &#34;&#34;&#34;) # 创建DNS查询器 dns_query = DNSQuery(dns_server=&#39;8.8.8.8&#39;) # 演示1：基本查询 print(&#34;\\n【演示1：基本DNS查询】&#34;) dns_query.query(&#39;www.baidu.com&#39;, &#39;A&#39;) input(&#34;\\n按Enter继续...&#34;) # 演示2：系统查询对比 print(&#34;\\n【演示2：自定义vs系统DNS查询对比】&#34;) dns_query.query_with_system(&#39;www.baidu.com&#39;) input(&#34;\\n按Enter继续...&#34;) # 演示3：DNS服务器性能对比 print(&#34;\\n【演示3：不同DNS服务器性能对比】&#34;) compare_dns_servers() print(&#34;&#34;&#34; \\n总结： DNS查询过程包括： 1. 构造查询报文 2. 发送UDP查询（端口53） 3. 接收响应 4. 解析结果 优化建议： - 使用快速DNS服务器 - 合理设置TTL - 启用DNS缓存 - 考虑使用DNS over HTTPS (DoH) 明天我们将学习DNS安全（DNSSEC）！ &#34;&#34;&#34;) if __name__ == &#34;__main__&#34;: main() ">
+<meta property='og:url' content='https://zhiblin.github.io/p/35%E5%A4%A9dns%E6%B7%B1%E5%85%A5-%E9%80%92%E5%BD%92%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%9F%A5%E8%AF%A2/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:25:56&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:25:56&#43;00:00'/>
+<meta name="twitter:title" content="35天：DNS深入 - 递归与迭代查询">
+<meta name="twitter:description" content="第35天：DNS深入 - 递归与迭代查询 &ldquo;DNS就像互联网的电话簿，将域名翻译成IP地址！&rdquo;\n📚 今日目标 深入理解DNS工作原理 掌握递归查询和迭代查询 学习DNS记录类型 理解DNS缓存机制 实现DNS查询工具 1. DNS基础回顾 1.1 DNS是什么？ DNS (Domain Name System) - 域名系统 作用：将人类可读的域名转换为机器可读的IP地址 示例： www.example.com → 93.184.216.34 生活化类比： DNS = 电话簿 域名 = 人名（张三） IP地址 = 电话号码（138-xxxx-xxxx） 你记得住&#34;张三&#34;，但记不住他的电话号码 DNS帮你把&#34;张三&#34;翻译成具体的电话号码 1.2 为什么需要DNS？ 问题：如果没有DNS 访问网站需要记住IP地址： - 访问百度：39.156.66.10 - 访问谷歌：172.217.160.68 - 访问GitHub：20.205.243.166 缺点： ❌ IP地址难记 ❌ IP地址会变化 ❌ 无法使用有意义的名称 有了DNS： ✅ 记住域名即可：www.baidu.com ✅ IP变化对用户透明 ✅ 域名有意义且易记 2. DNS层级结构 2.1 DNS树状结构 DNS命名空间是一个树状层级结构： 根域 (.) | ┌─────────────────┼─────────────────┐ | | | com org cn | | | ┌───┴───┐ ┌───┴───┐ ┌───┴───┐ | | | | | | example google wikipedia ietf baidu 163 | www 完整域名（FQDN）：www.example.com. - www: 主机名 - example: 二级域名 - com: 顶级域名（TLD） - .: 根域（通常省略） 域名层级（从右到左）： 1. 根域 (Root): . 2. 顶级域 (TLD): com, org, cn, net 3. 二级域 (SLD): example, google, baidu 4. 子域 (Subdomain): www, mail, ftp 常见顶级域名： 通用顶级域（gTLD）： - .com: 商业 - .org: 组织 - .net: 网络 - .edu: 教育 - .gov: 政府 国家顶级域（ccTLD）： - .cn: 中国 - .us: 美国 - .uk: 英国 - .jp: 日本 2.2 DNS服务器层级 DNS服务器架构： ┌─────────────────────────────────────────┐ │ 根DNS服务器 (Root DNS Servers) │ │ - 全球13个根服务器集群 │ │ - 知道所有TLD服务器的位置 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 顶级域DNS服务器 (TLD DNS Servers) │ │ - .com, .org, .cn等的权威服务器 │ │ - 知道各自域下的权威服务器位置 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 权威DNS服务器 (Authoritative Servers) │ │ - 存储域名的实际DNS记录 │ │ - example.com的权威服务器 │ └─────────────────────────────────────────┘ ↓ ┌─────────────────────────────────────────┐ │ 本地DNS服务器 (Local/Recursive Servers) │ │ - ISP提供或自己配置 │ │ - 执行实际的DNS查询 │ │ - 缓存查询结果 │ └─────────────────────────────────────────┘ 3. DNS查询类型 3.1 递归查询（Recursive Query） 递归查询流程： 客户端只需要问一次，DNS服务器负责完成所有查询 ┌──────────┐ │ 客户端 │ └────┬─────┘ │ 1. 查询 www.example.com ↓ ┌────────────────┐ │ 本地DNS服务器 │ ← 递归查询的核心 └────┬───────────┘ │ 2. 查询根服务器 ↓ ┌────────────────┐ │ 根DNS服务器 │ └────┬───────────┘ │ 3. 返回.com服务器地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 4. 查询.com服务器 ↓ ┌────────────────┐ │ .com DNS服务器 │ └────┬───────────┘ │ 5. 返回example.com服务器地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 6. 查询example.com服务器 ↓ ┌─────────────────────┐ │ example.com服务器 │ └────┬────────────────┘ │ 7. 返回www的IP地址 ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 8. 返回最终答案 ↓ ┌──────────┐ │ 客户端 │ ← 得到IP地址 └──────────┘ 特点： ✅ 客户端简单，只问一次 ✅ 服务器负责所有查询工作 ✅ 结果可以被缓存 ❌ 服务器负担重 生活化类比： 递归查询 = 找秘书帮忙 你：&#34;帮我查一下张三的电话&#34; 秘书：&#34;好的，我帮你查&#34; 秘书查遍所有通讯录，然后告诉你结果 3.2 迭代查询（Iterative Query） 迭代查询流程： 每次查询返回下一步应该问谁 ┌──────────┐ │ 客户端 │ （本地DNS服务器对客户端是递归） └────┬─────┘ │ 1. 查询 www.example.com ↓ ┌────────────────┐ │ 本地DNS服务器 │ ← 从这里开始是迭代查询 └────┬───────────┘ │ 2. 查询根服务器 ↓ ┌────────────────┐ │ 根DNS服务器 │ └────┬───────────┘ │ 3. 返回：&#34;我不知道，但你可以问.com服务器(192.x.x.x)&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 4. 查询.com服务器(192.x.x.x) ↓ ┌────────────────┐ │ .com DNS服务器 │ └────┬───────────┘ │ 5. 返回：&#34;我不知道，但你可以问example.com服务器(93.x.x.x)&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 6. 查询example.com服务器(93.x.x.x) ↓ ┌─────────────────────┐ │ example.com服务器 │ └────┬────────────────┘ │ 7. 返回：&#34;www.example.com的IP是93.184.216.34&#34; ↓ ┌────────────────┐ │ 本地DNS服务器 │ └────┬───────────┘ │ 8. 返回最终答案 ↓ ┌──────────┐ │ 客户端 │ └──────────┘ 特点： ✅ 每个服务器只负责回答或指引 ✅ 服务器负担轻 ❌ 需要多次查询 ❌ 客户端需要多次请求 生活化类比： 迭代查询 = 问路 你：&#34;请问图书馆怎么走？&#34; 路人甲：&#34;我不知道，但你可以问前面的警察&#34; 你走到警察处：&#34;请问图书馆怎么走？&#34; 警察：&#34;直走500米左转&#34; 3.3 查询对比 实际DNS查询过程： 客户端 → 本地DNS: 递归查询 本地DNS → 其他DNS: 迭代查询 为什么这样设计？ 1. 简化客户端 2. 减轻根服务器负担 3. 利用本地DNS缓存 完整查询示例： 时间线： T0: 客户端请求 www.example.com ├─ 客户端 → 本地DNS [递归查询] T1: 本地DNS开始工作 ├─ 检查缓存（未命中） ├─ 本地DNS → 根服务器 [迭代查询] └─ 根返回：请查询.com服务器(a.gtld-servers.net) T2: 本地DNS继续 ├─ 本地DNS → .com服务器 [迭代查询] └─ .com返回：请查询ns1.example.com T3: 本地DNS最后查询 ├─ 本地DNS → ns1.example.com [迭代查询] └─ ns1返回：93.184.216.34 T4: 结果返回 ├─ 本地DNS缓存结果（TTL=300秒） └─ 本地DNS → 客户端 [返回答案] 总耗时：约50-100ms（首次查询） 4. DNS记录类型 4.1 常见DNS记录 DNS资源记录（Resource Records, RR）格式： 名称 TTL 类 类型 数据 主要记录类型： 1. A记录 (Address) - 域名 → IPv4地址 - 示例：www.example.com. 300 IN A 93.184.216.34 - 用途：最常用，将域名指向IPv4 2. AAAA记录 - 域名 → IPv6地址 - 示例：www.example.com. 300 IN AAAA 2606:2800:220:1:248:1893:25c8:1946 - 用途：将域名指向IPv6 3. CNAME记录 (Canonical Name) - 域名 → 另一个域名（别名） - 示例：www.example.com. 300 IN CNAME example.com. - 用途：创建域名别名 - 注意：CNAME不能与其他记录共存 4. MX记录 (Mail Exchange) - 域名 → 邮件服务器 - 示例：example.com. 300 IN MX 10 mail.example.com. - 优先级：数字越小优先级越高 - 用途：指定邮件服务器 5. NS记录 (Name Server) - 域名 → 权威DNS服务器 - 示例：example.com. 300 IN NS ns1.example.com. - 用途：指定域名的DNS服务器 6. TXT记录 - 域名 → 文本信息 - 示例：example.com. 300 IN TXT &#34;v=spf1 include:_spf.example.com ~all&#34; - 用途：SPF、DKIM、域名验证等 7. PTR记录 (Pointer) - IP地址 → 域名（反向解析） - 示例：34.216.184.93.in-addr.arpa. 300 IN PTR www.example.com. - 用途：IP反向查询 8. SOA记录 (Start of Authority) - 域的权威信息 - 包含：主DNS服务器、管理员邮箱、序列号、刷新时间等 - 示例： example.com. 3600 IN SOA ns1.example.com. admin.example.com. ( 2024010601 ; 序列号 3600 ; 刷新时间 1800 ; 重试时间 604800 ; 过期时间 86400 ; 最小TTL ) 9. SRV记录 (Service) - 服务位置记录 - 示例：_http._tcp.example.com. 300 IN SRV 10 5 80 www.example.com. - 用途：指定服务的位置 4.2 DNS记录示例 完整的DNS区域文件示例： ; example.com DNS区域文件 ; SOA记录 example.com. 3600 IN SOA ns1.example.com. admin.example.com. ( 2024010601 ; Serial 3600 ; Refresh 1800 ; Retry 604800 ; Expire 86400 ) ; Minimum TTL ; NS记录 example.com. 3600 IN NS ns1.example.com. example.com. 3600 IN NS ns2.example.com. ; A记录 example.com. 300 IN A 93.184.216.34 www.example.com. 300 IN A 93.184.216.34 mail.example.com. 300 IN A 93.184.216.35 ftp.example.com. 300 IN A 93.184.216.36 ; AAAA记录 www.example.com. 300 IN AAAA 2606:2800:220:1:248:1893:25c8:1946 ; MX记录 example.com. 300 IN MX 10 mail.example.com. example.com. 300 IN MX 20 mail2.example.com. ; CNAME记录 blog.example.com. 300 IN CNAME www.example.com. shop.example.com. 300 IN CNAME www.example.com. ; TXT记录 example.com. 300 IN TXT &#34;v=spf1 mx ~all&#34; _dmarc.example.com. 300 IN TXT &#34;v=DMARC1; p=none; rua=mailto:dmarc@example.com&#34; 记录解读： - TTL 300: 缓存5分钟 - TTL 3600: 缓存1小时 - IN: Internet类 - 优先级10 &lt; 20: mail.example.com优先 5. DNS缓存机制 5.1 缓存层级 DNS缓存的多个层级： 1. 浏览器缓存 - 最快，但容量小 - Chrome: chrome://net-internals/#dns - TTL: 通常60秒 2. 操作系统缓存 - Windows: ipconfig /displaydns - Linux: systemd-resolved - macOS: dscacheutil -cachedump 3. 本地DNS服务器缓存 - ISP的DNS服务器 - 或自己配置的DNS（如8.8.8.8） - TTL: 由记录的TTL决定 4. 其他DNS服务器缓存 - 中间DNS服务器 - 根据TTL缓存 缓存工作流程： 查询 www.example.com Level 1: 浏览器缓存 ├─ 命中 → 直接返回 ✅ └─ 未命中 → 继续 Level 2: OS缓存 ├─ 命中 → 返回 ✅ └─ 未命中 → 继续 Level 3: 本地DNS缓存 ├─ 命中 → 返回 ✅ └─ 未命中 → 开始递归/迭代查询 Level 4: 实际DNS查询 └─ 查询权威服务器 → 获取答案 → 各层缓存 5.2 TTL（生存时间） TTL (Time To Live) - 缓存有效期 示例： www.example.com. 300 IN A 93.184.216.34 ↑ TTL=300秒（5分钟） TTL的作用： 1. 控制缓存时间 2. 平衡性能和新鲜度 3. 减轻DNS服务器负担 TTL设置策略： 短TTL（60-300秒）： ✅ 变更生效快 ✅ 适合频繁变更的记录 ❌ 查询多，服务器压力大 长TTL（3600-86400秒）： ✅ 减少查询，降低延迟 ✅ 减轻服务器负担 ❌ 变更生效慢 推荐设置： - 常用记录（www）: 300-3600秒 - 稳定记录（NS）: 3600-86400秒 - 邮件记录（MX）: 3600秒 - 变更前临时降低TTL 6. 实战项目：DNS查询工具 6.1 代码实现 # day35_dns_query_tool.py # 功能：DNS查询工具 import socket import struct from typing import List, Tuple, Dict import time class DNSQuery: &#34;&#34;&#34; DNS查询工具 功能： 1. 构造DNS查询报文 2. 发送查询 3. 解析响应 4. 支持多种记录类型 &#34;&#34;&#34; # DNS记录类型 QTYPE = { &#39;A&#39;: 1, # IPv4地址 &#39;NS&#39;: 2, # 域名服务器 &#39;CNAME&#39;: 5, # 规范名称 &#39;SOA&#39;: 6, # 授权开始 &#39;PTR&#39;: 12, # 指针记录 &#39;MX&#39;: 15, # 邮件交换 &#39;TXT&#39;: 16, # 文本 &#39;AAAA&#39;: 28, # IPv6地址 &#39;ANY&#39;: 255 # 所有记录 } def __init__(self, dns_server=&#39;8.8.8.8&#39;, port=53): &#34;&#34;&#34; 初始化DNS查询器 参数： dns_server: DNS服务器地址 port: DNS端口（默认53） &#34;&#34;&#34; self.dns_server = dns_server self.port = port def build_query(self, domain: str, qtype: str = &#39;A&#39;) -&gt; bytes: &#34;&#34;&#34; 构造DNS查询报文 参数： domain: 要查询的域名 qtype: 查询类型（A, AAAA, MX等） 返回： DNS查询报文（字节） DNS报文格式： +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Header | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Question | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Answer | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Authority | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ | Additional | +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ &#34;&#34;&#34; # 1. 构造Header（12字节） transaction_id = 0x1234 # 事务ID flags = 0x0100 # 标准查询，期望递归 questions = 1 # 问题数 answers = 0 # 回答数 authority = 0 # 权威记录数 additional = 0 # 附加记录数 header = struct.pack( &#39;!HHHHHH&#39;, transaction_id, flags, questions, answers, authority, additional ) # 2. 构造Question # 域名编码：将 www.example.com 编码为 \\x03www\\x07example\\x03com\\x00 qname = b&#39;&#39; for part in domain.split(&#39;.&#39;): qname += bytes([len(part)]) + part.encode() qname += b&#39;\\x00&#39; # 结束标记 qtype_value = self.QTYPE.get(qtype.upper(), 1) qclass = 1 # IN (Internet) question = qname + struct.pack(&#39;!HH&#39;, qtype_value, qclass) return header + question def parse_response(self, response: bytes) -&gt; Dict: &#34;&#34;&#34; 解析DNS响应 参数： response: DNS响应报文 返回： 解析后的结果字典 &#34;&#34;&#34; result = { &#39;header&#39;: {}, &#39;questions&#39;: [], &#39;answers&#39;: [], &#39;authority&#39;: [], &#39;additional&#39;: [] } # 解析Header header = struct.unpack(&#39;!HHHHHH&#39;, response[:12]) result[&#39;header&#39;] = { &#39;id&#39;: header[0], &#39;flags&#39;: header[1], &#39;questions&#39;: header[2], &#39;answers&#39;: header[3], &#39;authority&#39;: header[4], &#39;additional&#39;: header[5] } # 解析Answer部分（简化版本） offset = 12 # 跳过Question部分 while response[offset] != 0: offset += 1 offset += 5 # 跳过结束符和QTYPE、QCLASS # 解析Answer for _ in range(result[&#39;header&#39;][&#39;answers&#39;]): # 简化：直接提取IP地址（假设是A记录） if offset + 12 &lt;= len(response): # 跳过名称（指针） offset += 2 # 读取类型、类、TTL、数据长度 rtype, rclass, ttl, rdlength = struct.unpack( &#39;!HHIH&#39;, response[offset:offset+10] ) offset += 10 # 读取数据 rdata = response[offset:offset+rdlength] offset += rdlength if rtype == 1 and rdlength == 4: # A记录 ip = &#39;.&#39;.join(str(b) for b in rdata) result[&#39;answers&#39;].append({ &#39;type&#39;: &#39;A&#39;, &#39;ttl&#39;: ttl, &#39;data&#39;: ip }) return result def query(self, domain: str, qtype: str = &#39;A&#39;, verbose: bool = True) -&gt; Dict: &#34;&#34;&#34; 执行DNS查询 参数： domain: 域名 qtype: 查询类型 verbose: 是否显示详细信息 返回： 查询结果 &#34;&#34;&#34; if verbose: print(f&#34;\\n正在查询: {domain} ({qtype}记录)&#34;) print(f&#34;DNS服务器: {self.dns_server}:{self.port}&#34;) # 构造查询 query_data = self.build_query(domain, qtype) # 创建UDP socket sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) sock.settimeout(3) try: # 发送查询 start_time = time.time() sock.sendto(query_data, (self.dns_server, self.port)) # 接收响应 response, _ = sock.recvfrom(512) query_time = (time.time() - start_time) * 1000 # 解析响应 result = self.parse_response(response) result[&#39;query_time&#39;] = query_time if verbose: print(f&#34;查询时间: {query_time:.2f}ms&#34;) print(f&#34;回答数量: {result[&#39;header&#39;][&#39;answers&#39;]}&#34;) if result[&#39;answers&#39;]: print(&#34;\\n结果:&#34;) for answer in result[&#39;answers&#39;]: print(f&#34; 类型: {answer[&#39;type&#39;]}&#34;) print(f&#34; TTL: {answer[&#39;ttl&#39;]}秒&#34;) print(f&#34; 数据: {answer[&#39;data&#39;]}&#34;) return result except socket.timeout: if verbose: print(&#34;❌ 查询超时&#34;) return {&#39;error&#39;: &#39;timeout&#39;} except Exception as e: if verbose: print(f&#34;❌ 查询失败: {e}&#34;) return {&#39;error&#39;: str(e)} finally: sock.close() def query_with_system(self, domain: str, verbose: bool = True): &#34;&#34;&#34; 使用系统DNS查询（对比） 参数： domain: 域名 verbose: 是否显示详细信息 &#34;&#34;&#34; if verbose: print(f&#34;\\n使用系统DNS查询: {domain}&#34;) try: start_time = time.time() result = socket.getaddrinfo(domain, None) query_time = (time.time() - start_time) * 1000 if verbose: print(f&#34;查询时间: {query_time:.2f}ms&#34;) print(&#34;\\n结果:&#34;) for item in result: if item[0] == socket.AF_INET: # IPv4 print(f&#34; IPv4: {item[4][0]}&#34;) elif item[0] == socket.AF_INET6: # IPv6 print(f&#34; IPv6: {item[4][0]}&#34;) return {&#39;results&#39;: result, &#39;query_time&#39;: query_time} except Exception as e: if verbose: print(f&#34;❌ 查询失败: {e}&#34;) return {&#39;error&#39;: str(e)} def compare_dns_servers(): &#34;&#34;&#34;对比不同DNS服务器的性能&#34;&#34;&#34; print(&#34;\\n&#34; + &#34;=&#34;*60) print(&#34; DNS服务器性能对比&#34;) print(&#34;=&#34;*60) dns_servers = [ (&#39;Google DNS&#39;, &#39;8.8.8.8&#39;), (&#39;Cloudflare DNS&#39;, &#39;1.1.1.1&#39;), (&#39;114 DNS&#39;, &#39;114.114.114.114&#39;), ] test_domains = [ &#39;www.baidu.com&#39;, &#39;www.google.com&#39;, &#39;www.github.com&#39; ] print(f&#34;\\n测试域名: {&#39;, &#39;.join(test_domains)}\\n&#34;) for name, server in dns_servers: print(f&#34;\\n{name} ({server}):&#34;) print(&#34;-&#34; * 60) query_tool = DNSQuery(server) total_time = 0 success_count = 0 for domain in test_domains: result = query_tool.query(domain, verbose=False) if &#39;query_time&#39; in result: total_time += result[&#39;query_time&#39;] success_count += 1 print(f&#34; {domain}: {result[&#39;query_time&#39;]:.2f}ms&#34;) if success_count &gt; 0: avg_time = total_time / success_count print(f&#34;\\n 平均查询时间: {avg_time:.2f}ms&#34;) def main(): &#34;&#34;&#34;主程序&#34;&#34;&#34; print(&#34;&#34;&#34; ╔══════════════════════════════════════════════════════════╗ ║ DNS查询工具 v1.0 ║ ║ DNS Query Tool ║ ╚══════════════════════════════════════════════════════════╝ &#34;&#34;&#34;) # 创建DNS查询器 dns_query = DNSQuery(dns_server=&#39;8.8.8.8&#39;) # 演示1：基本查询 print(&#34;\\n【演示1：基本DNS查询】&#34;) dns_query.query(&#39;www.baidu.com&#39;, &#39;A&#39;) input(&#34;\\n按Enter继续...&#34;) # 演示2：系统查询对比 print(&#34;\\n【演示2：自定义vs系统DNS查询对比】&#34;) dns_query.query_with_system(&#39;www.baidu.com&#39;) input(&#34;\\n按Enter继续...&#34;) # 演示3：DNS服务器性能对比 print(&#34;\\n【演示3：不同DNS服务器性能对比】&#34;) compare_dns_servers() print(&#34;&#34;&#34; \\n总结： DNS查询过程包括： 1. 构造查询报文 2. 发送UDP查询（端口53） 3. 接收响应 4. 解析结果 优化建议： - 使用快速DNS服务器 - 合理设置TTL - 启用DNS缓存 - 考虑使用DNS over HTTPS (DoH) 明天我们将学习DNS安全（DNSSEC）！ &#34;&#34;&#34;) if __name__ == &#34;__main__&#34;: main() ">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#1-dns基础回顾">1. DNS基础回顾</a>
+      <ul>
+        <li><a href="#11-dns是什么">1.1 DNS是什么？</a></li>
+        <li><a href="#12-为什么需要dns">1.2 为什么需要DNS？</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-dns层级结构">2. DNS层级结构</a>
+      <ul>
+        <li><a href="#21-dns树状结构">2.1 DNS树状结构</a></li>
+        <li><a href="#22-dns服务器层级">2.2 DNS服务器层级</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-dns查询类型">3. DNS查询类型</a>
+      <ul>
+        <li><a href="#31-递归查询recursive-query">3.1 递归查询（Recursive Query）</a></li>
+        <li><a href="#32-迭代查询iterative-query">3.2 迭代查询（Iterative Query）</a></li>
+        <li><a href="#33-查询对比">3.3 查询对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-dns记录类型">4. DNS记录类型</a>
+      <ul>
+        <li><a href="#41-常见dns记录">4.1 常见DNS记录</a></li>
+        <li><a href="#42-dns记录示例">4.2 DNS记录示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-dns缓存机制">5. DNS缓存机制</a>
+      <ul>
+        <li><a href="#51-缓存层级">5.1 缓存层级</a></li>
+        <li><a href="#52-ttl生存时间">5.2 TTL（生存时间）</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-实战项目dns查询工具">6. 实战项目：DNS查询工具</a>
+      <ul>
+        <li><a href="#61-代码实现">6.1 代码实现</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/35%E5%A4%A9dns%E6%B7%B1%E5%85%A5-%E9%80%92%E5%BD%92%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%9F%A5%E8%AF%A2/">35天：DNS深入 - 递归与迭代查询</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:25:56Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#1-dns基础回顾">1. DNS基础回顾</a>
+      <ul>
+        <li><a href="#11-dns是什么">1.1 DNS是什么？</a></li>
+        <li><a href="#12-为什么需要dns">1.2 为什么需要DNS？</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-dns层级结构">2. DNS层级结构</a>
+      <ul>
+        <li><a href="#21-dns树状结构">2.1 DNS树状结构</a></li>
+        <li><a href="#22-dns服务器层级">2.2 DNS服务器层级</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-dns查询类型">3. DNS查询类型</a>
+      <ul>
+        <li><a href="#31-递归查询recursive-query">3.1 递归查询（Recursive Query）</a></li>
+        <li><a href="#32-迭代查询iterative-query">3.2 迭代查询（Iterative Query）</a></li>
+        <li><a href="#33-查询对比">3.3 查询对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-dns记录类型">4. DNS记录类型</a>
+      <ul>
+        <li><a href="#41-常见dns记录">4.1 常见DNS记录</a></li>
+        <li><a href="#42-dns记录示例">4.2 DNS记录示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-dns缓存机制">5. DNS缓存机制</a>
+      <ul>
+        <li><a href="#51-缓存层级">5.1 缓存层级</a></li>
+        <li><a href="#52-ttl生存时间">5.2 TTL（生存时间）</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-实战项目dns查询工具">6. 实战项目：DNS查询工具</a>
+      <ul>
+        <li><a href="#61-代码实现">6.1 代码实现</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第35天dns深入---递归与迭代查询">第35天：DNS深入 - 递归与迭代查询
+</h1>
+    <blockquote>
+        <p>&ldquo;DNS就像互联网的电话簿，将域名翻译成IP地址！&rdquo;</p>
+
+    </blockquote>
+<h2 id="-今日目标">📚 今日目标
+</h2><ul>
+<li>深入理解DNS工作原理</li>
+<li>掌握递归查询和迭代查询</li>
+<li>学习DNS记录类型</li>
+<li>理解DNS缓存机制</li>
+<li>实现DNS查询工具</li>
+</ul>
+<hr>
+<h2 id="1-dns基础回顾">1. DNS基础回顾
+</h2><h3 id="11-dns是什么">1.1 DNS是什么？
+</h3><pre tabindex="0"><code>DNS (Domain Name System) - 域名系统
+
+作用：将人类可读的域名转换为机器可读的IP地址
+
+示例：
+www.example.com  →  93.184.216.34
+
+生活化类比：
+DNS = 电话簿
+域名 = 人名（张三）
+IP地址 = 电话号码（138-xxxx-xxxx）
+
+你记得住&#34;张三&#34;，但记不住他的电话号码
+DNS帮你把&#34;张三&#34;翻译成具体的电话号码
+</code></pre><h3 id="12-为什么需要dns">1.2 为什么需要DNS？
+</h3><pre tabindex="0"><code>问题：如果没有DNS
+
+访问网站需要记住IP地址：
+- 访问百度：39.156.66.10
+- 访问谷歌：172.217.160.68
+- 访问GitHub：20.205.243.166
+
+缺点：
+❌ IP地址难记
+❌ IP地址会变化
+❌ 无法使用有意义的名称
+
+有了DNS：
+✅ 记住域名即可：www.baidu.com
+✅ IP变化对用户透明
+✅ 域名有意义且易记
+</code></pre><hr>
+<h2 id="2-dns层级结构">2. DNS层级结构
+</h2><h3 id="21-dns树状结构">2.1 DNS树状结构
+</h3><pre tabindex="0"><code>DNS命名空间是一个树状层级结构：
+
+                    根域 (.)
+                      |
+    ┌─────────────────┼─────────────────┐
+    |                 |                 |
+   com               org               cn
+    |                 |                 |
+┌───┴───┐         ┌───┴───┐         ┌───┴───┐
+|       |         |       |         |       |
+example google   wikipedia ietf    baidu  163
+|
+www
+
+完整域名（FQDN）：www.example.com.
+- www: 主机名
+- example: 二级域名
+- com: 顶级域名（TLD）
+- .: 根域（通常省略）
+
+域名层级（从右到左）：
+1. 根域 (Root): .
+2. 顶级域 (TLD): com, org, cn, net
+3. 二级域 (SLD): example, google, baidu
+4. 子域 (Subdomain): www, mail, ftp
+
+常见顶级域名：
+通用顶级域（gTLD）：
+- .com: 商业
+- .org: 组织
+- .net: 网络
+- .edu: 教育
+- .gov: 政府
+
+国家顶级域（ccTLD）：
+- .cn: 中国
+- .us: 美国
+- .uk: 英国
+- .jp: 日本
+</code></pre><h3 id="22-dns服务器层级">2.2 DNS服务器层级
+</h3><pre tabindex="0"><code>DNS服务器架构：
+
+┌─────────────────────────────────────────┐
+│ 根DNS服务器 (Root DNS Servers)          │
+│ - 全球13个根服务器集群                   │
+│ - 知道所有TLD服务器的位置                │
+└─────────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────────┐
+│ 顶级域DNS服务器 (TLD DNS Servers)       │
+│ - .com, .org, .cn等的权威服务器         │
+│ - 知道各自域下的权威服务器位置           │
+└─────────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────────┐
+│ 权威DNS服务器 (Authoritative Servers)   │
+│ - 存储域名的实际DNS记录                  │
+│ - example.com的权威服务器                │
+└─────────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────────┐
+│ 本地DNS服务器 (Local/Recursive Servers) │
+│ - ISP提供或自己配置                      │
+│ - 执行实际的DNS查询                      │
+│ - 缓存查询结果                           │
+└─────────────────────────────────────────┘
+</code></pre><hr>
+<h2 id="3-dns查询类型">3. DNS查询类型
+</h2><h3 id="31-递归查询recursive-query">3.1 递归查询（Recursive Query）
+</h3><pre tabindex="0"><code>递归查询流程：
+
+客户端只需要问一次，DNS服务器负责完成所有查询
+
+┌──────────┐
+│  客户端  │
+└────┬─────┘
+     │ 1. 查询 www.example.com
+     ↓
+┌────────────────┐
+│ 本地DNS服务器  │ ← 递归查询的核心
+└────┬───────────┘
+     │ 2. 查询根服务器
+     ↓
+┌────────────────┐
+│  根DNS服务器   │
+└────┬───────────┘
+     │ 3. 返回.com服务器地址
+     ↓
+┌────────────────┐
+│ 本地DNS服务器  │
+└────┬───────────┘
+     │ 4. 查询.com服务器
+     ↓
+┌────────────────┐
+│ .com DNS服务器 │
+└────┬───────────┘
+     │ 5. 返回example.com服务器地址
+     ↓
+┌────────────────┐
+│ 本地DNS服务器  │
+└────┬───────────┘
+     │ 6. 查询example.com服务器
+     ↓
+┌─────────────────────┐
+│ example.com服务器   │
+└────┬────────────────┘
+     │ 7. 返回www的IP地址
+     ↓
+┌────────────────┐
+│ 本地DNS服务器  │
+└────┬───────────┘
+     │ 8. 返回最终答案
+     ↓
+┌──────────┐
+│  客户端  │ ← 得到IP地址
+└──────────┘
+
+特点：
+✅ 客户端简单，只问一次
+✅ 服务器负责所有查询工作
+✅ 结果可以被缓存
+❌ 服务器负担重
+
+生活化类比：
+递归查询 = 找秘书帮忙
+你：&#34;帮我查一下张三的电话&#34;
+秘书：&#34;好的，我帮你查&#34;
+秘书查遍所有通讯录，然后告诉你结果
+</code></pre><h3 id="32-迭代查询iterative-query">3.2 迭代查询（Iterative Query）
+</h3><pre tabindex="0"><code>迭代查询流程：
+
+每次查询返回下一步应该问谁
+
+┌──────────┐
+│  客户端  │ （本地DNS服务器对客户端是递归）
+└────┬─────┘
+     │ 1. 查询 www.example.com
+     ↓
+┌────────────────┐
+│ 本地DNS服务器  │ ← 从这里开始是迭代查询
+└────┬───────────┘
+     │ 2. 查询根服务器
+     ↓
+┌────────────────┐
+│  根DNS服务器   │
+└────┬───────────┘
+     │ 3. 返回：&#34;我不知道，但你可以问.com服务器(192.x.x.x)&#34;
+     ↓
+┌────────────────┐
+│ 本地DNS服务器  │
+└────┬───────────┘
+     │ 4. 查询.com服务器(192.x.x.x)
+     ↓
+┌────────────────┐
+│ .com DNS服务器 │
+└────┬───────────┘
+     │ 5. 返回：&#34;我不知道，但你可以问example.com服务器(93.x.x.x)&#34;
+     ↓
+┌────────────────┐
+│ 本地DNS服务器  │
+└────┬───────────┘
+     │ 6. 查询example.com服务器(93.x.x.x)
+     ↓
+┌─────────────────────┐
+│ example.com服务器   │
+└────┬────────────────┘
+     │ 7. 返回：&#34;www.example.com的IP是93.184.216.34&#34;
+     ↓
+┌────────────────┐
+│ 本地DNS服务器  │
+└────┬───────────┘
+     │ 8. 返回最终答案
+     ↓
+┌──────────┐
+│  客户端  │
+└──────────┘
+
+特点：
+✅ 每个服务器只负责回答或指引
+✅ 服务器负担轻
+❌ 需要多次查询
+❌ 客户端需要多次请求
+
+生活化类比：
+迭代查询 = 问路
+你：&#34;请问图书馆怎么走？&#34;
+路人甲：&#34;我不知道，但你可以问前面的警察&#34;
+你走到警察处：&#34;请问图书馆怎么走？&#34;
+警察：&#34;直走500米左转&#34;
+</code></pre><h3 id="33-查询对比">3.3 查询对比
+</h3><pre tabindex="0"><code>实际DNS查询过程：
+
+客户端 → 本地DNS: 递归查询
+本地DNS → 其他DNS: 迭代查询
+
+为什么这样设计？
+1. 简化客户端
+2. 减轻根服务器负担
+3. 利用本地DNS缓存
+
+完整查询示例：
+
+时间线：
+T0: 客户端请求 www.example.com
+    ├─ 客户端 → 本地DNS [递归查询]
+
+T1: 本地DNS开始工作
+    ├─ 检查缓存（未命中）
+    ├─ 本地DNS → 根服务器 [迭代查询]
+    └─ 根返回：请查询.com服务器(a.gtld-servers.net)
+
+T2: 本地DNS继续
+    ├─ 本地DNS → .com服务器 [迭代查询]
+    └─ .com返回：请查询ns1.example.com
+
+T3: 本地DNS最后查询
+    ├─ 本地DNS → ns1.example.com [迭代查询]
+    └─ ns1返回：93.184.216.34
+
+T4: 结果返回
+    ├─ 本地DNS缓存结果（TTL=300秒）
+    └─ 本地DNS → 客户端 [返回答案]
+
+总耗时：约50-100ms（首次查询）
+</code></pre><hr>
+<h2 id="4-dns记录类型">4. DNS记录类型
+</h2><h3 id="41-常见dns记录">4.1 常见DNS记录
+</h3><pre tabindex="0"><code>DNS资源记录（Resource Records, RR）格式：
+名称  TTL  类  类型  数据
+
+主要记录类型：
+
+1. A记录 (Address)
+   - 域名 → IPv4地址
+   - 示例：www.example.com. 300 IN A 93.184.216.34
+   - 用途：最常用，将域名指向IPv4
+
+2. AAAA记录
+   - 域名 → IPv6地址
+   - 示例：www.example.com. 300 IN AAAA 2606:2800:220:1:248:1893:25c8:1946
+   - 用途：将域名指向IPv6
+
+3. CNAME记录 (Canonical Name)
+   - 域名 → 另一个域名（别名）
+   - 示例：www.example.com. 300 IN CNAME example.com.
+   - 用途：创建域名别名
+   - 注意：CNAME不能与其他记录共存
+
+4. MX记录 (Mail Exchange)
+   - 域名 → 邮件服务器
+   - 示例：example.com. 300 IN MX 10 mail.example.com.
+   - 优先级：数字越小优先级越高
+   - 用途：指定邮件服务器
+
+5. NS记录 (Name Server)
+   - 域名 → 权威DNS服务器
+   - 示例：example.com. 300 IN NS ns1.example.com.
+   - 用途：指定域名的DNS服务器
+
+6. TXT记录
+   - 域名 → 文本信息
+   - 示例：example.com. 300 IN TXT &#34;v=spf1 include:_spf.example.com ~all&#34;
+   - 用途：SPF、DKIM、域名验证等
+
+7. PTR记录 (Pointer)
+   - IP地址 → 域名（反向解析）
+   - 示例：34.216.184.93.in-addr.arpa. 300 IN PTR www.example.com.
+   - 用途：IP反向查询
+
+8. SOA记录 (Start of Authority)
+   - 域的权威信息
+   - 包含：主DNS服务器、管理员邮箱、序列号、刷新时间等
+   - 示例：
+     example.com. 3600 IN SOA ns1.example.com. admin.example.com. (
+       2024010601 ; 序列号
+       3600       ; 刷新时间
+       1800       ; 重试时间
+       604800     ; 过期时间
+       86400      ; 最小TTL
+     )
+
+9. SRV记录 (Service)
+   - 服务位置记录
+   - 示例：_http._tcp.example.com. 300 IN SRV 10 5 80 www.example.com.
+   - 用途：指定服务的位置
+</code></pre><h3 id="42-dns记录示例">4.2 DNS记录示例
+</h3><pre tabindex="0"><code>完整的DNS区域文件示例：
+
+; example.com DNS区域文件
+
+; SOA记录
+example.com.    3600    IN  SOA ns1.example.com. admin.example.com. (
+                            2024010601  ; Serial
+                            3600        ; Refresh
+                            1800        ; Retry
+                            604800      ; Expire
+                            86400 )     ; Minimum TTL
+
+; NS记录
+example.com.    3600    IN  NS  ns1.example.com.
+example.com.    3600    IN  NS  ns2.example.com.
+
+; A记录
+example.com.    300     IN  A   93.184.216.34
+www.example.com. 300    IN  A   93.184.216.34
+mail.example.com. 300   IN  A   93.184.216.35
+ftp.example.com.  300   IN  A   93.184.216.36
+
+; AAAA记录
+www.example.com. 300    IN  AAAA 2606:2800:220:1:248:1893:25c8:1946
+
+; MX记录
+example.com.    300     IN  MX  10 mail.example.com.
+example.com.    300     IN  MX  20 mail2.example.com.
+
+; CNAME记录
+blog.example.com. 300   IN  CNAME www.example.com.
+shop.example.com. 300   IN  CNAME www.example.com.
+
+; TXT记录
+example.com.    300     IN  TXT &#34;v=spf1 mx ~all&#34;
+_dmarc.example.com. 300 IN  TXT &#34;v=DMARC1; p=none; rua=mailto:dmarc@example.com&#34;
+
+记录解读：
+- TTL 300: 缓存5分钟
+- TTL 3600: 缓存1小时
+- IN: Internet类
+- 优先级10 &lt; 20: mail.example.com优先
+</code></pre><hr>
+<h2 id="5-dns缓存机制">5. DNS缓存机制
+</h2><h3 id="51-缓存层级">5.1 缓存层级
+</h3><pre tabindex="0"><code>DNS缓存的多个层级：
+
+1. 浏览器缓存
+   - 最快，但容量小
+   - Chrome: chrome://net-internals/#dns
+   - TTL: 通常60秒
+
+2. 操作系统缓存
+   - Windows: ipconfig /displaydns
+   - Linux: systemd-resolved
+   - macOS: dscacheutil -cachedump
+
+3. 本地DNS服务器缓存
+   - ISP的DNS服务器
+   - 或自己配置的DNS（如8.8.8.8）
+   - TTL: 由记录的TTL决定
+
+4. 其他DNS服务器缓存
+   - 中间DNS服务器
+   - 根据TTL缓存
+
+缓存工作流程：
+查询 www.example.com
+
+Level 1: 浏览器缓存
+  ├─ 命中 → 直接返回 ✅
+  └─ 未命中 → 继续
+
+Level 2: OS缓存
+  ├─ 命中 → 返回 ✅
+  └─ 未命中 → 继续
+
+Level 3: 本地DNS缓存
+  ├─ 命中 → 返回 ✅
+  └─ 未命中 → 开始递归/迭代查询
+
+Level 4: 实际DNS查询
+  └─ 查询权威服务器 → 获取答案 → 各层缓存
+</code></pre><h3 id="52-ttl生存时间">5.2 TTL（生存时间）
+</h3><pre tabindex="0"><code>TTL (Time To Live) - 缓存有效期
+
+示例：
+www.example.com. 300 IN A 93.184.216.34
+                 ↑
+                TTL=300秒（5分钟）
+
+TTL的作用：
+1. 控制缓存时间
+2. 平衡性能和新鲜度
+3. 减轻DNS服务器负担
+
+TTL设置策略：
+
+短TTL（60-300秒）：
+✅ 变更生效快
+✅ 适合频繁变更的记录
+❌ 查询多，服务器压力大
+
+长TTL（3600-86400秒）：
+✅ 减少查询，降低延迟
+✅ 减轻服务器负担
+❌ 变更生效慢
+
+推荐设置：
+- 常用记录（www）: 300-3600秒
+- 稳定记录（NS）: 3600-86400秒
+- 邮件记录（MX）: 3600秒
+- 变更前临时降低TTL
+</code></pre><hr>
+<h2 id="6-实战项目dns查询工具">6. 实战项目：DNS查询工具
+</h2><h3 id="61-代码实现">6.1 代码实现
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># day35_dns_query_tool.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 功能：DNS查询工具</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> struct
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> List, Tuple, Dict
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DNSQuery</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    DNS查询工具
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    功能：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        1. 构造DNS查询报文
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        2. 发送查询
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        3. 解析响应
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        4. 支持多种记录类型
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># DNS记录类型</span>
+</span></span><span style="display:flex;"><span>    QTYPE <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;A&#39;</span>: <span style="color:#ae81ff">1</span>,      <span style="color:#75715e"># IPv4地址</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;NS&#39;</span>: <span style="color:#ae81ff">2</span>,     <span style="color:#75715e"># 域名服务器</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;CNAME&#39;</span>: <span style="color:#ae81ff">5</span>,  <span style="color:#75715e"># 规范名称</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;SOA&#39;</span>: <span style="color:#ae81ff">6</span>,    <span style="color:#75715e"># 授权开始</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;PTR&#39;</span>: <span style="color:#ae81ff">12</span>,   <span style="color:#75715e"># 指针记录</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;MX&#39;</span>: <span style="color:#ae81ff">15</span>,    <span style="color:#75715e"># 邮件交换</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;TXT&#39;</span>: <span style="color:#ae81ff">16</span>,   <span style="color:#75715e"># 文本</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;AAAA&#39;</span>: <span style="color:#ae81ff">28</span>,  <span style="color:#75715e"># IPv6地址</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;ANY&#39;</span>: <span style="color:#ae81ff">255</span>   <span style="color:#75715e"># 所有记录</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self, dns_server<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;8.8.8.8&#39;</span>, port<span style="color:#f92672">=</span><span style="color:#ae81ff">53</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        初始化DNS查询器
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            dns_server: DNS服务器地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            port: DNS端口（默认53）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dns_server <span style="color:#f92672">=</span> dns_server
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>port <span style="color:#f92672">=</span> port
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">build_query</span>(self, domain: str, qtype: str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;A&#39;</span>) <span style="color:#f92672">-&gt;</span> bytes:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        构造DNS查询报文
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            domain: 要查询的域名
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            qtype: 查询类型（A, AAAA, MX等）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            DNS查询报文（字节）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        DNS报文格式：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        |                    Header                     |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        |                   Question                    |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        |                    Answer                     |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        |                  Authority                    |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        |                  Additional                   |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 1. 构造Header（12字节）</span>
+</span></span><span style="display:flex;"><span>        transaction_id <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x1234</span>  <span style="color:#75715e"># 事务ID</span>
+</span></span><span style="display:flex;"><span>        flags <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x0100</span>  <span style="color:#75715e"># 标准查询，期望递归</span>
+</span></span><span style="display:flex;"><span>        questions <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>   <span style="color:#75715e"># 问题数</span>
+</span></span><span style="display:flex;"><span>        answers <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>     <span style="color:#75715e"># 回答数</span>
+</span></span><span style="display:flex;"><span>        authority <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>   <span style="color:#75715e"># 权威记录数</span>
+</span></span><span style="display:flex;"><span>        additional <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>  <span style="color:#75715e"># 附加记录数</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        header <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>pack(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;!HHHHHH&#39;</span>,
+</span></span><span style="display:flex;"><span>            transaction_id, flags,
+</span></span><span style="display:flex;"><span>            questions, answers, authority, additional
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 2. 构造Question</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 域名编码：将 www.example.com 编码为 \x03www\x07example\x03com\x00</span>
+</span></span><span style="display:flex;"><span>        qname <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> part <span style="color:#f92672">in</span> domain<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;.&#39;</span>):
+</span></span><span style="display:flex;"><span>            qname <span style="color:#f92672">+=</span> bytes([len(part)]) <span style="color:#f92672">+</span> part<span style="color:#f92672">.</span>encode()
+</span></span><span style="display:flex;"><span>        qname <span style="color:#f92672">+=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>  <span style="color:#75715e"># 结束标记</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        qtype_value <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>QTYPE<span style="color:#f92672">.</span>get(qtype<span style="color:#f92672">.</span>upper(), <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        qclass <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>  <span style="color:#75715e"># IN (Internet)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        question <span style="color:#f92672">=</span> qname <span style="color:#f92672">+</span> struct<span style="color:#f92672">.</span>pack(<span style="color:#e6db74">&#39;!HH&#39;</span>, qtype_value, qclass)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> header <span style="color:#f92672">+</span> question
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_response</span>(self, response: bytes) <span style="color:#f92672">-&gt;</span> Dict:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        解析DNS响应
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            response: DNS响应报文
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            解析后的结果字典
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        result <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;header&#39;</span>: {},
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;questions&#39;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;answers&#39;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;authority&#39;</span>: [],
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;additional&#39;</span>: []
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 解析Header</span>
+</span></span><span style="display:flex;"><span>        header <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>unpack(<span style="color:#e6db74">&#39;!HHHHHH&#39;</span>, response[:<span style="color:#ae81ff">12</span>])
+</span></span><span style="display:flex;"><span>        result[<span style="color:#e6db74">&#39;header&#39;</span>] <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;id&#39;</span>: header[<span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;flags&#39;</span>: header[<span style="color:#ae81ff">1</span>],
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;questions&#39;</span>: header[<span style="color:#ae81ff">2</span>],
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;answers&#39;</span>: header[<span style="color:#ae81ff">3</span>],
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;authority&#39;</span>: header[<span style="color:#ae81ff">4</span>],
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;additional&#39;</span>: header[<span style="color:#ae81ff">5</span>]
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 解析Answer部分（简化版本）</span>
+</span></span><span style="display:flex;"><span>        offset <span style="color:#f92672">=</span> <span style="color:#ae81ff">12</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 跳过Question部分</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> response[offset] <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>            offset <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        offset <span style="color:#f92672">+=</span> <span style="color:#ae81ff">5</span>  <span style="color:#75715e"># 跳过结束符和QTYPE、QCLASS</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 解析Answer</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(result[<span style="color:#e6db74">&#39;header&#39;</span>][<span style="color:#e6db74">&#39;answers&#39;</span>]):
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 简化：直接提取IP地址（假设是A记录）</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> offset <span style="color:#f92672">+</span> <span style="color:#ae81ff">12</span> <span style="color:#f92672">&lt;=</span> len(response):
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 跳过名称（指针）</span>
+</span></span><span style="display:flex;"><span>                offset <span style="color:#f92672">+=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 读取类型、类、TTL、数据长度</span>
+</span></span><span style="display:flex;"><span>                rtype, rclass, ttl, rdlength <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>unpack(
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#39;!HHIH&#39;</span>,
+</span></span><span style="display:flex;"><span>                    response[offset:offset<span style="color:#f92672">+</span><span style="color:#ae81ff">10</span>]
+</span></span><span style="display:flex;"><span>                )
+</span></span><span style="display:flex;"><span>                offset <span style="color:#f92672">+=</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 读取数据</span>
+</span></span><span style="display:flex;"><span>                rdata <span style="color:#f92672">=</span> response[offset:offset<span style="color:#f92672">+</span>rdlength]
+</span></span><span style="display:flex;"><span>                offset <span style="color:#f92672">+=</span> rdlength
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> rtype <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">and</span> rdlength <span style="color:#f92672">==</span> <span style="color:#ae81ff">4</span>:  <span style="color:#75715e"># A记录</span>
+</span></span><span style="display:flex;"><span>                    ip <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;.&#39;</span><span style="color:#f92672">.</span>join(str(b) <span style="color:#66d9ef">for</span> b <span style="color:#f92672">in</span> rdata)
+</span></span><span style="display:flex;"><span>                    result[<span style="color:#e6db74">&#39;answers&#39;</span>]<span style="color:#f92672">.</span>append({
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">&#39;type&#39;</span>: <span style="color:#e6db74">&#39;A&#39;</span>,
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">&#39;ttl&#39;</span>: ttl,
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">&#39;data&#39;</span>: ip
+</span></span><span style="display:flex;"><span>                    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">query</span>(self, domain: str, qtype: str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;A&#39;</span>, verbose: bool <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>) <span style="color:#f92672">-&gt;</span> Dict:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        执行DNS查询
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            domain: 域名
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            qtype: 查询类型
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            verbose: 是否显示详细信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            查询结果
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> verbose:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">正在查询: </span><span style="color:#e6db74">{</span>domain<span style="color:#e6db74">}</span><span style="color:#e6db74"> (</span><span style="color:#e6db74">{</span>qtype<span style="color:#e6db74">}</span><span style="color:#e6db74">记录)&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;DNS服务器: </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>dns_server<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 构造查询</span>
+</span></span><span style="display:flex;"><span>        query_data <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>build_query(domain, qtype)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 创建UDP socket</span>
+</span></span><span style="display:flex;"><span>        sock <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_DGRAM)
+</span></span><span style="display:flex;"><span>        sock<span style="color:#f92672">.</span>settimeout(<span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 发送查询</span>
+</span></span><span style="display:flex;"><span>            start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>            sock<span style="color:#f92672">.</span>sendto(query_data, (self<span style="color:#f92672">.</span>dns_server, self<span style="color:#f92672">.</span>port))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 接收响应</span>
+</span></span><span style="display:flex;"><span>            response, _ <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recvfrom(<span style="color:#ae81ff">512</span>)
+</span></span><span style="display:flex;"><span>            query_time <span style="color:#f92672">=</span> (time<span style="color:#f92672">.</span>time() <span style="color:#f92672">-</span> start_time) <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 解析响应</span>
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>parse_response(response)
+</span></span><span style="display:flex;"><span>            result[<span style="color:#e6db74">&#39;query_time&#39;</span>] <span style="color:#f92672">=</span> query_time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> verbose:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;查询时间: </span><span style="color:#e6db74">{</span>query_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">ms&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;回答数量: </span><span style="color:#e6db74">{</span>result[<span style="color:#e6db74">&#39;header&#39;</span>][<span style="color:#e6db74">&#39;answers&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> result[<span style="color:#e6db74">&#39;answers&#39;</span>]:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">结果:&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> answer <span style="color:#f92672">in</span> result[<span style="color:#e6db74">&#39;answers&#39;</span>]:
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  类型: </span><span style="color:#e6db74">{</span>answer[<span style="color:#e6db74">&#39;type&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  TTL: </span><span style="color:#e6db74">{</span>answer[<span style="color:#e6db74">&#39;ttl&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">秒&#34;</span>)
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  数据: </span><span style="color:#e6db74">{</span>answer[<span style="color:#e6db74">&#39;data&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> socket<span style="color:#f92672">.</span>timeout:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> verbose:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">&#34;❌ 查询超时&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#39;error&#39;</span>: <span style="color:#e6db74">&#39;timeout&#39;</span>}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> verbose:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ 查询失败: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#39;error&#39;</span>: str(e)}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">finally</span>:
+</span></span><span style="display:flex;"><span>            sock<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">query_with_system</span>(self, domain: str, verbose: bool <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        使用系统DNS查询（对比）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            domain: 域名
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            verbose: 是否显示详细信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> verbose:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">使用系统DNS查询: </span><span style="color:#e6db74">{</span>domain<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>getaddrinfo(domain, <span style="color:#66d9ef">None</span>)
+</span></span><span style="display:flex;"><span>            query_time <span style="color:#f92672">=</span> (time<span style="color:#f92672">.</span>time() <span style="color:#f92672">-</span> start_time) <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> verbose:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;查询时间: </span><span style="color:#e6db74">{</span>query_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">ms&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">结果:&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> result:
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> item[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> socket<span style="color:#f92672">.</span>AF_INET:  <span style="color:#75715e"># IPv4</span>
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  IPv4: </span><span style="color:#e6db74">{</span>item[<span style="color:#ae81ff">4</span>][<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">elif</span> item[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> socket<span style="color:#f92672">.</span>AF_INET6:  <span style="color:#75715e"># IPv6</span>
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  IPv6: </span><span style="color:#e6db74">{</span>item[<span style="color:#ae81ff">4</span>][<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#39;results&#39;</span>: result, <span style="color:#e6db74">&#39;query_time&#39;</span>: query_time}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> verbose:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ 查询失败: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#39;error&#39;</span>: str(e)}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">compare_dns_servers</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;对比不同DNS服务器的性能&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34; DNS服务器性能对比&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    dns_servers <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        (<span style="color:#e6db74">&#39;Google DNS&#39;</span>, <span style="color:#e6db74">&#39;8.8.8.8&#39;</span>),
+</span></span><span style="display:flex;"><span>        (<span style="color:#e6db74">&#39;Cloudflare DNS&#39;</span>, <span style="color:#e6db74">&#39;1.1.1.1&#39;</span>),
+</span></span><span style="display:flex;"><span>        (<span style="color:#e6db74">&#39;114 DNS&#39;</span>, <span style="color:#e6db74">&#39;114.114.114.114&#39;</span>),
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    test_domains <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;www.baidu.com&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;www.google.com&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;www.github.com&#39;</span>
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">测试域名: </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;, &#39;</span><span style="color:#f92672">.</span>join(test_domains)<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> name, server <span style="color:#f92672">in</span> dns_servers:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74"> (</span><span style="color:#e6db74">{</span>server<span style="color:#e6db74">}</span><span style="color:#e6db74">):&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        query_tool <span style="color:#f92672">=</span> DNSQuery(server)
+</span></span><span style="display:flex;"><span>        total_time <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        success_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> domain <span style="color:#f92672">in</span> test_domains:
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> query_tool<span style="color:#f92672">.</span>query(domain, verbose<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;query_time&#39;</span> <span style="color:#f92672">in</span> result:
+</span></span><span style="display:flex;"><span>                total_time <span style="color:#f92672">+=</span> result[<span style="color:#e6db74">&#39;query_time&#39;</span>]
+</span></span><span style="display:flex;"><span>                success_count <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  </span><span style="color:#e6db74">{</span>domain<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>result[<span style="color:#e6db74">&#39;query_time&#39;</span>]<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">ms&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> success_count <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>            avg_time <span style="color:#f92672">=</span> total_time <span style="color:#f92672">/</span> success_count
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">  平均查询时间: </span><span style="color:#e6db74">{</span>avg_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">ms&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;主程序&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ╔══════════════════════════════════════════════════════════╗
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ║       DNS查询工具 v1.0                                    ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ║       DNS Query Tool                                     ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ╚══════════════════════════════════════════════════════════╝
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 创建DNS查询器</span>
+</span></span><span style="display:flex;"><span>    dns_query <span style="color:#f92672">=</span> DNSQuery(dns_server<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;8.8.8.8&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 演示1：基本查询</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">【演示1：基本DNS查询】&#34;</span>)
+</span></span><span style="display:flex;"><span>    dns_query<span style="color:#f92672">.</span>query(<span style="color:#e6db74">&#39;www.baidu.com&#39;</span>, <span style="color:#e6db74">&#39;A&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">按Enter继续...&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 演示2：系统查询对比</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">【演示2：自定义vs系统DNS查询对比】&#34;</span>)
+</span></span><span style="display:flex;"><span>    dns_query<span style="color:#f92672">.</span>query_with_system(<span style="color:#e6db74">&#39;www.baidu.com&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">按Enter继续...&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 演示3：DNS服务器性能对比</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">【演示3：不同DNS服务器性能对比】&#34;</span>)
+</span></span><span style="display:flex;"><span>    compare_dns_servers()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">总结：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">DNS查询过程包括：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">1. 构造查询报文
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">2. 发送UDP查询（端口53）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">3. 接收响应
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">4. 解析结果
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">优化建议：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">- 使用快速DNS服务器
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">- 合理设置TTL
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">- 启用DNS缓存
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">- 考虑使用DNS over HTTPS (DoH)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">明天我们将学习DNS安全（DNSSEC）！
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E4%BA%94%E5%91%A8%E5%AE%9E%E6%88%98%E6%80%BB%E7%BB%93/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">五周实战总结</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/31%E5%A4%A9websocket%E5%AE%9E%E6%97%B6%E9%80%9A%E4%BF%A1/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">31天：WebSocket实时通信</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/30%E5%A4%A9restful-api%E8%AE%BE%E8%AE%A1/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">30天：RESTful API设计</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/29%E5%A4%A9http/3%E5%92%8Cquic%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">29天：HTTP/3和QUIC协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/28%E5%A4%A9http/2%E5%8D%8F%E8%AE%AE%E7%89%B9%E6%80%A7/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">28天：HTTP/2协议特性</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

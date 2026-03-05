@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第9天：子网划分实战 &ldquo;子网划分就像把一栋大楼分成不同的房间。&rdquo;\n📚 今日目标 理解子网掩码的概念和作用 掌握CIDR表示法 学会计算网络地址、广播地址 能够进行子网划分 编写子网计算器工具 🎯 为什么需要子网划分？ 生活中的例子 没有子网划分： 一栋100层的大楼，所有人共用一个门牌号 → 混乱、难以管理 有子网划分： 把大楼分成不同楼层，每层有自己的编号 → 清晰、便于管理 网络也是一样： - 节省IP地址 - 提高网络性能 - 增强安全性 - 便于管理 实际问题 问题：一个公司有500台电脑，给了一个C类地址192.168.1.0 C类地址只能容纳254台主机（2^8 - 2） 解决方案： 1. 申请多个C类地址（浪费、管理复杂） 2. 使用B类地址，然后划分子网（推荐） 📊 子网掩码 什么是子网掩码？ 子网掩码（Subnet Mask）用于区分IP地址中的网络部分和主机部分。\n">
+<title>9天：子网划分实战</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/9%E5%A4%A9%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86%E5%AE%9E%E6%88%98/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="9天：子网划分实战">
+<meta property='og:description' content="第9天：子网划分实战 &ldquo;子网划分就像把一栋大楼分成不同的房间。&rdquo;\n📚 今日目标 理解子网掩码的概念和作用 掌握CIDR表示法 学会计算网络地址、广播地址 能够进行子网划分 编写子网计算器工具 🎯 为什么需要子网划分？ 生活中的例子 没有子网划分： 一栋100层的大楼，所有人共用一个门牌号 → 混乱、难以管理 有子网划分： 把大楼分成不同楼层，每层有自己的编号 → 清晰、便于管理 网络也是一样： - 节省IP地址 - 提高网络性能 - 增强安全性 - 便于管理 实际问题 问题：一个公司有500台电脑，给了一个C类地址192.168.1.0 C类地址只能容纳254台主机（2^8 - 2） 解决方案： 1. 申请多个C类地址（浪费、管理复杂） 2. 使用B类地址，然后划分子网（推荐） 📊 子网掩码 什么是子网掩码？ 子网掩码（Subnet Mask）用于区分IP地址中的网络部分和主机部分。\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/9%E5%A4%A9%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86%E5%AE%9E%E6%88%98/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:21:36&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:21:36&#43;00:00'/>
+<meta name="twitter:title" content="9天：子网划分实战">
+<meta name="twitter:description" content="第9天：子网划分实战 &ldquo;子网划分就像把一栋大楼分成不同的房间。&rdquo;\n📚 今日目标 理解子网掩码的概念和作用 掌握CIDR表示法 学会计算网络地址、广播地址 能够进行子网划分 编写子网计算器工具 🎯 为什么需要子网划分？ 生活中的例子 没有子网划分： 一栋100层的大楼，所有人共用一个门牌号 → 混乱、难以管理 有子网划分： 把大楼分成不同楼层，每层有自己的编号 → 清晰、便于管理 网络也是一样： - 节省IP地址 - 提高网络性能 - 增强安全性 - 便于管理 实际问题 问题：一个公司有500台电脑，给了一个C类地址192.168.1.0 C类地址只能容纳254台主机（2^8 - 2） 解决方案： 1. 申请多个C类地址（浪费、管理复杂） 2. 使用B类地址，然后划分子网（推荐） 📊 子网掩码 什么是子网掩码？ 子网掩码（Subnet Mask）用于区分IP地址中的网络部分和主机部分。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#-为什么需要子网划分">🎯 为什么需要子网划分？</a>
+      <ul>
+        <li><a href="#生活中的例子">生活中的例子</a></li>
+        <li><a href="#实际问题">实际问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#-子网掩码">📊 子网掩码</a>
+      <ul>
+        <li><a href="#什么是子网掩码">什么是子网掩码？</a></li>
+        <li><a href="#子网掩码的格式">子网掩码的格式</a></li>
+        <li><a href="#常见的子网掩码">常见的子网掩码</a></li>
+      </ul>
+    </li>
+    <li><a href="#-cidr表示法">🔢 CIDR表示法</a>
+      <ul>
+        <li><a href="#什么是cidr">什么是CIDR？</a></li>
+        <li><a href="#cidr对照表">CIDR对照表</a></li>
+        <li><a href="#计算公式">计算公式</a></li>
+      </ul>
+    </li>
+    <li><a href="#-子网划分计算">🧮 子网划分计算</a>
+      <ul>
+        <li><a href="#基本概念">基本概念</a></li>
+        <li><a href="#计算步骤">计算步骤</a></li>
+        <li><a href="#快速计算技巧">快速计算技巧</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战项目子网计算器">🔧 实战项目：子网计算器</a>
+      <ul>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#运行程序">运行程序</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战案例">💡 实战案例</a>
+      <ul>
+        <li><a href="#案例1公司网络规划">案例1：公司网络规划</a></li>
+        <li><a href="#案例2家庭网络">案例2：家庭网络</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识小结">🎓 知识小结</a>
+      <ul>
+        <li><a href="#重要公式">重要公式</a></li>
+      </ul>
+    </li>
+    <li><a href="#-练习题">💪 练习题</a>
+      <ul>
+        <li><a href="#练习1基础计算">练习1：基础计算</a></li>
+        <li><a href="#练习2子网划分">练习2：子网划分</a></li>
+        <li><a href="#练习3实际应用">练习3：实际应用</a></li>
+        <li><a href="#练习4进阶题目">练习4：进阶题目</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/9%E5%A4%A9%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86%E5%AE%9E%E6%88%98/">9天：子网划分实战</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:21:36Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#-为什么需要子网划分">🎯 为什么需要子网划分？</a>
+      <ul>
+        <li><a href="#生活中的例子">生活中的例子</a></li>
+        <li><a href="#实际问题">实际问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#-子网掩码">📊 子网掩码</a>
+      <ul>
+        <li><a href="#什么是子网掩码">什么是子网掩码？</a></li>
+        <li><a href="#子网掩码的格式">子网掩码的格式</a></li>
+        <li><a href="#常见的子网掩码">常见的子网掩码</a></li>
+      </ul>
+    </li>
+    <li><a href="#-cidr表示法">🔢 CIDR表示法</a>
+      <ul>
+        <li><a href="#什么是cidr">什么是CIDR？</a></li>
+        <li><a href="#cidr对照表">CIDR对照表</a></li>
+        <li><a href="#计算公式">计算公式</a></li>
+      </ul>
+    </li>
+    <li><a href="#-子网划分计算">🧮 子网划分计算</a>
+      <ul>
+        <li><a href="#基本概念">基本概念</a></li>
+        <li><a href="#计算步骤">计算步骤</a></li>
+        <li><a href="#快速计算技巧">快速计算技巧</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战项目子网计算器">🔧 实战项目：子网计算器</a>
+      <ul>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#运行程序">运行程序</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战案例">💡 实战案例</a>
+      <ul>
+        <li><a href="#案例1公司网络规划">案例1：公司网络规划</a></li>
+        <li><a href="#案例2家庭网络">案例2：家庭网络</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识小结">🎓 知识小结</a>
+      <ul>
+        <li><a href="#重要公式">重要公式</a></li>
+      </ul>
+    </li>
+    <li><a href="#-练习题">💪 练习题</a>
+      <ul>
+        <li><a href="#练习1基础计算">练习1：基础计算</a></li>
+        <li><a href="#练习2子网划分">练习2：子网划分</a></li>
+        <li><a href="#练习3实际应用">练习3：实际应用</a></li>
+        <li><a href="#练习4进阶题目">练习4：进阶题目</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第9天子网划分实战">第9天：子网划分实战
+</h1>
+    <blockquote>
+        <p>&ldquo;子网划分就像把一栋大楼分成不同的房间。&rdquo;</p>
+
+    </blockquote>
+<h2 id="-今日目标">📚 今日目标
+</h2><ul>
+<li>理解子网掩码的概念和作用</li>
+<li>掌握CIDR表示法</li>
+<li>学会计算网络地址、广播地址</li>
+<li>能够进行子网划分</li>
+<li>编写子网计算器工具</li>
+</ul>
+<h2 id="-为什么需要子网划分">🎯 为什么需要子网划分？
+</h2><h3 id="生活中的例子">生活中的例子
+</h3><pre tabindex="0"><code>没有子网划分：
+一栋100层的大楼，所有人共用一个门牌号
+→ 混乱、难以管理
+
+有子网划分：
+把大楼分成不同楼层，每层有自己的编号
+→ 清晰、便于管理
+
+网络也是一样：
+- 节省IP地址
+- 提高网络性能
+- 增强安全性
+- 便于管理
+</code></pre><h3 id="实际问题">实际问题
+</h3><pre tabindex="0"><code>问题：一个公司有500台电脑，给了一个C类地址192.168.1.0
+
+C类地址只能容纳254台主机（2^8 - 2）
+
+解决方案：
+1. 申请多个C类地址（浪费、管理复杂）
+2. 使用B类地址，然后划分子网（推荐）
+</code></pre><h2 id="-子网掩码">📊 子网掩码
+</h2><h3 id="什么是子网掩码">什么是子网掩码？
+</h3><p><strong>子网掩码</strong>（Subnet Mask）用于区分IP地址中的网络部分和主机部分。</p>
+<pre tabindex="0"><code>IP地址：    192.168.1.100
+子网掩码：  255.255.255.0
+
+作用：确定哪些位是网络号，哪些位是主机号
+</code></pre><h3 id="子网掩码的格式">子网掩码的格式
+</h3><pre tabindex="0"><code>二进制表示：
+网络部分：全是1
+主机部分：全是0
+
+例如：255.255.255.0
+11111111.11111111.11111111.00000000
+[    网络部分（24位）    ][主机部分(8位)]
+</code></pre><h3 id="常见的子网掩码">常见的子网掩码
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>类别</th>
+          <th>默认子网掩码</th>
+          <th>二进制</th>
+          <th>CIDR</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>A类</td>
+          <td>255.0.0.0</td>
+          <td>11111111.00000000.00000000.00000000</td>
+          <td>/8</td>
+      </tr>
+      <tr>
+          <td>B类</td>
+          <td>255.255.0.0</td>
+          <td>11111111.11111111.00000000.00000000</td>
+          <td>/16</td>
+      </tr>
+      <tr>
+          <td>C类</td>
+          <td>255.255.255.0</td>
+          <td>11111111.11111111.11111111.00000000</td>
+          <td>/24</td>
+      </tr>
+  </tbody>
+</table></div>
+<h2 id="-cidr表示法">🔢 CIDR表示法
+</h2><h3 id="什么是cidr">什么是CIDR？
+</h3><p><strong>CIDR</strong>（Classless Inter-Domain Routing，无类域间路由）</p>
+<p>用 <code>/数字</code> 表示子网掩码，数字表示网络位数。</p>
+<pre tabindex="0"><code>传统表示：192.168.1.0  子网掩码：255.255.255.0
+CIDR表示：192.168.1.0/24
+
+/24 表示前24位是网络位，后8位是主机位
+</code></pre><h3 id="cidr对照表">CIDR对照表
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>CIDR</th>
+          <th>子网掩码</th>
+          <th>可用主机数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>/8</td>
+          <td>255.0.0.0</td>
+          <td>16,777,214</td>
+          <td>A类默认</td>
+      </tr>
+      <tr>
+          <td>/16</td>
+          <td>255.255.0.0</td>
+          <td>65,534</td>
+          <td>B类默认</td>
+      </tr>
+      <tr>
+          <td>/24</td>
+          <td>255.255.255.0</td>
+          <td>254</td>
+          <td>C类默认</td>
+      </tr>
+      <tr>
+          <td>/25</td>
+          <td>255.255.255.128</td>
+          <td>126</td>
+          <td>C类分2个子网</td>
+      </tr>
+      <tr>
+          <td>/26</td>
+          <td>255.255.255.192</td>
+          <td>62</td>
+          <td>C类分4个子网</td>
+      </tr>
+      <tr>
+          <td>/27</td>
+          <td>255.255.255.224</td>
+          <td>30</td>
+          <td>C类分8个子网</td>
+      </tr>
+      <tr>
+          <td>/28</td>
+          <td>255.255.255.240</td>
+          <td>14</td>
+          <td>C类分16个子网</td>
+      </tr>
+      <tr>
+          <td>/29</td>
+          <td>255.255.255.248</td>
+          <td>6</td>
+          <td>C类分32个子网</td>
+      </tr>
+      <tr>
+          <td>/30</td>
+          <td>255.255.255.252</td>
+          <td>2</td>
+          <td>点对点链路</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="计算公式">计算公式
+</h3><pre tabindex="0"><code>网络位数：n
+主机位数：32 - n
+
+可用主机数 = 2^(主机位数) - 2
+
+减2的原因：
+- 网络地址（主机位全0）
+- 广播地址（主机位全1）
+
+例如：/24
+主机位数 = 32 - 24 = 8
+可用主机数 = 2^8 - 2 = 254
+</code></pre><h2 id="-子网划分计算">🧮 子网划分计算
+</h2><h3 id="基本概念">基本概念
+</h3><p><strong>网络地址</strong>：主机位全为0
+<strong>广播地址</strong>：主机位全为1
+<strong>第一个可用IP</strong>：网络地址 + 1
+<strong>最后一个可用IP</strong>：广播地址 - 1</p>
+<h3 id="计算步骤">计算步骤
+</h3><h4 id="例11921681024">例1：192.168.1.0/24
+</h4><pre tabindex="0"><code>1. IP地址：192.168.1.0
+2. 子网掩码：255.255.255.0 (/24)
+
+计算：
+网络地址：192.168.1.0
+广播地址：192.168.1.255
+第一个可用IP：192.168.1.1
+最后一个可用IP：192.168.1.254
+可用主机数：254
+</code></pre><h4 id="例21921681025">例2：192.168.1.0/25
+</h4><pre tabindex="0"><code>1. IP地址：192.168.1.0
+2. 子网掩码：255.255.255.128 (/25)
+
+分析：
+/25 表示前25位是网络位，后7位是主机位
+255.255.255.128 = 11111111.11111111.11111111.10000000
+
+子网1：
+网络地址：192.168.1.0
+广播地址：192.168.1.127
+可用IP：192.168.1.1 - 192.168.1.126
+可用主机数：126
+
+子网2：
+网络地址：192.168.1.128
+广播地址：192.168.1.255
+可用IP：192.168.1.129 - 192.168.1.254
+可用主机数：126
+</code></pre><h3 id="快速计算技巧">快速计算技巧
+</h3><pre tabindex="0"><code>1. 找到&#34;变化的八位&#34;
+   255.255.255.128 → 最后一个八位是128
+
+2. 计算块大小
+   块大小 = 256 - 子网掩码最后非0的八位
+   块大小 = 256 - 128 = 128
+
+3. 列出子网
+   第一个子网：0
+   第二个子网：0 + 128 = 128
+   第三个子网：128 + 128 = 256（超出范围，没有第三个）
+
+所以子网是：
+192.168.1.0/25
+192.168.1.128/25
+</code></pre><h2 id="-实战项目子网计算器">🔧 实战项目：子网计算器
+</h2><p>让我们编写一个强大的子网计算器！</p>
+<h3 id="代码实现">代码实现
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># day09_subnet_calculator.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 功能：子网计算器</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> math
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SubnetCalculator</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;子网计算器&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">cidr_to_mask</span>(self, cidr):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        将CIDR转换为子网掩码
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            cidr: CIDR值（如24）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            子网掩码字符串（如 &#34;255.255.255.0&#34;）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 生成32位二进制，前cidr位是1，其余是0</span>
+</span></span><span style="display:flex;"><span>        binary <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">*</span> cidr <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;0&#39;</span> <span style="color:#f92672">*</span> (<span style="color:#ae81ff">32</span> <span style="color:#f92672">-</span> cidr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 分成4组，每组8位</span>
+</span></span><span style="display:flex;"><span>        octets <span style="color:#f92672">=</span> [binary[i:i<span style="color:#f92672">+</span><span style="color:#ae81ff">8</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">32</span>, <span style="color:#ae81ff">8</span>)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 转换为十进制</span>
+</span></span><span style="display:flex;"><span>        mask <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;.&#39;</span><span style="color:#f92672">.</span>join([str(int(octet, <span style="color:#ae81ff">2</span>)) <span style="color:#66d9ef">for</span> octet <span style="color:#f92672">in</span> octets])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> mask
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">mask_to_cidr</span>(self, mask):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        将子网掩码转换为CIDR
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            mask: 子网掩码字符串（如 &#34;255.255.255.0&#34;）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            CIDR值
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 转换为二进制</span>
+</span></span><span style="display:flex;"><span>        binary <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join([format(int(x), <span style="color:#e6db74">&#39;08b&#39;</span>) <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> mask<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;.&#39;</span>)])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算1的个数</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> binary<span style="color:#f92672">.</span>count(<span style="color:#e6db74">&#39;1&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">ip_to_int</span>(self, ip):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;将IP地址转换为整数&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        parts <span style="color:#f92672">=</span> ip<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;.&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (int(parts[<span style="color:#ae81ff">0</span>]) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">24</span>) <span style="color:#f92672">+</span> (int(parts[<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">+</span> \
+</span></span><span style="display:flex;"><span>               (int(parts[<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>) <span style="color:#f92672">+</span> int(parts[<span style="color:#ae81ff">3</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">int_to_ip</span>(self, num):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;将整数转换为IP地址&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>(num <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">24</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">255</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.</span><span style="color:#e6db74">{</span>(num <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">255</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.&#34;</span> \
+</span></span><span style="display:flex;"><span>               <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>(num <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">8</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">255</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.</span><span style="color:#e6db74">{</span>num <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">255</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calculate_subnet</span>(self, ip, cidr):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        计算子网信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            ip: IP地址字符串
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            cidr: CIDR值
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            包含所有子网信息的字典
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 转换为整数</span>
+</span></span><span style="display:flex;"><span>        ip_int <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>ip_to_int(ip)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算子网掩码</span>
+</span></span><span style="display:flex;"><span>        mask <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>cidr_to_mask(cidr)
+</span></span><span style="display:flex;"><span>        mask_int <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>ip_to_int(mask)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算网络地址（IP AND 掩码）</span>
+</span></span><span style="display:flex;"><span>        network_int <span style="color:#f92672">=</span> ip_int <span style="color:#f92672">&amp;</span> mask_int
+</span></span><span style="display:flex;"><span>        network <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>int_to_ip(network_int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算广播地址（网络地址 OR 反码掩码）</span>
+</span></span><span style="display:flex;"><span>        wildcard_int <span style="color:#f92672">=</span> <span style="color:#f92672">~</span>mask_int <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFFFFFFFF</span>  <span style="color:#75715e"># 通配符掩码（反码）</span>
+</span></span><span style="display:flex;"><span>        broadcast_int <span style="color:#f92672">=</span> network_int <span style="color:#f92672">|</span> wildcard_int
+</span></span><span style="display:flex;"><span>        broadcast <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>int_to_ip(broadcast_int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算第一个和最后一个可用IP</span>
+</span></span><span style="display:flex;"><span>        first_usable_int <span style="color:#f92672">=</span> network_int <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        last_usable_int <span style="color:#f92672">=</span> broadcast_int <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        first_usable <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>int_to_ip(first_usable_int)
+</span></span><span style="display:flex;"><span>        last_usable <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>int_to_ip(last_usable_int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算主机数</span>
+</span></span><span style="display:flex;"><span>        host_bits <span style="color:#f92672">=</span> <span style="color:#ae81ff">32</span> <span style="color:#f92672">-</span> cidr
+</span></span><span style="display:flex;"><span>        total_hosts <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">**</span> host_bits
+</span></span><span style="display:flex;"><span>        usable_hosts <span style="color:#f92672">=</span> total_hosts <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span> <span style="color:#66d9ef">if</span> total_hosts <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2</span> <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算通配符掩码</span>
+</span></span><span style="display:flex;"><span>        wildcard <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>int_to_ip(wildcard_int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        result <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;ip&#39;</span>: ip,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;cidr&#39;</span>: cidr,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;mask&#39;</span>: mask,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;wildcard&#39;</span>: wildcard,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;network&#39;</span>: network,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;broadcast&#39;</span>: broadcast,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;first_usable&#39;</span>: first_usable,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;last_usable&#39;</span>: last_usable,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;total_hosts&#39;</span>: total_hosts,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;usable_hosts&#39;</span>: usable_hosts
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">split_subnet</span>(self, ip, old_cidr, new_cidr):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        将一个子网划分为多个更小的子网
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            ip: 原始网络地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            old_cidr: 原始CIDR
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            new_cidr: 新的CIDR（必须大于old_cidr）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            子网列表
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> new_cidr <span style="color:#f92672">&lt;=</span> old_cidr:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算可以划分多少个子网</span>
+</span></span><span style="display:flex;"><span>        num_subnets <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">**</span> (new_cidr <span style="color:#f92672">-</span> old_cidr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 计算每个子网的大小</span>
+</span></span><span style="display:flex;"><span>        subnet_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">**</span> (<span style="color:#ae81ff">32</span> <span style="color:#f92672">-</span> new_cidr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 获取起始网络地址</span>
+</span></span><span style="display:flex;"><span>        start_int <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>ip_to_int(ip) <span style="color:#f92672">&amp;</span> self<span style="color:#f92672">.</span>ip_to_int(self<span style="color:#f92672">.</span>cidr_to_mask(old_cidr))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        subnets <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(num_subnets):
+</span></span><span style="display:flex;"><span>            subnet_ip_int <span style="color:#f92672">=</span> start_int <span style="color:#f92672">+</span> (i <span style="color:#f92672">*</span> subnet_size)
+</span></span><span style="display:flex;"><span>            subnet_ip <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>int_to_ip(subnet_ip_int)
+</span></span><span style="display:flex;"><span>            subnets<span style="color:#f92672">.</span>append(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>subnet_ip<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>new_cidr<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> subnets
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">print_subnet_info</span>(self, info):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        打印子网信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            info: calculate_subnet()返回的字典
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;子网信息&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">70</span>))
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">📍 IP地址:          </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;ip&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🔢 CIDR:            /</span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;cidr&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🎭 子网掩码:        </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;mask&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🃏 通配符掩码:      </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;wildcard&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">🌐 网络地址:        </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;network&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;cidr&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;📡 广播地址:        </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;broadcast&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">🏁 第一个可用IP:    </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;first_usable&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🏁 最后一个可用IP:  </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;last_usable&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">📊 总主机数:        </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;total_hosts&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;✅ 可用主机数:      </span><span style="color:#e6db74">{</span>info[<span style="color:#e6db74">&#39;usable_hosts&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    主函数
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    calc <span style="color:#f92672">=</span> SubnetCalculator()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;子网计算器&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">70</span>))
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请选择功能:&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;1. 计算子网信息&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;2. CIDR ↔ 子网掩码转换&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;3. 子网划分&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;4. 快速查询常用CIDR&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;0. 退出&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        choice <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请输入选项: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;0&#39;</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">再见！&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">elif</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>:
+</span></span><span style="display:flex;"><span>            ip <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请输入IP地址: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>            cidr <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;请输入CIDR（如24）: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                cidr <span style="color:#f92672">=</span> int(cidr)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&lt;=</span> cidr <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">32</span>:
+</span></span><span style="display:flex;"><span>                    info <span style="color:#f92672">=</span> calc<span style="color:#f92672">.</span>calculate_subnet(ip, cidr)
+</span></span><span style="display:flex;"><span>                    calc<span style="color:#f92672">.</span>print_subnet_info(info)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">&#34;❌ CIDR必须在0-32之间&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">ValueError</span>:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">&#34;❌ 请输入有效的数字&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">elif</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;2&#39;</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请选择转换方向:&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;1. CIDR → 子网掩码&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;2. 子网掩码 → CIDR&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            sub_choice <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;请输入选项: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> sub_choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>:
+</span></span><span style="display:flex;"><span>                cidr <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请输入CIDR: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                    cidr <span style="color:#f92672">=</span> int(cidr)
+</span></span><span style="display:flex;"><span>                    mask <span style="color:#f92672">=</span> calc<span style="color:#f92672">.</span>cidr_to_mask(cidr)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>cidr<span style="color:#e6db74">}</span><span style="color:#e6db74"> = </span><span style="color:#e6db74">{</span>mask<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">ValueError</span>:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">&#34;❌ 请输入有效的数字&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> sub_choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;2&#39;</span>:
+</span></span><span style="display:flex;"><span>                mask <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请输入子网掩码: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                    cidr <span style="color:#f92672">=</span> calc<span style="color:#f92672">.</span>mask_to_cidr(mask)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span>mask<span style="color:#e6db74">}</span><span style="color:#e6db74"> = /</span><span style="color:#e6db74">{</span>cidr<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">&#34;❌ 请输入有效的子网掩码&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">elif</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;3&#39;</span>:
+</span></span><span style="display:flex;"><span>            ip <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请输入网络地址: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>            old_cidr <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;请输入原始CIDR: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>            new_cidr <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;请输入新的CIDR: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                old_cidr <span style="color:#f92672">=</span> int(old_cidr)
+</span></span><span style="display:flex;"><span>                new_cidr <span style="color:#f92672">=</span> int(new_cidr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                subnets <span style="color:#f92672">=</span> calc<span style="color:#f92672">.</span>split_subnet(ip, old_cidr, new_cidr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> subnets:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">📊 将 </span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>old_cidr<span style="color:#e6db74">}</span><span style="color:#e6db74"> 划分为 /</span><span style="color:#e6db74">{</span>new_cidr<span style="color:#e6db74">}</span><span style="color:#e6db74"> 子网:&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   共 </span><span style="color:#e6db74">{</span>len(subnets)<span style="color:#e6db74">}</span><span style="color:#e6db74"> 个子网</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> i, subnet <span style="color:#f92672">in</span> enumerate(subnets, <span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   </span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">. </span><span style="color:#e6db74">{</span>subnet<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">&#34;❌ 新CIDR必须大于原CIDR&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">ValueError</span>:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">&#34;❌ 请输入有效的数字&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">elif</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;4&#39;</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">常用CIDR速查表：&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;CIDR&#39;</span><span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;8</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;子网掩码&#39;</span><span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;18</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;可用主机数&#39;</span><span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;12</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;说明&#39;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            common_cidrs <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">8</span>, <span style="color:#e6db74">&#34;A类默认&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">16</span>, <span style="color:#e6db74">&#34;B类默认&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">24</span>, <span style="color:#e6db74">&#34;C类默认&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">25</span>, <span style="color:#e6db74">&#34;C类分2个子网&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">26</span>, <span style="color:#e6db74">&#34;C类分4个子网&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">27</span>, <span style="color:#e6db74">&#34;C类分8个子网&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">28</span>, <span style="color:#e6db74">&#34;C类分16个子网&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">29</span>, <span style="color:#e6db74">&#34;小型子网&#34;</span>),
+</span></span><span style="display:flex;"><span>                (<span style="color:#ae81ff">30</span>, <span style="color:#e6db74">&#34;点对点链路&#34;</span>),
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> cidr, desc <span style="color:#f92672">in</span> common_cidrs:
+</span></span><span style="display:flex;"><span>                mask <span style="color:#f92672">=</span> calc<span style="color:#f92672">.</span>cidr_to_mask(cidr)
+</span></span><span style="display:flex;"><span>                hosts <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">**</span> (<span style="color:#ae81ff">32</span> <span style="color:#f92672">-</span> cidr) <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;/</span><span style="color:#e6db74">{</span>cidr<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;7</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span>mask<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;18</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span>hosts<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;12</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span>desc<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><h3 id="运行程序">运行程序
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python code/day09/day09_subnet_calculator.py
+</span></span></code></pre></div><h2 id="-实战案例">💡 实战案例
+</h2><h3 id="案例1公司网络规划">案例1：公司网络规划
+</h3><pre tabindex="0"><code>需求：
+公司有200台电脑，分布在4个部门
+- 销售部：60台
+- 技术部：80台
+- 行政部：40台
+- 财务部：20台
+
+给定网络：192.168.0.0/24
+
+方案：
+1. 技术部：192.168.0.0/25（126台主机）
+2. 销售部：192.168.0.128/26（62台主机）
+3. 行政部：192.168.0.192/27（30台主机）
+4. 财务部：192.168.0.224/27（30台主机）
+</code></pre><h3 id="案例2家庭网络">案例2：家庭网络
+</h3><pre tabindex="0"><code>需求：
+家里有10台设备，使用C类私网
+
+方案：
+网络：192.168.1.0/24
+- 可用IP：192.168.1.1 - 192.168.1.254
+- 路由器：192.168.1.1
+- 设备：192.168.1.100-109
+</code></pre><h2 id="-知识小结">🎓 知识小结
+</h2><p>今天学习了：</p>
+<ol>
+<li>✅ 子网掩码用于区分网络部分和主机部分</li>
+<li>✅ CIDR是子网掩码的简写形式</li>
+<li>✅ 可用主机数 = 2^主机位数 - 2</li>
+<li>✅ 网络地址、广播地址的计算方法</li>
+<li>✅ 子网划分的实际应用</li>
+</ol>
+<h3 id="重要公式">重要公式
+</h3><pre tabindex="0"><code>可用主机数 = 2^(32-CIDR) - 2
+子网数量 = 2^(新CIDR - 旧CIDR)
+块大小 = 256 - 子网掩码的变化八位
+</code></pre><h2 id="-练习题">💪 练习题
+</h2><h3 id="练习1基础计算">练习1：基础计算
+</h3><p>计算以下子网的信息：</p>
+<ol>
+<li>192.168.10.0/24</li>
+<li>172.16.0.0/16</li>
+<li>10.0.0.0/8</li>
+</ol>
+<h3 id="练习2子网划分">练习2：子网划分
+</h3><p>将192.168.1.0/24划分为：</p>
+<ol>
+<li>2个相等的子网</li>
+<li>4个相等的子网</li>
+<li>8个相等的子网</li>
+</ol>
+<h3 id="练习3实际应用">练习3：实际应用
+</h3><p>一个公司有以下需求：</p>
+<ul>
+<li>部门A：需要50台主机</li>
+<li>部门B：需要30台主机</li>
+<li>部门C：需要20台主机</li>
+</ul>
+<p>给定192.168.0.0/24，如何划分？</p>
+<h3 id="练习4进阶题目">练习4：进阶题目
+</h3><p>如何判断两个IP是否在同一子网？</p>
+<ul>
+<li>IP1: 192.168.1.100/25</li>
+<li>IP2: 192.168.1.150/25</li>
+</ul>
+<hr>
+<p>💡 <strong>今日金句</strong>：子网划分是网络规划的基本功！</p>
+<p>👉 <a class="link" href="day08.md" >上一天：IP地址详解</a> | <a class="link" href="../../README.md" >返回目录</a> | <a class="link" href="day10.md" >下一天：MAC地址和ARP</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/8%E5%A4%A9ip%E5%9C%B0%E5%9D%80%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">8天：IP地址详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/7%E5%A4%A9wireshark%E6%8A%93%E5%8C%85%E5%85%A5%E9%97%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">7天：Wireshark抓包入门</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%B8%80%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">一周总结：网络基础入门</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/6%E5%A4%A9%E7%BD%91%E7%BB%9C%E5%91%BD%E4%BB%A4%E8%BF%9B%E9%98%B6-traceroute/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">6天：网络命令进阶 - traceroute</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/5%E5%A4%A9%E7%BD%91%E7%BB%9C%E5%91%BD%E4%BB%A4%E5%85%A5%E9%97%A8-ping/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">5天：网络命令入门 - ping</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第14天：第一阶段总结与综合实战 &ldquo;前两周的学习为你打开了网络世界的大门，现在是时候检验学习成果了！&rdquo;\n📚 今日目标 回顾第一阶段核心知识点 完成综合实战项目 掌握网络问题排查方法 为下一阶段做好准备 1. 第一阶段学习回顾（Day 1-13） 1.1 知识地图 第一阶段：网络基础入门 │ ├── 第1周：网络基础概念 │ ├── Day 1: 计算机网络概述 │ │ ├── 什么是计算机网络 │ │ ├── 网络的作用 │ │ └── 网络连接检测工具 │ │ │ ├── Day 2: 网络分类和拓扑 │ │ ├── LAN/WAN/MAN │ │ ├── 五种拓扑结构 │ │ └── 局域网扫描器 │ │ │ ├── Day 3: OSI七层模型 │ │ ├── 七层模型详解 │ │ ├── 数据封装过程 │ │ └── 协议分层演示 │ │ │ ├── Day 4: TCP/IP四层模型 │ │ ├── TCP/IP vs OSI │ │ ├── 四层模型详解 │ │ └── 数据包分析 │ │ │ ├── Day 5: ping命令 │ │ ├── ping原理 │ │ ├── ICMP协议 │ │ └── 简易ping工具 │ │ │ ├── Day 6: traceroute命令 │ │ ├── traceroute原理 │ │ ├── TTL字段 │ │ └── traceroute工具 │ │ │ └── Day 7: Wireshark抓包 │ ├── Wireshark基础 │ ├── 过滤器语法 │ └── HTTP请求分析 │ └── 第2周：网络层深入理解 ├── Day 8: IP地址基础 │ ├── IPv4地址结构 │ ├── IP地址分类 │ └── IP地址分析工具 │ ├── Day 9: 子网划分 │ ├── 子网掩码 │ ├── CIDR表示法 │ └── 子网计算器 │ ├── Day 10: MAC地址和ARP │ ├── MAC地址结构 │ ├── ARP协议 │ └── ARP扫描工具 │ ├── Day 11: 端口和Socket │ ├── 端口概念 │ ├── Socket基础 │ └── 端口扫描器 │ ├── Day 12: DNS协议 │ ├── DNS工作原理 │ ├── DNS查询流程 │ └── DNS查询工具 │ └── Day 13: DHCP协议 ├── DHCP原理 ├── DORA四次握手 └── DHCP分析工具 2. 核心知识点总结 2.1 OSI七层模型 vs TCP/IP四层模型 OSI七层模型 TCP/IP四层模型 协议示例 ┌────────────────┐ │ 7. 应用层 │ ┌──────────┐ HTTP, FTP, DNS │ 6. 表示层 │──────│ 应用层 │ SMTP, SSH, Telnet │ 5. 会话层 │ └──────────┘ ├────────────────┤ ┌──────────┐ │ 4. 传输层 │──────│ 传输层 │ TCP, UDP ├────────────────┤ └──────────┘ │ 3. 网络层 │ ┌──────────┐ ├────────────────┤──────│ 网络层 │ IP, ICMP, ARP │ 2. 数据链路层 │ └──────────┘ ├────────────────┤ ┌──────────┐ │ 1. 物理层 │──────│ 链路层 │ Ethernet, WiFi └────────────────┘ └──────────┘ 数据封装过程： 应用数据 → 添加TCP/UDP头（传输层） → 添加IP头（网络层） → 添加以太网帧头/尾（链路层） → 转换为比特流（物理层） 2.2 IP地址和子网划分 IP地址分类：\n">
+<title>14天：第一阶段总结与综合实战</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/14%E5%A4%A9%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%E6%80%BB%E7%BB%93%E4%B8%8E%E7%BB%BC%E5%90%88%E5%AE%9E%E6%88%98/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="14天：第一阶段总结与综合实战">
+<meta property='og:description' content="第14天：第一阶段总结与综合实战 &ldquo;前两周的学习为你打开了网络世界的大门，现在是时候检验学习成果了！&rdquo;\n📚 今日目标 回顾第一阶段核心知识点 完成综合实战项目 掌握网络问题排查方法 为下一阶段做好准备 1. 第一阶段学习回顾（Day 1-13） 1.1 知识地图 第一阶段：网络基础入门 │ ├── 第1周：网络基础概念 │ ├── Day 1: 计算机网络概述 │ │ ├── 什么是计算机网络 │ │ ├── 网络的作用 │ │ └── 网络连接检测工具 │ │ │ ├── Day 2: 网络分类和拓扑 │ │ ├── LAN/WAN/MAN │ │ ├── 五种拓扑结构 │ │ └── 局域网扫描器 │ │ │ ├── Day 3: OSI七层模型 │ │ ├── 七层模型详解 │ │ ├── 数据封装过程 │ │ └── 协议分层演示 │ │ │ ├── Day 4: TCP/IP四层模型 │ │ ├── TCP/IP vs OSI │ │ ├── 四层模型详解 │ │ └── 数据包分析 │ │ │ ├── Day 5: ping命令 │ │ ├── ping原理 │ │ ├── ICMP协议 │ │ └── 简易ping工具 │ │ │ ├── Day 6: traceroute命令 │ │ ├── traceroute原理 │ │ ├── TTL字段 │ │ └── traceroute工具 │ │ │ └── Day 7: Wireshark抓包 │ ├── Wireshark基础 │ ├── 过滤器语法 │ └── HTTP请求分析 │ └── 第2周：网络层深入理解 ├── Day 8: IP地址基础 │ ├── IPv4地址结构 │ ├── IP地址分类 │ └── IP地址分析工具 │ ├── Day 9: 子网划分 │ ├── 子网掩码 │ ├── CIDR表示法 │ └── 子网计算器 │ ├── Day 10: MAC地址和ARP │ ├── MAC地址结构 │ ├── ARP协议 │ └── ARP扫描工具 │ ├── Day 11: 端口和Socket │ ├── 端口概念 │ ├── Socket基础 │ └── 端口扫描器 │ ├── Day 12: DNS协议 │ ├── DNS工作原理 │ ├── DNS查询流程 │ └── DNS查询工具 │ └── Day 13: DHCP协议 ├── DHCP原理 ├── DORA四次握手 └── DHCP分析工具 2. 核心知识点总结 2.1 OSI七层模型 vs TCP/IP四层模型 OSI七层模型 TCP/IP四层模型 协议示例 ┌────────────────┐ │ 7. 应用层 │ ┌──────────┐ HTTP, FTP, DNS │ 6. 表示层 │──────│ 应用层 │ SMTP, SSH, Telnet │ 5. 会话层 │ └──────────┘ ├────────────────┤ ┌──────────┐ │ 4. 传输层 │──────│ 传输层 │ TCP, UDP ├────────────────┤ └──────────┘ │ 3. 网络层 │ ┌──────────┐ ├────────────────┤──────│ 网络层 │ IP, ICMP, ARP │ 2. 数据链路层 │ └──────────┘ ├────────────────┤ ┌──────────┐ │ 1. 物理层 │──────│ 链路层 │ Ethernet, WiFi └────────────────┘ └──────────┘ 数据封装过程： 应用数据 → 添加TCP/UDP头（传输层） → 添加IP头（网络层） → 添加以太网帧头/尾（链路层） → 转换为比特流（物理层） 2.2 IP地址和子网划分 IP地址分类：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/14%E5%A4%A9%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%E6%80%BB%E7%BB%93%E4%B8%8E%E7%BB%BC%E5%90%88%E5%AE%9E%E6%88%98/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:21:41&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:21:41&#43;00:00'/>
+<meta name="twitter:title" content="14天：第一阶段总结与综合实战">
+<meta name="twitter:description" content="第14天：第一阶段总结与综合实战 &ldquo;前两周的学习为你打开了网络世界的大门，现在是时候检验学习成果了！&rdquo;\n📚 今日目标 回顾第一阶段核心知识点 完成综合实战项目 掌握网络问题排查方法 为下一阶段做好准备 1. 第一阶段学习回顾（Day 1-13） 1.1 知识地图 第一阶段：网络基础入门 │ ├── 第1周：网络基础概念 │ ├── Day 1: 计算机网络概述 │ │ ├── 什么是计算机网络 │ │ ├── 网络的作用 │ │ └── 网络连接检测工具 │ │ │ ├── Day 2: 网络分类和拓扑 │ │ ├── LAN/WAN/MAN │ │ ├── 五种拓扑结构 │ │ └── 局域网扫描器 │ │ │ ├── Day 3: OSI七层模型 │ │ ├── 七层模型详解 │ │ ├── 数据封装过程 │ │ └── 协议分层演示 │ │ │ ├── Day 4: TCP/IP四层模型 │ │ ├── TCP/IP vs OSI │ │ ├── 四层模型详解 │ │ └── 数据包分析 │ │ │ ├── Day 5: ping命令 │ │ ├── ping原理 │ │ ├── ICMP协议 │ │ └── 简易ping工具 │ │ │ ├── Day 6: traceroute命令 │ │ ├── traceroute原理 │ │ ├── TTL字段 │ │ └── traceroute工具 │ │ │ └── Day 7: Wireshark抓包 │ ├── Wireshark基础 │ ├── 过滤器语法 │ └── HTTP请求分析 │ └── 第2周：网络层深入理解 ├── Day 8: IP地址基础 │ ├── IPv4地址结构 │ ├── IP地址分类 │ └── IP地址分析工具 │ ├── Day 9: 子网划分 │ ├── 子网掩码 │ ├── CIDR表示法 │ └── 子网计算器 │ ├── Day 10: MAC地址和ARP │ ├── MAC地址结构 │ ├── ARP协议 │ └── ARP扫描工具 │ ├── Day 11: 端口和Socket │ ├── 端口概念 │ ├── Socket基础 │ └── 端口扫描器 │ ├── Day 12: DNS协议 │ ├── DNS工作原理 │ ├── DNS查询流程 │ └── DNS查询工具 │ └── Day 13: DHCP协议 ├── DHCP原理 ├── DORA四次握手 └── DHCP分析工具 2. 核心知识点总结 2.1 OSI七层模型 vs TCP/IP四层模型 OSI七层模型 TCP/IP四层模型 协议示例 ┌────────────────┐ │ 7. 应用层 │ ┌──────────┐ HTTP, FTP, DNS │ 6. 表示层 │──────│ 应用层 │ SMTP, SSH, Telnet │ 5. 会话层 │ └──────────┘ ├────────────────┤ ┌──────────┐ │ 4. 传输层 │──────│ 传输层 │ TCP, UDP ├────────────────┤ └──────────┘ │ 3. 网络层 │ ┌──────────┐ ├────────────────┤──────│ 网络层 │ IP, ICMP, ARP │ 2. 数据链路层 │ └──────────┘ ├────────────────┤ ┌──────────┐ │ 1. 物理层 │──────│ 链路层 │ Ethernet, WiFi └────────────────┘ └──────────┘ 数据封装过程： 应用数据 → 添加TCP/UDP头（传输层） → 添加IP头（网络层） → 添加以太网帧头/尾（链路层） → 转换为比特流（物理层） 2.2 IP地址和子网划分 IP地址分类：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#1-第一阶段学习回顾day-1-13">1. 第一阶段学习回顾（Day 1-13）</a>
+      <ul>
+        <li><a href="#11-知识地图">1.1 知识地图</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-核心知识点总结">2. 核心知识点总结</a>
+      <ul>
+        <li><a href="#21-osi七层模型-vs-tcpip四层模型">2.1 OSI七层模型 vs TCP/IP四层模型</a></li>
+        <li><a href="#22-ip地址和子网划分">2.2 IP地址和子网划分</a></li>
+        <li><a href="#23-arp协议">2.3 ARP协议</a></li>
+        <li><a href="#24-dns工作原理">2.4 DNS工作原理</a></li>
+        <li><a href="#25-dhcp工作原理">2.5 DHCP工作原理</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-综合实战项目网络配置检测工具">3. 综合实战项目：网络配置检测工具</a>
+      <ul>
+        <li><a href="#31-项目需求">3.1 项目需求</a></li>
+        <li><a href="#32-代码实现">3.2 代码实现</a></li>
+        <li><a href="#33-运行示例">3.3 运行示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-常见网络问题诊断">4. 常见网络问题诊断</a>
+      <ul>
+        <li><a href="#41-问题诊断流程图">4.1 问题诊断流程图</a></li>
+        <li><a href="#42-常见问题和解决方案">4.2 常见问题和解决方案</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-第一阶段技能清单">5. 第一阶段技能清单</a>
+      <ul>
+        <li><a href="#51-理论知识">5.1 理论知识</a></li>
+        <li><a href="#52-工具使用">5.2 工具使用</a></li>
+        <li><a href="#53-编程能力">5.3 编程能力</a></li>
+        <li><a href="#54-问题排查">5.4 问题排查</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-今日练习">6. 今日练习</a>
+      <ul>
+        <li><a href="#练习1综合诊断">练习1：综合诊断</a></li>
+        <li><a href="#练习2子网划分">练习2：子网划分</a></li>
+        <li><a href="#练习3故障排查">练习3：故障排查</a></li>
+        <li><a href="#练习4抓包分析">练习4：抓包分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-扩展学习">7. 扩展学习</a>
+      <ul>
+        <li><a href="#71-推荐阅读">7.1 推荐阅读</a></li>
+        <li><a href="#72-在线资源">7.2 在线资源</a></li>
+        <li><a href="#73-实践建议">7.3 实践建议</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-下一阶段预告">8. 下一阶段预告</a>
+      <ul>
+        <li><a href="#第二阶段应用层协议深入day-15-27">第二阶段：应用层协议深入（Day 15-27）</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-总结">9. 总结</a></li>
+    <li><a href="#附录常用命令速查表">附录：常用命令速查表</a>
+      <ul>
+        <li><a href="#windows命令">Windows命令</a></li>
+        <li><a href="#linuxmac命令">Linux/Mac命令</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/14%E5%A4%A9%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%E6%80%BB%E7%BB%93%E4%B8%8E%E7%BB%BC%E5%90%88%E5%AE%9E%E6%88%98/">14天：第一阶段总结与综合实战</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:21:41Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#1-第一阶段学习回顾day-1-13">1. 第一阶段学习回顾（Day 1-13）</a>
+      <ul>
+        <li><a href="#11-知识地图">1.1 知识地图</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-核心知识点总结">2. 核心知识点总结</a>
+      <ul>
+        <li><a href="#21-osi七层模型-vs-tcpip四层模型">2.1 OSI七层模型 vs TCP/IP四层模型</a></li>
+        <li><a href="#22-ip地址和子网划分">2.2 IP地址和子网划分</a></li>
+        <li><a href="#23-arp协议">2.3 ARP协议</a></li>
+        <li><a href="#24-dns工作原理">2.4 DNS工作原理</a></li>
+        <li><a href="#25-dhcp工作原理">2.5 DHCP工作原理</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-综合实战项目网络配置检测工具">3. 综合实战项目：网络配置检测工具</a>
+      <ul>
+        <li><a href="#31-项目需求">3.1 项目需求</a></li>
+        <li><a href="#32-代码实现">3.2 代码实现</a></li>
+        <li><a href="#33-运行示例">3.3 运行示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-常见网络问题诊断">4. 常见网络问题诊断</a>
+      <ul>
+        <li><a href="#41-问题诊断流程图">4.1 问题诊断流程图</a></li>
+        <li><a href="#42-常见问题和解决方案">4.2 常见问题和解决方案</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-第一阶段技能清单">5. 第一阶段技能清单</a>
+      <ul>
+        <li><a href="#51-理论知识">5.1 理论知识</a></li>
+        <li><a href="#52-工具使用">5.2 工具使用</a></li>
+        <li><a href="#53-编程能力">5.3 编程能力</a></li>
+        <li><a href="#54-问题排查">5.4 问题排查</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-今日练习">6. 今日练习</a>
+      <ul>
+        <li><a href="#练习1综合诊断">练习1：综合诊断</a></li>
+        <li><a href="#练习2子网划分">练习2：子网划分</a></li>
+        <li><a href="#练习3故障排查">练习3：故障排查</a></li>
+        <li><a href="#练习4抓包分析">练习4：抓包分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-扩展学习">7. 扩展学习</a>
+      <ul>
+        <li><a href="#71-推荐阅读">7.1 推荐阅读</a></li>
+        <li><a href="#72-在线资源">7.2 在线资源</a></li>
+        <li><a href="#73-实践建议">7.3 实践建议</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-下一阶段预告">8. 下一阶段预告</a>
+      <ul>
+        <li><a href="#第二阶段应用层协议深入day-15-27">第二阶段：应用层协议深入（Day 15-27）</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-总结">9. 总结</a></li>
+    <li><a href="#附录常用命令速查表">附录：常用命令速查表</a>
+      <ul>
+        <li><a href="#windows命令">Windows命令</a></li>
+        <li><a href="#linuxmac命令">Linux/Mac命令</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第14天第一阶段总结与综合实战">第14天：第一阶段总结与综合实战
+</h1>
+    <blockquote>
+        <p>&ldquo;前两周的学习为你打开了网络世界的大门，现在是时候检验学习成果了！&rdquo;</p>
+
+    </blockquote>
+<h2 id="-今日目标">📚 今日目标
+</h2><ul>
+<li>回顾第一阶段核心知识点</li>
+<li>完成综合实战项目</li>
+<li>掌握网络问题排查方法</li>
+<li>为下一阶段做好准备</li>
+</ul>
+<hr>
+<h2 id="1-第一阶段学习回顾day-1-13">1. 第一阶段学习回顾（Day 1-13）
+</h2><h3 id="11-知识地图">1.1 知识地图
+</h3><pre tabindex="0"><code>第一阶段：网络基础入门
+│
+├── 第1周：网络基础概念
+│   ├── Day 1: 计算机网络概述
+│   │   ├── 什么是计算机网络
+│   │   ├── 网络的作用
+│   │   └── 网络连接检测工具
+│   │
+│   ├── Day 2: 网络分类和拓扑
+│   │   ├── LAN/WAN/MAN
+│   │   ├── 五种拓扑结构
+│   │   └── 局域网扫描器
+│   │
+│   ├── Day 3: OSI七层模型
+│   │   ├── 七层模型详解
+│   │   ├── 数据封装过程
+│   │   └── 协议分层演示
+│   │
+│   ├── Day 4: TCP/IP四层模型
+│   │   ├── TCP/IP vs OSI
+│   │   ├── 四层模型详解
+│   │   └── 数据包分析
+│   │
+│   ├── Day 5: ping命令
+│   │   ├── ping原理
+│   │   ├── ICMP协议
+│   │   └── 简易ping工具
+│   │
+│   ├── Day 6: traceroute命令
+│   │   ├── traceroute原理
+│   │   ├── TTL字段
+│   │   └── traceroute工具
+│   │
+│   └── Day 7: Wireshark抓包
+│       ├── Wireshark基础
+│       ├── 过滤器语法
+│       └── HTTP请求分析
+│
+└── 第2周：网络层深入理解
+    ├── Day 8: IP地址基础
+    │   ├── IPv4地址结构
+    │   ├── IP地址分类
+    │   └── IP地址分析工具
+    │
+    ├── Day 9: 子网划分
+    │   ├── 子网掩码
+    │   ├── CIDR表示法
+    │   └── 子网计算器
+    │
+    ├── Day 10: MAC地址和ARP
+    │   ├── MAC地址结构
+    │   ├── ARP协议
+    │   └── ARP扫描工具
+    │
+    ├── Day 11: 端口和Socket
+    │   ├── 端口概念
+    │   ├── Socket基础
+    │   └── 端口扫描器
+    │
+    ├── Day 12: DNS协议
+    │   ├── DNS工作原理
+    │   ├── DNS查询流程
+    │   └── DNS查询工具
+    │
+    └── Day 13: DHCP协议
+        ├── DHCP原理
+        ├── DORA四次握手
+        └── DHCP分析工具
+</code></pre><hr>
+<h2 id="2-核心知识点总结">2. 核心知识点总结
+</h2><h3 id="21-osi七层模型-vs-tcpip四层模型">2.1 OSI七层模型 vs TCP/IP四层模型
+</h3><pre tabindex="0"><code>OSI七层模型              TCP/IP四层模型        协议示例
+┌────────────────┐
+│  7. 应用层      │      ┌──────────┐         HTTP, FTP, DNS
+│  6. 表示层      │──────│ 应用层    │         SMTP, SSH, Telnet
+│  5. 会话层      │      └──────────┘
+├────────────────┤      ┌──────────┐
+│  4. 传输层      │──────│ 传输层    │         TCP, UDP
+├────────────────┤      └──────────┘
+│  3. 网络层      │      ┌──────────┐
+├────────────────┤──────│ 网络层    │         IP, ICMP, ARP
+│  2. 数据链路层   │      └──────────┘
+├────────────────┤      ┌──────────┐
+│  1. 物理层      │──────│ 链路层    │         Ethernet, WiFi
+└────────────────┘      └──────────┘
+
+数据封装过程：
+应用数据
+  → 添加TCP/UDP头（传输层）
+    → 添加IP头（网络层）
+      → 添加以太网帧头/尾（链路层）
+        → 转换为比特流（物理层）
+</code></pre><h3 id="22-ip地址和子网划分">2.2 IP地址和子网划分
+</h3><p><strong>IP地址分类</strong>：</p>
+<pre tabindex="0"><code>类别    范围                    默认掩码          用途
+A    1.0.0.0 - 126.255.255.255    /8 (255.0.0.0)        大型网络
+B    128.0.0.0 - 191.255.255.255  /16 (255.255.0.0)     中型网络
+C    192.0.0.0 - 223.255.255.255  /24 (255.255.255.0)   小型网络
+
+私有IP：
+10.0.0.0/8         (10.0.0.0 - 10.255.255.255)
+172.16.0.0/12      (172.16.0.0 - 172.31.255.255)
+192.168.0.0/16     (192.168.0.0 - 192.168.255.255)
+
+特殊IP：
+127.0.0.1          环回地址（本机）
+0.0.0.0            所有地址/未知地址
+255.255.255.255    广播地址
+</code></pre><p><strong>子网划分快速计算</strong>：</p>
+<pre tabindex="0"><code>CIDR    掩码              主机数    子网数（从/24划分）
+/24     255.255.255.0     254       1
+/25     255.255.255.128   126       2
+/26     255.255.255.192   62        4
+/27     255.255.255.224   30        8
+/28     255.255.255.240   14        16
+/29     255.255.255.248   6         32
+/30     255.255.255.252   2         64（用于点对点）
+
+主机数计算：2^(32-CIDR) - 2
+</code></pre><h3 id="23-arp协议">2.3 ARP协议
+</h3><p><strong>ARP工作流程</strong>：</p>
+<pre tabindex="0"><code>场景：主机A (192.168.1.10) 想发送数据给主机B (192.168.1.20)
+
+步骤1：检查ARP缓存
+    arp -a
+    → 如果有B的MAC地址，直接使用
+    → 如果没有，进行ARP请求
+
+步骤2：广播ARP请求
+    源MAC: AA:AA:AA:AA:AA:AA (主机A)
+    目标MAC: FF:FF:FF:FF:FF:FF (广播)
+    内容: &#34;谁是192.168.1.20？请告诉192.168.1.10&#34;
+
+步骤3：目标主机回应
+    源MAC: BB:BB:BB:BB:BB:BB (主机B)
+    目标MAC: AA:AA:AA:AA:AA:AA (主机A)
+    内容: &#34;192.168.1.20是我，我的MAC是BB:BB:BB:BB:BB:BB&#34;
+
+步骤4：更新ARP缓存
+    192.168.1.20 → BB:BB:BB:BB:BB:BB (保存在缓存中)
+
+步骤5：发送数据
+    现在可以直接发送数据了
+</code></pre><h3 id="24-dns工作原理">2.4 DNS工作原理
+</h3><p><strong>DNS查询流程</strong>：</p>
+<pre tabindex="0"><code>用户访问 www.example.com
+
+1. 浏览器检查缓存
+   浏览器缓存 → 操作系统缓存 → hosts文件
+
+2. 如果缓存未命中，向本地DNS服务器查询
+   客户端 → 本地DNS (192.168.1.1)
+
+3. 本地DNS递归查询
+   ┌──────────────────────────────────────┐
+   │ 本地DNS → 根DNS服务器 (.)            │
+   │     &#34;example.com在哪？&#34;              │
+   │     ← &#34;去问.com的DNS服务器&#34;          │
+   │                                      │
+   │ 本地DNS → .com顶级DNS                │
+   │     &#34;example.com在哪？&#34;              │
+   │     ← &#34;去问example.com的权威DNS&#34;     │
+   │                                      │
+   │ 本地DNS → example.com权威DNS         │
+   │     &#34;www.example.com的IP是？&#34;        │
+   │     ← &#34;IP是93.184.216.34&#34;            │
+   └──────────────────────────────────────┘
+
+4. 本地DNS返回结果给客户端
+   IP: 93.184.216.34
+
+5. 浏览器使用该IP建立连接
+   HTTP GET http://93.184.216.34/
+</code></pre><h3 id="25-dhcp工作原理">2.5 DHCP工作原理
+</h3><p><strong>DHCP四次握手（DORA）</strong>：</p>
+<pre tabindex="0"><code>D - Discover  发现
+O - Offer     提供
+R - Request   请求
+A - Ack       确认
+
+场景：新电脑接入网络
+
+1. DHCP Discover (广播)
+   客户端: &#34;有DHCP服务器吗？我需要IP地址！&#34;
+   源IP: 0.0.0.0
+   目标IP: 255.255.255.255
+   目标MAC: FF:FF:FF:FF:FF:FF
+
+2. DHCP Offer (单播)
+   服务器: &#34;我是DHCP服务器，可以给你192.168.1.100&#34;
+   提供: IP=192.168.1.100, 掩码=255.255.255.0, 网关=192.168.1.1
+
+3. DHCP Request (广播)
+   客户端: &#34;我接受192.168.1.100这个地址&#34;
+   （广播是为了告诉其他DHCP服务器这个IP被占用了）
+
+4. DHCP Ack (单播)
+   服务器: &#34;确认分配给你192.168.1.100，租期24小时&#34;
+   包含: IP、掩码、网关、DNS、租期
+
+配置完成！客户端现在可以上网了。
+</code></pre><hr>
+<h2 id="3-综合实战项目网络配置检测工具">3. 综合实战项目：网络配置检测工具
+</h2><h3 id="31-项目需求">3.1 项目需求
+</h3><p>创建一个命令行工具，能够：</p>
+<ol>
+<li>检测本机网络配置</li>
+<li>测试网络连通性</li>
+<li>DNS查询测试</li>
+<li>生成诊断报告</li>
+</ol>
+<h3 id="32-代码实现">3.2 代码实现
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># day14_network_inspector.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 功能：综合网络配置检测工具</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> struct
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> subprocess
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> platform
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Dict, List, Tuple
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NetworkInspector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    网络配置检测工具
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    功能：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        1. 获取本机网络配置
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        2. 测试网络连通性
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        3. DNS解析测试
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        4. 生成诊断报告
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>system <span style="color:#f92672">=</span> platform<span style="color:#f92672">.</span>system()
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>report <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add_to_report</span>(self, section: str, content: str):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;添加内容到报告&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>report<span style="color:#f92672">.</span>append(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;=&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>report<span style="color:#f92672">.</span>append(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34; </span><span style="color:#e6db74">{</span>section<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>report<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#39;=&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>report<span style="color:#f92672">.</span>append(content)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_local_ip</span>(self) <span style="color:#f92672">-&gt;</span> str:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        获取本机IP地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回值：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            本机IP地址字符串
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        工作原理：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            创建UDP socket连接到外部地址（不实际发送数据）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            从socket获取本机使用的IP地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 创建UDP socket</span>
+</span></span><span style="display:flex;"><span>            s <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_DGRAM)
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 连接到外部地址（Google DNS）</span>
+</span></span><span style="display:flex;"><span>            s<span style="color:#f92672">.</span>connect((<span style="color:#e6db74">&#34;8.8.8.8&#34;</span>, <span style="color:#ae81ff">80</span>))
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 获取socket使用的本地IP</span>
+</span></span><span style="display:flex;"><span>            local_ip <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>getsockname()[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>            s<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> local_ip
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;获取失败: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_hostname</span>(self) <span style="color:#f92672">-&gt;</span> str:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;获取主机名&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> socket<span style="color:#f92672">.</span>gethostname()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_network_interfaces</span>(self) <span style="color:#f92672">-&gt;</span> Dict[str, str]:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        获取网络接口信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回值：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            包含接口信息的字典
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        interfaces <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 获取主机名对应的所有IP地址</span>
+</span></span><span style="display:flex;"><span>            hostname <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>gethostname()
+</span></span><span style="display:flex;"><span>            local_ips <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>gethostbyname_ex(hostname)[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            interfaces[<span style="color:#e6db74">&#39;主机名&#39;</span>] <span style="color:#f92672">=</span> hostname
+</span></span><span style="display:flex;"><span>            interfaces[<span style="color:#e6db74">&#39;本机IP&#39;</span>] <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>get_local_ip()
+</span></span><span style="display:flex;"><span>            interfaces[<span style="color:#e6db74">&#39;所有IP&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;, &#39;</span><span style="color:#f92672">.</span>join(local_ips)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            interfaces[<span style="color:#e6db74">&#39;错误&#39;</span>] <span style="color:#f92672">=</span> str(e)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> interfaces
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_connectivity</span>(self, host: str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;8.8.8.8&#34;</span>, port: int <span style="color:#f92672">=</span> <span style="color:#ae81ff">53</span>) <span style="color:#f92672">-&gt;</span> Tuple[bool, str]:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        测试网络连通性
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            host: 目标主机
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            port: 目标端口
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回值：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            (是否连通, 详细信息)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 尝试建立TCP连接</span>
+</span></span><span style="display:flex;"><span>            sock <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>            sock<span style="color:#f92672">.</span>settimeout(<span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>            start_time <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>connect_ex((host, port))
+</span></span><span style="display:flex;"><span>            end_time <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>            sock<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> result <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                latency <span style="color:#f92672">=</span> (end_time <span style="color:#f92672">-</span> start_time) <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>  <span style="color:#75715e"># 转换为毫秒</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;✅ 连接成功 (</span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">) - 延迟: </span><span style="color:#e6db74">{</span>latency<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">ms&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ 连接失败 (</span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ 连接异常: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_dns</span>(self, domain: str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;www.baidu.com&#34;</span>) <span style="color:#f92672">-&gt;</span> Tuple[bool, str]:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        测试DNS解析
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            domain: 要解析的域名
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回值：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            (是否成功, 详细信息)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            start_time <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>            ip <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>gethostbyname(domain)
+</span></span><span style="display:flex;"><span>            end_time <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            query_time <span style="color:#f92672">=</span> (end_time <span style="color:#f92672">-</span> start_time) <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;✅ DNS解析成功</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">   </span><span style="color:#e6db74">{</span>domain<span style="color:#e6db74">}</span><span style="color:#e6db74"> → </span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">   查询时间: </span><span style="color:#e6db74">{</span>query_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">ms&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> socket<span style="color:#f92672">.</span>gaierror <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ DNS解析失败: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ DNS查询异常: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_default_gateway</span>(self) <span style="color:#f92672">-&gt;</span> str:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        获取默认网关
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回值：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            默认网关IP地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>system <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Windows&#34;</span>:
+</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>run(
+</span></span><span style="display:flex;"><span>                    [<span style="color:#e6db74">&#39;ipconfig&#39;</span>],
+</span></span><span style="display:flex;"><span>                    capture_output<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>                    text<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>                )
+</span></span><span style="display:flex;"><span>                output <span style="color:#f92672">=</span> result<span style="color:#f92672">.</span>stdout
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> output<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>):
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;默认网关&#39;</span> <span style="color:#f92672">in</span> line <span style="color:#f92672">or</span> <span style="color:#e6db74">&#39;Default Gateway&#39;</span> <span style="color:#f92672">in</span> line:
+</span></span><span style="display:flex;"><span>                        parts <span style="color:#f92672">=</span> line<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;:&#39;</span>)
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> len(parts) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>                            gateway <span style="color:#f92672">=</span> parts[<span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">if</span> gateway <span style="color:#f92672">and</span> gateway <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;&#39;</span>:
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">return</span> gateway
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># Linux/Mac</span>
+</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>run(
+</span></span><span style="display:flex;"><span>                    [<span style="color:#e6db74">&#39;ip&#39;</span>, <span style="color:#e6db74">&#39;route&#39;</span>],
+</span></span><span style="display:flex;"><span>                    capture_output<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>                    text<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>                )
+</span></span><span style="display:flex;"><span>                output <span style="color:#f92672">=</span> result<span style="color:#f92672">.</span>stdout
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> output<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>):
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;default&#39;</span> <span style="color:#f92672">in</span> line:
+</span></span><span style="display:flex;"><span>                        parts <span style="color:#f92672">=</span> line<span style="color:#f92672">.</span>split()
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> len(parts) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">return</span> parts[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;未找到&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;获取失败: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run_full_inspection</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        运行完整的网络检测
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        工作流程：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            1. 获取本机网络配置
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            2. 测试本地连通性
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            3. 测试外网连通性
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            4. 测试DNS解析
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            5. 生成诊断报告
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34; 网络配置检测工具 - Network Inspector&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 1. 本机配置</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">[1/5] 正在获取本机网络配置...&#34;</span>)
+</span></span><span style="display:flex;"><span>        interfaces <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>get_network_interfaces()
+</span></span><span style="display:flex;"><span>        gateway <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>get_default_gateway()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        config_info <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        config_info<span style="color:#f92672">.</span>append(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;主机名:    </span><span style="color:#e6db74">{</span>interfaces<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;主机名&#39;</span>, <span style="color:#e6db74">&#39;未知&#39;</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        config_info<span style="color:#f92672">.</span>append(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;本机IP:    </span><span style="color:#e6db74">{</span>interfaces<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;本机IP&#39;</span>, <span style="color:#e6db74">&#39;未知&#39;</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        config_info<span style="color:#f92672">.</span>append(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;默认网关:  </span><span style="color:#e6db74">{</span>gateway<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        config_info<span style="color:#f92672">.</span>append(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;操作系统:  </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>system<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>add_to_report(<span style="color:#e6db74">&#34;本机网络配置&#34;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>join(config_info))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> config_info:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  </span><span style="color:#e6db74">{</span>line<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 2. 测试网关连通性</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">[2/5] 正在测试网关连通性...&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> gateway <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;未找到&#34;</span> <span style="color:#f92672">and</span> gateway <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;获取失败&#34;</span>:
+</span></span><span style="display:flex;"><span>            success, msg <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>test_connectivity(gateway, <span style="color:#ae81ff">80</span>)
+</span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>add_to_report(<span style="color:#e6db74">&#34;网关连通性测试&#34;</span>, msg)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  </span><span style="color:#e6db74">{</span>msg<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;❌ 无法获取网关，跳过测试&#34;</span>
+</span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>add_to_report(<span style="color:#e6db74">&#34;网关连通性测试&#34;</span>, msg)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  </span><span style="color:#e6db74">{</span>msg<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 3. 测试外网连通性</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">[3/5] 正在测试外网连通性...&#34;</span>)
+</span></span><span style="display:flex;"><span>        test_hosts <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>            (<span style="color:#e6db74">&#34;8.8.8.8&#34;</span>, <span style="color:#ae81ff">53</span>, <span style="color:#e6db74">&#34;Google DNS&#34;</span>),
+</span></span><span style="display:flex;"><span>            (<span style="color:#e6db74">&#34;114.114.114.114&#34;</span>, <span style="color:#ae81ff">53</span>, <span style="color:#e6db74">&#34;114 DNS&#34;</span>),
+</span></span><span style="display:flex;"><span>            (<span style="color:#e6db74">&#34;1.1.1.1&#34;</span>, <span style="color:#ae81ff">53</span>, <span style="color:#e6db74">&#34;Cloudflare DNS&#34;</span>)
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        connectivity_results <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> host, port, name <span style="color:#f92672">in</span> test_hosts:
+</span></span><span style="display:flex;"><span>            success, msg <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>test_connectivity(host, port)
+</span></span><span style="display:flex;"><span>            connectivity_results<span style="color:#f92672">.</span>append(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>msg<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  </span><span style="color:#e6db74">{</span>msg<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>add_to_report(<span style="color:#e6db74">&#34;外网连通性测试&#34;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>join(connectivity_results))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 4. 测试DNS</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">[4/5] 正在测试DNS解析...&#34;</span>)
+</span></span><span style="display:flex;"><span>        test_domains <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;www.baidu.com&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;www.google.com&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;www.github.com&#34;</span>
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        dns_results <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> domain <span style="color:#f92672">in</span> test_domains:
+</span></span><span style="display:flex;"><span>            success, msg <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>test_dns(domain)
+</span></span><span style="display:flex;"><span>            dns_results<span style="color:#f92672">.</span>append(msg)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;  </span><span style="color:#e6db74">{</span>msg<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>add_to_report(<span style="color:#e6db74">&#34;DNS解析测试&#34;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>join(dns_results))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 5. 生成诊断建议</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">[5/5] 正在生成诊断报告...&#34;</span>)
+</span></span><span style="display:flex;"><span>        diagnosis <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>generate_diagnosis()
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>add_to_report(<span style="color:#e6db74">&#34;诊断建议&#34;</span>, diagnosis)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generate_diagnosis</span>(self) <span style="color:#f92672">-&gt;</span> str:
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        生成诊断建议
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回值：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            诊断建议字符串
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        suggestions <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 检查报告中的问题</span>
+</span></span><span style="display:flex;"><span>        report_text <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>join(self<span style="color:#f92672">.</span>report)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;连接失败&#39;</span> <span style="color:#f92672">in</span> report_text <span style="color:#f92672">or</span> <span style="color:#e6db74">&#39;连接异常&#39;</span> <span style="color:#f92672">in</span> report_text:
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;⚠️  检测到网络连接问题：&#34;</span>)
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;   1. 检查网线或WiFi连接&#34;</span>)
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;   2. 检查防火墙设置&#34;</span>)
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;   3. 尝试重启路由器&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;DNS解析失败&#39;</span> <span style="color:#f92672">in</span> report_text:
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">⚠️  检测到DNS解析问题：&#34;</span>)
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;   1. 检查DNS服务器配置&#34;</span>)
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;   2. 尝试使用公共DNS (8.8.8.8)&#34;</span>)
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;   3. 清除DNS缓存&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> suggestions:
+</span></span><span style="display:flex;"><span>            suggestions<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;✅ 网络状态良好，未发现明显问题&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>join(suggestions)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">print_report</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;打印完整报告&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34; 完整诊断报告&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> section <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>report:
+</span></span><span style="display:flex;"><span>            print(section)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34; 报告结束&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">save_report</span>(self, filename: str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;network_report.txt&#34;</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        保存报告到文件
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            filename: 保存的文件名
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">with</span> open(filename, <span style="color:#e6db74">&#39;w&#39;</span>, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;utf-8&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>                f<span style="color:#f92672">.</span>write(<span style="color:#e6db74">&#34;网络配置检测报告</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                f<span style="color:#f92672">.</span>write(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;生成时间: </span><span style="color:#e6db74">{</span>socket<span style="color:#f92672">.</span>time<span style="color:#f92672">.</span>ctime()<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                f<span style="color:#f92672">.</span>write(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>join(self<span style="color:#f92672">.</span>report))
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">✅ 报告已保存到: </span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">❌ 保存报告失败: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;主程序&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ╔══════════════════════════════════════════════════════════╗
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ║       网络配置检测工具 v1.0                               ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ║       Network Configuration Inspector                    ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ╚══════════════════════════════════════════════════════════╝
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    inspector <span style="color:#f92672">=</span> NetworkInspector()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 运行完整检测</span>
+</span></span><span style="display:flex;"><span>        inspector<span style="color:#f92672">.</span>run_full_inspection()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 打印报告</span>
+</span></span><span style="display:flex;"><span>        inspector<span style="color:#f92672">.</span>print_report()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 保存报告</span>
+</span></span><span style="display:flex;"><span>        save_option <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">是否保存报告到文件？(y/n): &#34;</span>)<span style="color:#f92672">.</span>strip()<span style="color:#f92672">.</span>lower()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> save_option <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;y&#39;</span>:
+</span></span><span style="display:flex;"><span>            filename <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;请输入文件名 (默认: network_report.txt): &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> filename:
+</span></span><span style="display:flex;"><span>                filename <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;network_report.txt&#34;</span>
+</span></span><span style="display:flex;"><span>            inspector<span style="color:#f92672">.</span>save_report(filename)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">KeyboardInterrupt</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">用户中断程序&#34;</span>)
+</span></span><span style="display:flex;"><span>        sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">❌ 程序异常: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        sys<span style="color:#f92672">.</span>exit(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><h3 id="33-运行示例">3.3 运行示例
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 运行程序</span>
+</span></span><span style="display:flex;"><span>python code/day14/day14_network_inspector.py
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>输出示例：
+</span></span><span style="display:flex;"><span>╔══════════════════════════════════════════════════════════╗
+</span></span><span style="display:flex;"><span>║       网络配置检测工具 v1.0                               ║
+</span></span><span style="display:flex;"><span>║       Network Configuration Inspector                    ║
+</span></span><span style="display:flex;"><span>╚══════════════════════════════════════════════════════════╝
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">============================================================</span>
+</span></span><span style="display:flex;"><span> 网络配置检测工具 - Network Inspector
+</span></span><span style="display:flex;"><span><span style="color:#f92672">============================================================</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>1/5<span style="color:#f92672">]</span> 正在获取本机网络配置...
+</span></span><span style="display:flex;"><span>  主机名:    DESKTOP-ABC123
+</span></span><span style="display:flex;"><span>  本机IP:    192.168.1.100
+</span></span><span style="display:flex;"><span>  默认网关:  192.168.1.1
+</span></span><span style="display:flex;"><span>  操作系统:  Windows
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>2/5<span style="color:#f92672">]</span> 正在测试网关连通性...
+</span></span><span style="display:flex;"><span>  ✅ 连接成功 <span style="color:#f92672">(</span>192.168.1.1:80<span style="color:#f92672">)</span> - 延迟: 1.23ms
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>3/5<span style="color:#f92672">]</span> 正在测试外网连通性...
+</span></span><span style="display:flex;"><span>  ✅ 连接成功 <span style="color:#f92672">(</span>8.8.8.8:53<span style="color:#f92672">)</span> - 延迟: 15.67ms
+</span></span><span style="display:flex;"><span>  ✅ 连接成功 <span style="color:#f92672">(</span>114.114.114.114:53<span style="color:#f92672">)</span> - 延迟: 12.34ms
+</span></span><span style="display:flex;"><span>  ✅ 连接成功 <span style="color:#f92672">(</span>1.1.1.1:53<span style="color:#f92672">)</span> - 延迟: 18.90ms
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>4/5<span style="color:#f92672">]</span> 正在测试DNS解析...
+</span></span><span style="display:flex;"><span>  ✅ DNS解析成功
+</span></span><span style="display:flex;"><span>     www.baidu.com → 39.156.66.10
+</span></span><span style="display:flex;"><span>     查询时间: 45.67ms
+</span></span><span style="display:flex;"><span>  ✅ DNS解析成功
+</span></span><span style="display:flex;"><span>     www.google.com → 172.217.160.68
+</span></span><span style="display:flex;"><span>     查询时间: 23.45ms
+</span></span><span style="display:flex;"><span>  ✅ DNS解析成功
+</span></span><span style="display:flex;"><span>     www.github.com → 20.205.243.166
+</span></span><span style="display:flex;"><span>     查询时间: 34.56ms
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>5/5<span style="color:#f92672">]</span> 正在生成诊断报告...
+</span></span></code></pre></div><hr>
+<h2 id="4-常见网络问题诊断">4. 常见网络问题诊断
+</h2><h3 id="41-问题诊断流程图">4.1 问题诊断流程图
+</h3><pre tabindex="0"><code>网络无法访问？
+│
+├─ 步骤1: 检查物理连接
+│   ├─ 网线是否插好？
+│   ├─ WiFi是否连接？
+│   └─ 网卡指示灯是否亮？
+│
+├─ 步骤2: 检查IP配置
+│   ├─ IP地址: ipconfig / ip addr
+│   ├─ 子网掩码正确？
+│   ├─ 网关配置正确？
+│   └─ DNS服务器配置正确？
+│
+├─ 步骤3: Ping测试
+│   ├─ ping 127.0.0.1 (本机)
+│   ├─ ping 网关
+│   ├─ ping DNS服务器
+│   └─ ping 外网IP (8.8.8.8)
+│
+├─ 步骤4: DNS测试
+│   ├─ nslookup www.baidu.com
+│   └─ 检查DNS解析是否正常
+│
+└─ 步骤5: 路由测试
+    └─ traceroute/tracert 检查路径
+</code></pre><h3 id="42-常见问题和解决方案">4.2 常见问题和解决方案
+</h3><p><strong>问题1：获取不到IP地址（169.254.x.x）</strong></p>
+<pre tabindex="0"><code>原因：
+- DHCP服务器故障
+- 网络线路问题
+- DHCP服务未启动
+
+解决方法：
+1. 重启网卡
+   # Windows
+   ipconfig /release
+   ipconfig /renew
+
+   # Linux
+   sudo dhclient -r
+   sudo dhclient
+
+2. 检查DHCP服务器
+3. 手动配置静态IP
+</code></pre><p><strong>问题2：能Ping通IP但无法访问网站</strong></p>
+<pre tabindex="0"><code>原因：
+- DNS服务器故障
+- DNS配置错误
+
+解决方法：
+1. 更换DNS服务器
+   Windows: 网络适配器设置
+   Linux: /etc/resolv.conf
+
+   推荐DNS:
+   - 8.8.8.8 (Google)
+   - 114.114.114.114 (114DNS)
+   - 1.1.1.1 (Cloudflare)
+
+2. 清除DNS缓存
+   # Windows
+   ipconfig /flushdns
+
+   # Linux
+   sudo systemd-resolve --flush-caches
+</code></pre><p><strong>问题3：网速很慢</strong></p>
+<pre tabindex="0"><code>原因：
+- 网络拥堵
+- 带宽限制
+- DNS解析慢
+- 路由问题
+
+诊断方法：
+1. 测试带宽
+   使用speedtest等工具
+
+2. 检查延迟
+   ping -n 100 网关
+   检查平均延迟和抖动
+
+3. 追踪路由
+   tracert www.baidu.com
+   查看哪一跳延迟高
+
+4. 优化DNS
+   更换更快的DNS服务器
+</code></pre><hr>
+<h2 id="5-第一阶段技能清单">5. 第一阶段技能清单
+</h2><p>完成第一阶段后，你应该掌握：</p>
+<h3 id="51-理论知识">5.1 理论知识
+</h3><ul>
+<li>✅ 理解OSI七层模型和TCP/IP四层模型</li>
+<li>✅ 掌握IP地址分类和子网划分</li>
+<li>✅ 理解MAC地址和ARP协议</li>
+<li>✅ 掌握DNS和DHCP工作原理</li>
+<li>✅ 理解端口和Socket概念</li>
+</ul>
+<h3 id="52-工具使用">5.2 工具使用
+</h3><ul>
+<li>✅ ping - 测试连通性</li>
+<li>✅ traceroute/tracert - 追踪路由</li>
+<li>✅ ipconfig/ifconfig - 查看网络配置</li>
+<li>✅ nslookup/dig - DNS查询</li>
+<li>✅ arp - 查看ARP缓存</li>
+<li>✅ Wireshark - 抓包分析</li>
+</ul>
+<h3 id="53-编程能力">5.3 编程能力
+</h3><ul>
+<li>✅ 使用Python socket库</li>
+<li>✅ 实现网络连接检测</li>
+<li>✅ 实现局域网扫描</li>
+<li>✅ 实现简单的ping和traceroute</li>
+<li>✅ 实现DNS查询工具</li>
+</ul>
+<h3 id="54-问题排查">5.4 问题排查
+</h3><ul>
+<li>✅ 系统化的网络问题诊断流程</li>
+<li>✅ 使用命令行工具排查问题</li>
+<li>✅ 分析网络配置错误</li>
+<li>✅ 解决常见网络问题</li>
+</ul>
+<hr>
+<h2 id="6-今日练习">6. 今日练习
+</h2><h3 id="练习1综合诊断">练习1：综合诊断
+</h3><p>运行day14的网络检测工具，分析输出结果，回答：</p>
+<ol>
+<li>你的本机IP地址是什么？属于哪一类？</li>
+<li>默认网关是什么？</li>
+<li>DNS解析速度如何？</li>
+<li>是否存在网络问题？</li>
+</ol>
+<h3 id="练习2子网划分">练习2：子网划分
+</h3><p>给定网络 192.168.10.0/24，划分为：</p>
+<ol>
+<li>4个相等的子网</li>
+<li>计算每个子网的网络地址、广播地址、可用IP范围</li>
+<li>选择CIDR表示法</li>
+</ol>
+<h3 id="练习3故障排查">练习3：故障排查
+</h3><p>假设场景：</p>
+<ul>
+<li>能ping通192.168.1.1（网关）</li>
+<li>能ping通8.8.8.8</li>
+<li>无法访问www.baidu.com</li>
+</ul>
+<p>请使用所学的诊断方法，找出问题原因并给出解决方案。</p>
+<h3 id="练习4抓包分析">练习4：抓包分析
+</h3><p>使用Wireshark：</p>
+<ol>
+<li>抓取一次完整的DHCP四次握手</li>
+<li>分析每个数据包的内容</li>
+<li>识别DORA四个阶段</li>
+<li>截图标注关键信息</li>
+</ol>
+<hr>
+<h2 id="7-扩展学习">7. 扩展学习
+</h2><h3 id="71-推荐阅读">7.1 推荐阅读
+</h3><ul>
+<li>RFC 791: Internet Protocol (IP)</li>
+<li>RFC 826: Address Resolution Protocol (ARP)</li>
+<li>RFC 792: Internet Control Message Protocol (ICMP)</li>
+<li>RFC 2131: Dynamic Host Configuration Protocol (DHCP)</li>
+<li>RFC 1035: Domain Names - Implementation and Specification (DNS)</li>
+</ul>
+<h3 id="72-在线资源">7.2 在线资源
+</h3><ul>
+<li>Wireshark官方教程</li>
+<li>子网划分在线计算器</li>
+<li>网络协议分析案例</li>
+</ul>
+<h3 id="73-实践建议">7.3 实践建议
+</h3><ol>
+<li>搭建虚拟实验环境（VirtualBox + 多台虚拟机）</li>
+<li>配置不同的网络拓扑</li>
+<li>模拟各种网络故障</li>
+<li>练习问题诊断和解决</li>
+</ol>
+<hr>
+<h2 id="8-下一阶段预告">8. 下一阶段预告
+</h2><h3 id="第二阶段应用层协议深入day-15-27">第二阶段：应用层协议深入（Day 15-27）
+</h3><p><strong>第3周：传输层协议基础</strong></p>
+<ul>
+<li>TCP协议详解</li>
+<li>TCP可靠传输机制</li>
+<li>UDP协议</li>
+<li>Socket编程</li>
+</ul>
+<p><strong>第4周：网络层协议深入</strong></p>
+<ul>
+<li>IP协议深入</li>
+<li>IPv6</li>
+<li>ICMP详解</li>
+<li>路由协议基础</li>
+</ul>
+<p>学习重点：</p>
+<ul>
+<li>深入理解TCP/IP核心协议</li>
+<li>掌握Socket网络编程</li>
+<li>学习网络层路由机制</li>
+<li>完成更复杂的实战项目</li>
+</ul>
+<hr>
+<h2 id="9-总结">9. 总结
+</h2><pre tabindex="0"><code>第一阶段学习路径：
+
+网络基础概念 → 协议分层模型 → 诊断工具
+       ↓              ↓            ↓
+   网络拓扑        OSI/TCP-IP     ping/traceroute
+                      ↓
+              IP地址和子网划分
+                      ↓
+              MAC地址和ARP
+                      ↓
+              DNS和DHCP
+                      ↓
+           综合实战：网络诊断工具
+
+核心能力：
+✅ 网络基础理论
+✅ 协议工作原理
+✅ 工具使用
+✅ 编程实现
+✅ 问题诊断
+
+学习心得：
+网络基础是所有网络技术的根基。
+理解了IP地址、子网划分、ARP、DNS这些基础概念，
+就像掌握了网络世界的&#34;字母表&#34;。
+
+接下来我们将深入传输层和网络层，
+学习TCP/IP协议栈的核心机制。
+
+继续加油！💪
+</code></pre><hr>
+<p><strong>进度：14/120天（11.7%）</strong></p>
+<p>恭喜完成第一阶段学习！你已经建立了扎实的网络基础知识。接下来的学习将更加深入和精彩，让我们继续前进！</p>
+<hr>
+<h2 id="附录常用命令速查表">附录：常用命令速查表
+</h2><h3 id="windows命令">Windows命令
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ipconfig /all              <span style="color:#75715e"># 查看详细网络配置</span>
+</span></span><span style="display:flex;"><span>ipconfig /release          <span style="color:#75715e"># 释放DHCP分配的IP</span>
+</span></span><span style="display:flex;"><span>ipconfig /renew            <span style="color:#75715e"># 重新获取IP</span>
+</span></span><span style="display:flex;"><span>ipconfig /flushdns         <span style="color:#75715e"># 清除DNS缓存</span>
+</span></span><span style="display:flex;"><span>ipconfig /displaydns       <span style="color:#75715e"># 显示DNS缓存</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ping &lt;IP&gt;                  <span style="color:#75715e"># 测试连通性</span>
+</span></span><span style="display:flex;"><span>ping -t &lt;IP&gt;              <span style="color:#75715e"># 持续ping</span>
+</span></span><span style="display:flex;"><span>tracert &lt;域名&gt;             <span style="color:#75715e"># 追踪路由</span>
+</span></span><span style="display:flex;"><span>nslookup &lt;域名&gt;            <span style="color:#75715e"># DNS查询</span>
+</span></span><span style="display:flex;"><span>arp -a                     <span style="color:#75715e"># 查看ARP缓存</span>
+</span></span><span style="display:flex;"><span>netstat -an               <span style="color:#75715e"># 查看网络连接</span>
+</span></span><span style="display:flex;"><span>route print               <span style="color:#75715e"># 查看路由表</span>
+</span></span></code></pre></div><h3 id="linuxmac命令">Linux/Mac命令
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ip addr show              <span style="color:#75715e"># 查看网络配置</span>
+</span></span><span style="display:flex;"><span>ip route show             <span style="color:#75715e"># 查看路由表</span>
+</span></span><span style="display:flex;"><span>ifconfig                  <span style="color:#75715e"># 查看网络接口（旧）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ping &lt;IP&gt;                 <span style="color:#75715e"># 测试连通性</span>
+</span></span><span style="display:flex;"><span>ping -c <span style="color:#ae81ff">4</span> &lt;IP&gt;           <span style="color:#75715e"># ping 4次</span>
+</span></span><span style="display:flex;"><span>traceroute &lt;域名&gt;         <span style="color:#75715e"># 追踪路由</span>
+</span></span><span style="display:flex;"><span>dig &lt;域名&gt;                <span style="color:#75715e"># DNS查询（详细）</span>
+</span></span><span style="display:flex;"><span>nslookup &lt;域名&gt;           <span style="color:#75715e"># DNS查询（简单）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>arp -a                    <span style="color:#75715e"># 查看ARP缓存</span>
+</span></span><span style="display:flex;"><span>netstat -an              <span style="color:#75715e"># 查看网络连接</span>
+</span></span><span style="display:flex;"><span>ss -tulpn                <span style="color:#75715e"># 查看监听端口</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sudo dhclient -r         <span style="color:#75715e"># 释放IP</span>
+</span></span><span style="display:flex;"><span>sudo dhclient            <span style="color:#75715e"># 获取IP</span>
+</span></span><span style="display:flex;"><span>sudo systemd-resolve --flush-caches  <span style="color:#75715e"># 清除DNS缓存</span>
+</span></span></code></pre></div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/13%E5%A4%A9dhcp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">13天：DHCP协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/12%E5%A4%A9dns%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">12天：DNS协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/11%E5%A4%A9%E7%AB%AF%E5%8F%A3%E5%92%8Csocket%E6%B7%B1%E5%85%A5/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">11天：端口和Socket深入</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/10%E5%A4%A9mac%E5%9C%B0%E5%9D%80%E5%92%8Carp%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">10天：MAC地址和ARP协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/9%E5%A4%A9%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86%E5%AE%9E%E6%88%98/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">9天：子网划分实战</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

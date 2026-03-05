@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第3天：OSI七层模型 &ldquo;网络协议就像流水线，每一层都有自己的分工。&rdquo;\n📚 今日目标 理解什么是OSI七层模型 掌握每一层的作用 理解数据封装和解封装过程 编写程序演示协议分层 🎯 为什么要分层？ 生活中的例子：快递系统 想象你要给上海的朋友寄一本书：\n">
+<title>3天：OSI七层模型</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/3%E5%A4%A9osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="3天：OSI七层模型">
+<meta property='og:description' content="第3天：OSI七层模型 &ldquo;网络协议就像流水线，每一层都有自己的分工。&rdquo;\n📚 今日目标 理解什么是OSI七层模型 掌握每一层的作用 理解数据封装和解封装过程 编写程序演示协议分层 🎯 为什么要分层？ 生活中的例子：快递系统 想象你要给上海的朋友寄一本书：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/3%E5%A4%A9osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T14:39:36&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T14:39:36&#43;00:00'/>
+<meta name="twitter:title" content="3天：OSI七层模型">
+<meta name="twitter:description" content="第3天：OSI七层模型 &ldquo;网络协议就像流水线，每一层都有自己的分工。&rdquo;\n📚 今日目标 理解什么是OSI七层模型 掌握每一层的作用 理解数据封装和解封装过程 编写程序演示协议分层 🎯 为什么要分层？ 生活中的例子：快递系统 想象你要给上海的朋友寄一本书：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#-为什么要分层">🎯 为什么要分层？</a>
+      <ul>
+        <li><a href="#生活中的例子快递系统">生活中的例子：快递系统</a></li>
+        <li><a href="#分层的好处">分层的好处</a></li>
+      </ul>
+    </li>
+    <li><a href="#-osi七层模型">📊 OSI七层模型</a>
+      <ul>
+        <li><a href="#七层概览">七层概览</a></li>
+        <li><a href="#记忆口诀">记忆口诀</a></li>
+      </ul>
+    </li>
+    <li><a href="#-各层详解">🔍 各层详解</a>
+      <ul>
+        <li><a href="#第7层应用层application-layer">第7层：应用层（Application Layer）</a></li>
+        <li><a href="#第6层表示层presentation-layer">第6层：表示层（Presentation Layer）</a></li>
+        <li><a href="#第5层会话层session-layer">第5层：会话层（Session Layer）</a></li>
+        <li><a href="#第4层传输层transport-layer">第4层：传输层（Transport Layer）</a></li>
+        <li><a href="#第3层网络层network-layer">第3层：网络层（Network Layer）</a></li>
+        <li><a href="#第2层数据链路层data-link-layer">第2层：数据链路层（Data Link Layer）</a></li>
+        <li><a href="#第1层物理层physical-layer">第1层：物理层（Physical Layer）</a></li>
+      </ul>
+    </li>
+    <li><a href="#-数据封装过程">📦 数据封装过程</a>
+      <ul>
+        <li><a href="#类比理解">类比理解</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战项目协议分层演示">🔧 实战项目：协议分层演示</a>
+      <ul>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#运行程序">运行程序</a></li>
+        <li><a href="#预期输出">预期输出</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识小结">🎓 知识小结</a>
+      <ul>
+        <li><a href="#今天学到了什么">今天学到了什么？</a></li>
+        <li><a href="#osi七层速记">OSI七层速记</a></li>
+        <li><a href="#重要概念">重要概念</a></li>
+      </ul>
+    </li>
+    <li><a href="#-练习题">💪 练习题</a>
+      <ul>
+        <li><a href="#练习1层次识别">练习1：层次识别</a></li>
+        <li><a href="#练习2绘制封装过程">练习2：绘制封装过程</a></li>
+        <li><a href="#练习3思考题">练习3：思考题</a></li>
+        <li><a href="#练习4代码扩展">练习4：代码扩展</a></li>
+      </ul>
+    </li>
+    <li><a href="#-扩展阅读">📚 扩展阅读</a>
+      <ul>
+        <li><a href="#osi-vs-tcpip模型">OSI vs TCP/IP模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#-明天预告">🎯 明天预告</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/3%E5%A4%A9osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/">3天：OSI七层模型</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T14:39:36Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#-为什么要分层">🎯 为什么要分层？</a>
+      <ul>
+        <li><a href="#生活中的例子快递系统">生活中的例子：快递系统</a></li>
+        <li><a href="#分层的好处">分层的好处</a></li>
+      </ul>
+    </li>
+    <li><a href="#-osi七层模型">📊 OSI七层模型</a>
+      <ul>
+        <li><a href="#七层概览">七层概览</a></li>
+        <li><a href="#记忆口诀">记忆口诀</a></li>
+      </ul>
+    </li>
+    <li><a href="#-各层详解">🔍 各层详解</a>
+      <ul>
+        <li><a href="#第7层应用层application-layer">第7层：应用层（Application Layer）</a></li>
+        <li><a href="#第6层表示层presentation-layer">第6层：表示层（Presentation Layer）</a></li>
+        <li><a href="#第5层会话层session-layer">第5层：会话层（Session Layer）</a></li>
+        <li><a href="#第4层传输层transport-layer">第4层：传输层（Transport Layer）</a></li>
+        <li><a href="#第3层网络层network-layer">第3层：网络层（Network Layer）</a></li>
+        <li><a href="#第2层数据链路层data-link-layer">第2层：数据链路层（Data Link Layer）</a></li>
+        <li><a href="#第1层物理层physical-layer">第1层：物理层（Physical Layer）</a></li>
+      </ul>
+    </li>
+    <li><a href="#-数据封装过程">📦 数据封装过程</a>
+      <ul>
+        <li><a href="#类比理解">类比理解</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战项目协议分层演示">🔧 实战项目：协议分层演示</a>
+      <ul>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#运行程序">运行程序</a></li>
+        <li><a href="#预期输出">预期输出</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识小结">🎓 知识小结</a>
+      <ul>
+        <li><a href="#今天学到了什么">今天学到了什么？</a></li>
+        <li><a href="#osi七层速记">OSI七层速记</a></li>
+        <li><a href="#重要概念">重要概念</a></li>
+      </ul>
+    </li>
+    <li><a href="#-练习题">💪 练习题</a>
+      <ul>
+        <li><a href="#练习1层次识别">练习1：层次识别</a></li>
+        <li><a href="#练习2绘制封装过程">练习2：绘制封装过程</a></li>
+        <li><a href="#练习3思考题">练习3：思考题</a></li>
+        <li><a href="#练习4代码扩展">练习4：代码扩展</a></li>
+      </ul>
+    </li>
+    <li><a href="#-扩展阅读">📚 扩展阅读</a>
+      <ul>
+        <li><a href="#osi-vs-tcpip模型">OSI vs TCP/IP模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#-明天预告">🎯 明天预告</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第3天osi七层模型">第3天：OSI七层模型
+</h1>
+    <blockquote>
+        <p>&ldquo;网络协议就像流水线，每一层都有自己的分工。&rdquo;</p>
+
+    </blockquote>
+<h2 id="-今日目标">📚 今日目标
+</h2><ul>
+<li>理解什么是OSI七层模型</li>
+<li>掌握每一层的作用</li>
+<li>理解数据封装和解封装过程</li>
+<li>编写程序演示协议分层</li>
+</ul>
+<h2 id="-为什么要分层">🎯 为什么要分层？
+</h2><h3 id="生活中的例子快递系统">生活中的例子：快递系统
+</h3><p>想象你要给上海的朋友寄一本书：</p>
+<pre tabindex="0"><code>你写信 ────────────────────────────&gt; 朋友读信
+  ↓                                      ↑
+包装快递 ──────────────────────────&gt; 拆开快递
+  ↓                                      ↑
+分拣中心 ──────────────────────────&gt; 分拣中心
+  ↓                                      ↑
+运输车辆 ──────────────────────────&gt; 运输车辆
+</code></pre><p><strong>每一层只关心自己的工作</strong>：</p>
+<ul>
+<li>你只需要写信，不管怎么运输</li>
+<li>快递员只负责包装，不管写的什么</li>
+<li>司机只负责开车，不管包裹里是什么</li>
+</ul>
+<p>这就是<strong>分层的思想</strong>！</p>
+<h3 id="分层的好处">分层的好处
+</h3><ol>
+<li><strong>降低复杂度</strong>：每层只处理自己的任务</li>
+<li><strong>标准化接口</strong>：层与层之间有明确的接口</li>
+<li><strong>易于维护</strong>：修改某一层不影响其他层</li>
+<li><strong>可替换</strong>：可以更换某一层的实现</li>
+</ol>
+<h2 id="-osi七层模型">📊 OSI七层模型
+</h2><p><strong>OSI</strong>（Open Systems Interconnection）是国际标准化组织（ISO）制定的网络模型。</p>
+<h3 id="七层概览">七层概览
+</h3><pre tabindex="0"><code>┌─────────────┬────────────┬──────────────┬──────────────┐
+│  层次       │  名称      │  作用        │  例子        │
+├─────────────┼────────────┼──────────────┼──────────────┤
+│  第7层      │  应用层    │  为用户提供  │  HTTP、FTP   │
+│             │Application │  网络服务    │  SMTP、DNS   │
+├─────────────┼────────────┼──────────────┼──────────────┤
+│  第6层      │  表示层    │  数据格式转换│  加密、压缩  │
+│             │Presentation│  编码、加密  │  JPEG、MPEG  │
+├─────────────┼────────────┼──────────────┼──────────────┤
+│  第5层      │  会话层    │  建立、管理  │  RPC、SQL    │
+│             │Session     │  会话        │              │
+├─────────────┼────────────┼──────────────┼──────────────┤
+│  第4层      │  传输层    │  端到端通信  │  TCP、UDP    │
+│             │Transport   │  可靠传输    │              │
+├─────────────┼────────────┼──────────────┼──────────────┤
+│  第3层      │  网络层    │  路由选择    │  IP、ICMP    │
+│             │Network     │  寻址        │              │
+├─────────────┼────────────┼──────────────┼──────────────┤
+│  第2层      │  数据链路层│  帧传输      │  Ethernet    │
+│             │Data Link   │  错误检测    │  WiFi、PPP   │
+├─────────────┼────────────┼──────────────┼──────────────┤
+│  第1层      │  物理层    │  比特传输    │  网线、光纤  │
+│             │Physical    │  电信号      │  无线电波    │
+└─────────────┴────────────┴──────────────┴──────────────┘
+</code></pre><h3 id="记忆口诀">记忆口诀
+</h3><p><strong>从上到下</strong>：</p>
+<ul>
+<li>应（应用层）</li>
+<li>表（表示层）</li>
+<li>会（会话层）</li>
+<li>传（传输层）</li>
+<li>网（网络层）</li>
+<li>数（数据链路层）</li>
+<li>物（物理层）</li>
+</ul>
+<p><strong>英文口诀</strong>：All People Seem To Need Data Processing</p>
+<h2 id="-各层详解">🔍 各层详解
+</h2><h3 id="第7层应用层application-layer">第7层：应用层（Application Layer）
+</h3><p><strong>作用</strong>：为应用程序提供网络服务</p>
+<p><strong>通俗理解</strong>：你直接使用的软件层面</p>
+<p><strong>例子</strong>：</p>
+<ul>
+<li>浏览器打开网页（HTTP/HTTPS）</li>
+<li>收发邮件（SMTP/POP3）</li>
+<li>下载文件（FTP）</li>
+<li>域名解析（DNS）</li>
+</ul>
+<p><strong>类比</strong>：快递公司的客服窗口</p>
+<hr>
+<h3 id="第6层表示层presentation-layer">第6层：表示层（Presentation Layer）
+</h3><p><strong>作用</strong>：数据格式转换、加密、压缩</p>
+<p><strong>通俗理解</strong>：翻译官</p>
+<p><strong>例子</strong>：</p>
+<ul>
+<li>JPEG图片格式</li>
+<li>MP3音频格式</li>
+<li>加密算法（SSL/TLS）</li>
+<li>字符编码（UTF-8）</li>
+</ul>
+<p><strong>类比</strong>：快递包装、封装</p>
+<hr>
+<h3 id="第5层会话层session-layer">第5层：会话层（Session Layer）
+</h3><p><strong>作用</strong>：建立、管理、终止会话</p>
+<p><strong>通俗理解</strong>：负责通话的接线员</p>
+<p><strong>例子</strong>：</p>
+<ul>
+<li>登录会话</li>
+<li>数据库连接</li>
+<li>RPC远程调用</li>
+</ul>
+<p><strong>类比</strong>：快递单号管理系统</p>
+<hr>
+<h3 id="第4层传输层transport-layer">第4层：传输层（Transport Layer）
+</h3><p><strong>作用</strong>：端到端的可靠传输</p>
+<p><strong>通俗理解</strong>：确保包裹完整送达</p>
+<p><strong>例子</strong>：</p>
+<ul>
+<li>TCP：可靠传输，确保数据不丢失</li>
+<li>UDP：快速传输，不保证可靠</li>
+</ul>
+<p><strong>关键概念</strong>：端口号（区分不同的应用）</p>
+<p><strong>类比</strong>：快递公司的分发系统</p>
+<hr>
+<h3 id="第3层网络层network-layer">第3层：网络层（Network Layer）
+</h3><p><strong>作用</strong>：路由选择和寻址</p>
+<p><strong>通俗理解</strong>：找到最佳路径</p>
+<p><strong>例子</strong>：</p>
+<ul>
+<li>IP协议（IP地址）</li>
+<li>路由器工作在这一层</li>
+</ul>
+<p><strong>关键概念</strong>：IP地址（定位设备位置）</p>
+<p><strong>类比</strong>：快递运输路线规划</p>
+<hr>
+<h3 id="第2层数据链路层data-link-layer">第2层：数据链路层（Data Link Layer）
+</h3><p><strong>作用</strong>：帧传输，相邻节点之间的数据传输</p>
+<p><strong>通俗理解</strong>：同一条街道内的传送</p>
+<p><strong>例子</strong>：</p>
+<ul>
+<li>以太网（Ethernet）</li>
+<li>WiFi</li>
+<li>MAC地址</li>
+</ul>
+<p><strong>关键概念</strong>：MAC地址（网卡的物理地址）</p>
+<p><strong>类比</strong>：同城快递站点之间的传递</p>
+<hr>
+<h3 id="第1层物理层physical-layer">第1层：物理层（Physical Layer）
+</h3><p><strong>作用</strong>：在物理媒介上传输比特流</p>
+<p><strong>通俗理解</strong>：实际的传输介质</p>
+<p><strong>例子</strong>：</p>
+<ul>
+<li>网线（双绞线）</li>
+<li>光纤</li>
+<li>无线电波</li>
+</ul>
+<p><strong>关键概念</strong>：电信号、光信号、无线信号</p>
+<p><strong>类比</strong>：快递车、飞机、轮船</p>
+<h2 id="-数据封装过程">📦 数据封装过程
+</h2><p>当你发送数据时，数据会经过<strong>封装</strong>过程：</p>
+<pre tabindex="0"><code>应用层：    [用户数据]
+              ↓ 添加应用层头部
+表示层：    [表示层头部|用户数据]
+              ↓ 添加会话层头部
+会话层：    [会话层头部|表示层头部|用户数据]
+              ↓ 添加传输层头部
+传输层：    [TCP头部|数据] ← 称为&#34;段&#34;（Segment）
+              ↓ 添加网络层头部
+网络层：    [IP头部|TCP头部|数据] ← 称为&#34;包&#34;（Packet）
+              ↓ 添加数据链路层头部和尾部
+数据链路层：[帧头|IP头部|TCP头部|数据|帧尾] ← 称为&#34;帧&#34;（Frame）
+              ↓ 转换为比特流
+物理层：    01010101010101... ← 比特流（Bits）
+</code></pre><h3 id="类比理解">类比理解
+</h3><pre tabindex="0"><code>你写的信     →  应用层数据
+装进信封     →  传输层添加端口信息
+写上地址     →  网络层添加IP地址
+放入包裹箱   →  数据链路层添加MAC地址
+快递车运输   →  物理层传输
+</code></pre><h2 id="-实战项目协议分层演示">🔧 实战项目：协议分层演示
+</h2><p>让我们编写一个程序，模拟OSI七层模型的数据封装过程！</p>
+<h3 id="代码实现">代码实现
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># day03_osi_demo.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 功能：演示OSI七层模型的数据封装和解封装过程</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OSILayer</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;OSI模型的基础层类&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self, name, layer_num):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>name <span style="color:#f92672">=</span> name
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>layer_num <span style="color:#f92672">=</span> layer_num
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;封装数据：添加本层头部&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        header <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">头部]&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> header <span style="color:#f92672">+</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;解封装数据：移除本层头部&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        header <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">头部]&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> data<span style="color:#f92672">.</span>startswith(header):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> data[len(header):]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PhysicalLayer</span>(OSILayer):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;物理层：第1层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>(<span style="color:#e6db74">&#34;物理层&#34;</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;将数据转换为比特流&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        bits <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join(format(ord(c), <span style="color:#e6db74">&#39;08b&#39;</span>) <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> data)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;📡 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 将数据转换为比特流&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   比特流(前64位): </span><span style="color:#e6db74">{</span>bits[:<span style="color:#ae81ff">64</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">...&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> bits
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decapsulate</span>(self, bits):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;将比特流转换为数据&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        chars <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(bits), <span style="color:#ae81ff">8</span>):
+</span></span><span style="display:flex;"><span>            byte <span style="color:#f92672">=</span> bits[i:i<span style="color:#f92672">+</span><span style="color:#ae81ff">8</span>]
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> len(byte) <span style="color:#f92672">==</span> <span style="color:#ae81ff">8</span>:
+</span></span><span style="display:flex;"><span>                chars<span style="color:#f92672">.</span>append(chr(int(byte, <span style="color:#ae81ff">2</span>)))
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join(chars)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;📡 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 将比特流转换为数据&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DataLinkLayer</span>(OSILayer):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;数据链路层：第2层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>(<span style="color:#e6db74">&#34;数据链路层&#34;</span>, <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;添加MAC地址（帧头和帧尾）&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        mac_src <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;AA:BB:CC:DD:EE:FF&#34;</span>  <span style="color:#75715e"># 源MAC地址</span>
+</span></span><span style="display:flex;"><span>        mac_dst <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;11:22:33:44:55:66&#34;</span>  <span style="color:#75715e"># 目标MAC地址</span>
+</span></span><span style="display:flex;"><span>        frame <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[帧头|源MAC:</span><span style="color:#e6db74">{</span>mac_src<span style="color:#e6db74">}</span><span style="color:#e6db74">|目标MAC:</span><span style="color:#e6db74">{</span>mac_dst<span style="color:#e6db74">}</span><span style="color:#e6db74">]</span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#e6db74">[帧尾|CRC校验]&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🔗 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 添加MAC地址&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   源MAC: </span><span style="color:#e6db74">{</span>mac_src<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   目标MAC: </span><span style="color:#e6db74">{</span>mac_dst<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> frame
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decapsulate</span>(self, frame):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;移除MAC地址&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 简化处理：移除帧头和帧尾</span>
+</span></span><span style="display:flex;"><span>        start <span style="color:#f92672">=</span> frame<span style="color:#f92672">.</span>find(<span style="color:#e6db74">&#34;]&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        end <span style="color:#f92672">=</span> frame<span style="color:#f92672">.</span>rfind(<span style="color:#e6db74">&#34;[&#34;</span>)
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> frame[start:end]
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🔗 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 移除MAC地址&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NetworkLayer</span>(OSILayer):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;网络层：第3层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>(<span style="color:#e6db74">&#34;网络层&#34;</span>, <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;添加IP地址&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        ip_src <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;192.168.1.100&#34;</span>  <span style="color:#75715e"># 源IP地址</span>
+</span></span><span style="display:flex;"><span>        ip_dst <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;93.184.216.34&#34;</span>  <span style="color:#75715e"># 目标IP地址（example.com）</span>
+</span></span><span style="display:flex;"><span>        packet <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[IP头|源IP:</span><span style="color:#e6db74">{</span>ip_src<span style="color:#e6db74">}</span><span style="color:#e6db74">|目标IP:</span><span style="color:#e6db74">{</span>ip_dst<span style="color:#e6db74">}</span><span style="color:#e6db74">|TTL:64]</span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🌐 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 添加IP地址&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   源IP: </span><span style="color:#e6db74">{</span>ip_src<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   目标IP: </span><span style="color:#e6db74">{</span>ip_dst<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> packet
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decapsulate</span>(self, packet):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;移除IP头部&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        start <span style="color:#f92672">=</span> packet<span style="color:#f92672">.</span>find(<span style="color:#e6db74">&#34;]&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🌐 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 移除IP头部&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> start <span style="color:#f92672">and</span> packet[start:] <span style="color:#f92672">or</span> packet
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TransportLayer</span>(OSILayer):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;传输层：第4层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>(<span style="color:#e6db74">&#34;传输层&#34;</span>, <span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;添加端口号（TCP头部）&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        port_src <span style="color:#f92672">=</span> <span style="color:#ae81ff">54321</span>  <span style="color:#75715e"># 源端口</span>
+</span></span><span style="display:flex;"><span>        port_dst <span style="color:#f92672">=</span> <span style="color:#ae81ff">80</span>     <span style="color:#75715e"># 目标端口（HTTP）</span>
+</span></span><span style="display:flex;"><span>        segment <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[TCP头|源端口:</span><span style="color:#e6db74">{</span>port_src<span style="color:#e6db74">}</span><span style="color:#e6db74">|目标端口:</span><span style="color:#e6db74">{</span>port_dst<span style="color:#e6db74">}</span><span style="color:#e6db74">|序号:12345]</span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🚚 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 添加端口号（TCP协议）&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   源端口: </span><span style="color:#e6db74">{</span>port_src<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   目标端口: </span><span style="color:#e6db74">{</span>port_dst<span style="color:#e6db74">}</span><span style="color:#e6db74"> (HTTP)&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> segment
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decapsulate</span>(self, segment):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;移除TCP头部&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        start <span style="color:#f92672">=</span> segment<span style="color:#f92672">.</span>find(<span style="color:#e6db74">&#34;]&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🚚 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 移除TCP头部&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> segment[start:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SessionLayer</span>(OSILayer):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;会话层：第5层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>(<span style="color:#e6db74">&#34;会话层&#34;</span>, <span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;建立会话&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        session_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SESSION-20250105-12345&#34;</span>
+</span></span><span style="display:flex;"><span>        session_data <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[会话头|会话ID:</span><span style="color:#e6db74">{</span>session_id<span style="color:#e6db74">}</span><span style="color:#e6db74">]</span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;💬 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 建立会话&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   会话ID: </span><span style="color:#e6db74">{</span>session_id<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> session_data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;终止会话&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        start <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>find(<span style="color:#e6db74">&#34;]&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;💬 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 解析会话信息&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> data[start:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PresentationLayer</span>(OSILayer):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;表示层：第6层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>(<span style="color:#e6db74">&#34;表示层&#34;</span>, <span style="color:#ae81ff">6</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;数据格式转换&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 这里简化为添加编码信息</span>
+</span></span><span style="display:flex;"><span>        formatted_data <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[格式|编码:UTF-8|压缩:无|加密:无]</span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🎨 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 数据格式处理&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   编码: UTF-8&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> formatted_data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;数据格式还原&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        start <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>find(<span style="color:#e6db74">&#34;]&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🎨 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 数据格式还原&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> data[start:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ApplicationLayer</span>(OSILayer):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;应用层：第7层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>(<span style="color:#e6db74">&#34;应用层&#34;</span>, <span style="color:#ae81ff">7</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;生成HTTP请求&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        http_request <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;GET / HTTP/1.1</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">nHost: example.com</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">n</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">n</span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;📱 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 生成HTTP请求&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   请求: GET / HTTP/1.1&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   主机: example.com&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> http_request
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decapsulate</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;解析HTTP响应&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;📱 </span><span style="color:#e6db74">{</span>self<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">: 解析HTTP响应&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">OSIModel</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;OSI七层模型&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 创建各层对象</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>layers <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>            ApplicationLayer(),    <span style="color:#75715e"># 第7层</span>
+</span></span><span style="display:flex;"><span>            PresentationLayer(),   <span style="color:#75715e"># 第6层</span>
+</span></span><span style="display:flex;"><span>            SessionLayer(),        <span style="color:#75715e"># 第5层</span>
+</span></span><span style="display:flex;"><span>            TransportLayer(),      <span style="color:#75715e"># 第4层</span>
+</span></span><span style="display:flex;"><span>            NetworkLayer(),        <span style="color:#75715e"># 第3层</span>
+</span></span><span style="display:flex;"><span>            DataLinkLayer(),       <span style="color:#75715e"># 第2层</span>
+</span></span><span style="display:flex;"><span>            PhysicalLayer(),       <span style="color:#75715e"># 第1层</span>
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">send_data</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;发送数据：从应用层到物理层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;📤 数据发送过程（封装）&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">70</span>))
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">原始数据: </span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        current_data <span style="color:#f92672">=</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 从应用层到物理层，逐层封装</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> layer <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>layers:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;▼&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">35</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            current_data <span style="color:#f92672">=</span> layer<span style="color:#f92672">.</span>encapsulate(current_data)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> layer<span style="color:#f92672">.</span>layer_num <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>:  <span style="color:#75715e"># 物理层的输出太长，不显示完整数据</span>
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   数据长度: </span><span style="color:#e6db74">{</span>len(current_data)<span style="color:#e6db74">}</span><span style="color:#e6db74"> 字符&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> current_data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">receive_data</span>(self, data):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;接收数据：从物理层到应用层&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;📥 数据接收过程（解封装）&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">70</span>))
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        current_data <span style="color:#f92672">=</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 从物理层到应用层，逐层解封装</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> layer <span style="color:#f92672">in</span> reversed(self<span style="color:#f92672">.</span>layers):
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;▲&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">35</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            current_data <span style="color:#f92672">=</span> layer<span style="color:#f92672">.</span>decapsulate(current_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">最终数据: </span><span style="color:#e6db74">{</span>current_data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> current_data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;主函数&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;OSI七层模型数据封装演示&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">70</span>))
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">📚 本程序演示OSI七层模型的数据封装和解封装过程&#34;</span>)
+</span></span><span style="display:flex;"><span>    print()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 创建OSI模型</span>
+</span></span><span style="display:flex;"><span>    osi <span style="color:#f92672">=</span> OSIModel()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 要发送的数据</span>
+</span></span><span style="display:flex;"><span>    original_data <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hello, Network World!&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🎯 准备发送数据: </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">{</span>original_data<span style="color:#e6db74">}</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 发送数据（封装过程）</span>
+</span></span><span style="display:flex;"><span>    transmitted_data <span style="color:#f92672">=</span> osi<span style="color:#f92672">.</span>send_data(original_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 模拟数据传输</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;⚡&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">35</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;   数据通过网络传输中...&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;⚡&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">35</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 接收数据（解封装过程）</span>
+</span></span><span style="display:flex;"><span>    received_data <span style="color:#f92672">=</span> osi<span style="color:#f92672">.</span>receive_data(transmitted_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 验证</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;✅ 传输完成！&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">70</span>))
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">发送的数据: </span><span style="color:#e6db74">{</span>original_data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;接收的数据: </span><span style="color:#e6db74">{</span>received_data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;Hello, Network World!&#34;</span> <span style="color:#f92672">in</span> received_data:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">🎉 数据传输成功！&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">❌ 数据传输失败！&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><h3 id="运行程序">运行程序
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cd code/day03
+</span></span><span style="display:flex;"><span>python day03_osi_demo.py
+</span></span></code></pre></div><h3 id="预期输出">预期输出
+</h3><p>程序会详细展示数据在OSI七层模型中的封装和解封装过程，帮助你直观理解每一层的作用。</p>
+<h2 id="-知识小结">🎓 知识小结
+</h2><h3 id="今天学到了什么">今天学到了什么？
+</h3><ol>
+<li>✅ OSI七层模型是网络通信的标准模型</li>
+<li>✅ 每一层都有明确的职责</li>
+<li>✅ 数据发送时逐层封装，接收时逐层解封装</li>
+<li>✅ 分层的优点是降低复杂度、便于维护</li>
+</ol>
+<h3 id="osi七层速记">OSI七层速记
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>层次</th>
+          <th>名称</th>
+          <th>关键词</th>
+          <th>协议示例</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>7</td>
+          <td>应用层</td>
+          <td>用户接口</td>
+          <td>HTTP、FTP、DNS</td>
+      </tr>
+      <tr>
+          <td>6</td>
+          <td>表示层</td>
+          <td>格式转换</td>
+          <td>SSL、JPEG</td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>会话层</td>
+          <td>会话管理</td>
+          <td>RPC、SQL</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>传输层</td>
+          <td>端到端</td>
+          <td>TCP、UDP</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td>网络层</td>
+          <td>路由寻址</td>
+          <td>IP、ICMP</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>数据链路层</td>
+          <td>帧传输</td>
+          <td>Ethernet、WiFi</td>
+      </tr>
+      <tr>
+          <td>1</td>
+          <td>物理层</td>
+          <td>比特流</td>
+          <td>网线、光纤</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="重要概念">重要概念
+</h3><ul>
+<li><strong>封装</strong>（Encapsulation）：发送数据时，逐层添加头部信息</li>
+<li><strong>解封装</strong>（Decapsulation）：接收数据时，逐层移除头部信息</li>
+<li><strong>PDU</strong>（Protocol Data Unit）：协议数据单元
+<ul>
+<li>应用层：消息（Message）</li>
+<li>传输层：段（Segment）</li>
+<li>网络层：包（Packet）</li>
+<li>数据链路层：帧（Frame）</li>
+<li>物理层：比特（Bit）</li>
+</ul>
+</li>
+</ul>
+<h2 id="-练习题">💪 练习题
+</h2><h3 id="练习1层次识别">练习1：层次识别
+</h3><p>以下操作分别在哪一层完成？</p>
+<ol>
+<li>输入网址 <a class="link" href="https://www.baidu.com"  target="_blank" rel="noopener"
+    >www.baidu.com</a></li>
+<li>将域名解析为IP地址</li>
+<li>添加源端口和目标端口</li>
+<li>选择路由路径</li>
+<li>将数据转换为电信号</li>
+</ol>
+<h3 id="练习2绘制封装过程">练习2：绘制封装过程
+</h3><p>画出&quot;发送一封邮件&quot;的完整封装过程，标注每一层添加的信息。</p>
+<h3 id="练习3思考题">练习3：思考题
+</h3><ol>
+<li>为什么要分成7层？能不能只分3层或分10层？</li>
+<li>如果没有分层，会有什么问题？</li>
+<li>哪些层是软件实现的？哪些是硬件实现的？</li>
+</ol>
+<h3 id="练习4代码扩展">练习4：代码扩展
+</h3><p>修改演示程序，添加以下功能：</p>
+<ol>
+<li>显示每层数据的大小变化</li>
+<li>模拟数据在传输过程中丢失的情况</li>
+<li>添加错误检测和重传机制</li>
+</ol>
+<h2 id="-扩展阅读">📚 扩展阅读
+</h2><h3 id="osi-vs-tcpip模型">OSI vs TCP/IP模型
+</h3><p>OSI是理论模型，TCP/IP是实际使用的模型：</p>
+<pre tabindex="0"><code>OSI七层模型              TCP/IP四层模型
+┌─────────────┐
+│  应用层     │ \        ┌─────────────┐
+├─────────────┤  \       │  应用层     │
+│  表示层     │   } ───&gt; │             │
+├─────────────┤  /       │             │
+│  会话层     │ /        └─────────────┘
+├─────────────┤          ┌─────────────┐
+│  传输层     │  ─────&gt;  │  传输层     │
+├─────────────┤          └─────────────┘
+│  网络层     │  ─────&gt;  ┌─────────────┐
+├─────────────┤          │  网络层     │
+│ 数据链路层  │ \        └─────────────┘
+├─────────────┤  } ───&gt;  ┌─────────────┐
+│  物理层     │ /        │ 网络接口层  │
+└─────────────┘          └─────────────┘
+</code></pre><p><strong>明天我们将详细学习TCP/IP模型！</strong></p>
+<h2 id="-明天预告">🎯 明天预告
+</h2><p><strong>第4天：TCP/IP四层模型</strong></p>
+<p>我们将学习：</p>
+<ul>
+<li>TCP/IP模型和OSI模型的区别</li>
+<li>TCP/IP各层的详细功能</li>
+<li>实际网络中如何使用TCP/IP</li>
+<li>编写程序分析真实的网络数据包</li>
+</ul>
+<hr>
+<p>💡 <strong>今日金句</strong>：分层不是为了复杂化，而是为了简单化！</p>
+<p>👉 <a class="link" href="day02.md" >上一天：网络的分类和拓扑结构</a> | <a class="link" href="../../README.md" >返回目录</a> | <a class="link" href="day04.md" >下一天：TCP/IP四层模型</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/2%E5%A4%A9%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2天：网络的分类和拓扑结构</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/1%E5%A4%A9%E8%AE%A4%E8%AF%86%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">1天：认识计算机网络</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

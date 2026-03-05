@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第二周总结：网络层深入理解 本周学习回顾 恭喜你完成了第二周的学习！本周我们深入学习了网络层的核心概念和协议。让我们一起回顾这一周的精彩内容。\n📚 本周知识地图 第二周：网络层深入 ├── Day 8: IP地址详解 │ ├── IPv4地址结构 │ ├── IP地址分类（A/B/C/D/E） │ ├── 公有IP vs 私有IP │ ├── 特殊IP地址 │ └── IP地址分析工具 │ ├── Day 9: 子网划分与CIDR │ ├── 子网掩码原理 │ ├── CIDR表示法 │ ├── 子网计算方法 │ ├── VLSM可变长子网 │ └── 子网计算器 │ ├── Day 10: MAC地址与ARP │ ├── MAC地址结构 │ ├── OUI厂商标识 │ ├── ARP工作原理 │ ├── ARP缓存机制 │ └── ARP扫描工具 │ ├── Day 11: 端口和Socket深入 │ ├── 端口概念（0-65535） │ ├── 常用端口号 │ ├── Socket编程基础 │ ├── TCP vs UDP │ └── 端口扫描器 │ ├── Day 12: DNS协议详解 │ ├── DNS层级架构 │ ├── DNS查询流程（递归/迭代） │ ├── DNS记录类型 │ ├── DNS缓存机制 │ └── DNS查询工具 │ └── Day 13: DHCP协议详解 ├── DHCP工作原理 ├── DORA四次握手 ├── IP地址租约管理 ├── DHCP报文格式 └── DHCP分析工具 🎯 核心知识点回顾 1. IP地址体系 IPv4地址结构：\n">
+<title>二周总结：网络层深入理解</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/%E4%BA%8C%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%B1%82%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="二周总结：网络层深入理解">
+<meta property='og:description' content="第二周总结：网络层深入理解 本周学习回顾 恭喜你完成了第二周的学习！本周我们深入学习了网络层的核心概念和协议。让我们一起回顾这一周的精彩内容。\n📚 本周知识地图 第二周：网络层深入 ├── Day 8: IP地址详解 │ ├── IPv4地址结构 │ ├── IP地址分类（A/B/C/D/E） │ ├── 公有IP vs 私有IP │ ├── 特殊IP地址 │ └── IP地址分析工具 │ ├── Day 9: 子网划分与CIDR │ ├── 子网掩码原理 │ ├── CIDR表示法 │ ├── 子网计算方法 │ ├── VLSM可变长子网 │ └── 子网计算器 │ ├── Day 10: MAC地址与ARP │ ├── MAC地址结构 │ ├── OUI厂商标识 │ ├── ARP工作原理 │ ├── ARP缓存机制 │ └── ARP扫描工具 │ ├── Day 11: 端口和Socket深入 │ ├── 端口概念（0-65535） │ ├── 常用端口号 │ ├── Socket编程基础 │ ├── TCP vs UDP │ └── 端口扫描器 │ ├── Day 12: DNS协议详解 │ ├── DNS层级架构 │ ├── DNS查询流程（递归/迭代） │ ├── DNS记录类型 │ ├── DNS缓存机制 │ └── DNS查询工具 │ └── Day 13: DHCP协议详解 ├── DHCP工作原理 ├── DORA四次握手 ├── IP地址租约管理 ├── DHCP报文格式 └── DHCP分析工具 🎯 核心知识点回顾 1. IP地址体系 IPv4地址结构：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/%E4%BA%8C%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%B1%82%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:21:42&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:21:42&#43;00:00'/>
+<meta name="twitter:title" content="二周总结：网络层深入理解">
+<meta name="twitter:description" content="第二周总结：网络层深入理解 本周学习回顾 恭喜你完成了第二周的学习！本周我们深入学习了网络层的核心概念和协议。让我们一起回顾这一周的精彩内容。\n📚 本周知识地图 第二周：网络层深入 ├── Day 8: IP地址详解 │ ├── IPv4地址结构 │ ├── IP地址分类（A/B/C/D/E） │ ├── 公有IP vs 私有IP │ ├── 特殊IP地址 │ └── IP地址分析工具 │ ├── Day 9: 子网划分与CIDR │ ├── 子网掩码原理 │ ├── CIDR表示法 │ ├── 子网计算方法 │ ├── VLSM可变长子网 │ └── 子网计算器 │ ├── Day 10: MAC地址与ARP │ ├── MAC地址结构 │ ├── OUI厂商标识 │ ├── ARP工作原理 │ ├── ARP缓存机制 │ └── ARP扫描工具 │ ├── Day 11: 端口和Socket深入 │ ├── 端口概念（0-65535） │ ├── 常用端口号 │ ├── Socket编程基础 │ ├── TCP vs UDP │ └── 端口扫描器 │ ├── Day 12: DNS协议详解 │ ├── DNS层级架构 │ ├── DNS查询流程（递归/迭代） │ ├── DNS记录类型 │ ├── DNS缓存机制 │ └── DNS查询工具 │ └── Day 13: DHCP协议详解 ├── DHCP工作原理 ├── DORA四次握手 ├── IP地址租约管理 ├── DHCP报文格式 └── DHCP分析工具 🎯 核心知识点回顾 1. IP地址体系 IPv4地址结构：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#本周学习回顾">本周学习回顾</a></li>
+    <li><a href="#-本周知识地图">📚 本周知识地图</a></li>
+    <li><a href="#-核心知识点回顾">🎯 核心知识点回顾</a>
+      <ul>
+        <li><a href="#1-ip地址体系">1. IP地址体系</a></li>
+        <li><a href="#2-子网划分">2. 子网划分</a></li>
+        <li><a href="#3-mac地址与arp">3. MAC地址与ARP</a></li>
+        <li><a href="#4-端口与socket">4. 端口与Socket</a></li>
+        <li><a href="#5-dns协议">5. DNS协议</a></li>
+        <li><a href="#6-dhcp协议">6. DHCP协议</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识串联">🔗 知识串联</a>
+      <ul>
+        <li><a href="#场景你的电脑如何访问">场景：你的电脑如何访问 www.baidu.com</a></li>
+        <li><a href="#完整的网络层协议栈">完整的网络层协议栈</a></li>
+      </ul>
+    </li>
+    <li><a href="#-综合实战项目">💻 综合实战项目</a>
+      <ul>
+        <li><a href="#项目网络配置诊断工具">项目：网络配置诊断工具</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识测验">📝 知识测验</a>
+      <ul>
+        <li><a href="#基础题每题10分">基础题（每题10分）</a></li>
+        <li><a href="#进阶题每题15分">进阶题（每题15分）</a></li>
+        <li><a href="#计分标准">计分标准</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实践建议">🎓 实践建议</a>
+      <ul>
+        <li><a href="#1-动手实验">1. 动手实验</a></li>
+        <li><a href="#2-工具使用">2. 工具使用</a></li>
+        <li><a href="#3-延伸学习">3. 延伸学习</a></li>
+      </ul>
+    </li>
+    <li><a href="#-下周预告">🚀 下周预告</a></li>
+    <li><a href="#-学习进度追踪">📊 学习进度追踪</a></li>
+    <li><a href="#-本周检查清单">✅ 本周检查清单</a></li>
+    <li><a href="#-学习心得">💬 学习心得</a></li>
+    <li><a href="#-总结">🎉 总结</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E4%BA%8C%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%B1%82%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3/">二周总结：网络层深入理解</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:21:42Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#本周学习回顾">本周学习回顾</a></li>
+    <li><a href="#-本周知识地图">📚 本周知识地图</a></li>
+    <li><a href="#-核心知识点回顾">🎯 核心知识点回顾</a>
+      <ul>
+        <li><a href="#1-ip地址体系">1. IP地址体系</a></li>
+        <li><a href="#2-子网划分">2. 子网划分</a></li>
+        <li><a href="#3-mac地址与arp">3. MAC地址与ARP</a></li>
+        <li><a href="#4-端口与socket">4. 端口与Socket</a></li>
+        <li><a href="#5-dns协议">5. DNS协议</a></li>
+        <li><a href="#6-dhcp协议">6. DHCP协议</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识串联">🔗 知识串联</a>
+      <ul>
+        <li><a href="#场景你的电脑如何访问">场景：你的电脑如何访问 www.baidu.com</a></li>
+        <li><a href="#完整的网络层协议栈">完整的网络层协议栈</a></li>
+      </ul>
+    </li>
+    <li><a href="#-综合实战项目">💻 综合实战项目</a>
+      <ul>
+        <li><a href="#项目网络配置诊断工具">项目：网络配置诊断工具</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识测验">📝 知识测验</a>
+      <ul>
+        <li><a href="#基础题每题10分">基础题（每题10分）</a></li>
+        <li><a href="#进阶题每题15分">进阶题（每题15分）</a></li>
+        <li><a href="#计分标准">计分标准</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实践建议">🎓 实践建议</a>
+      <ul>
+        <li><a href="#1-动手实验">1. 动手实验</a></li>
+        <li><a href="#2-工具使用">2. 工具使用</a></li>
+        <li><a href="#3-延伸学习">3. 延伸学习</a></li>
+      </ul>
+    </li>
+    <li><a href="#-下周预告">🚀 下周预告</a></li>
+    <li><a href="#-学习进度追踪">📊 学习进度追踪</a></li>
+    <li><a href="#-本周检查清单">✅ 本周检查清单</a></li>
+    <li><a href="#-学习心得">💬 学习心得</a></li>
+    <li><a href="#-总结">🎉 总结</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第二周总结网络层深入理解">第二周总结：网络层深入理解
+</h1><h2 id="本周学习回顾">本周学习回顾
+</h2><p>恭喜你完成了第二周的学习！本周我们深入学习了网络层的核心概念和协议。让我们一起回顾这一周的精彩内容。</p>
+<hr>
+<h2 id="-本周知识地图">📚 本周知识地图
+</h2><pre tabindex="0"><code>第二周：网络层深入
+├── Day 8: IP地址详解
+│   ├── IPv4地址结构
+│   ├── IP地址分类（A/B/C/D/E）
+│   ├── 公有IP vs 私有IP
+│   ├── 特殊IP地址
+│   └── IP地址分析工具
+│
+├── Day 9: 子网划分与CIDR
+│   ├── 子网掩码原理
+│   ├── CIDR表示法
+│   ├── 子网计算方法
+│   ├── VLSM可变长子网
+│   └── 子网计算器
+│
+├── Day 10: MAC地址与ARP
+│   ├── MAC地址结构
+│   ├── OUI厂商标识
+│   ├── ARP工作原理
+│   ├── ARP缓存机制
+│   └── ARP扫描工具
+│
+├── Day 11: 端口和Socket深入
+│   ├── 端口概念（0-65535）
+│   ├── 常用端口号
+│   ├── Socket编程基础
+│   ├── TCP vs UDP
+│   └── 端口扫描器
+│
+├── Day 12: DNS协议详解
+│   ├── DNS层级架构
+│   ├── DNS查询流程（递归/迭代）
+│   ├── DNS记录类型
+│   ├── DNS缓存机制
+│   └── DNS查询工具
+│
+└── Day 13: DHCP协议详解
+    ├── DHCP工作原理
+    ├── DORA四次握手
+    ├── IP地址租约管理
+    ├── DHCP报文格式
+    └── DHCP分析工具
+</code></pre><hr>
+<h2 id="-核心知识点回顾">🎯 核心知识点回顾
+</h2><h3 id="1-ip地址体系">1. IP地址体系
+</h3><p><strong>IPv4地址结构</strong>：</p>
+<pre tabindex="0"><code>192.168.1.100
+ |   |   | |
+ |   |   | +-- 主机号
+ |   |   +---- 子网号
+ |   +-------- 网络号
+ +------------ 网络类别
+</code></pre><p><strong>IP地址分类</strong>：</p>
+<pre tabindex="0"><code>A类：1.0.0.0 - 126.255.255.255
+     0xxxxxxx.xxxxxxxx.xxxxxxxx.xxxxxxxx
+     用途：大型网络
+
+B类：128.0.0.0 - 191.255.255.255
+     10xxxxxx.xxxxxxxx.xxxxxxxx.xxxxxxxx
+     用途：中型网络
+
+C类：192.0.0.0 - 223.255.255.255
+     110xxxxx.xxxxxxxx.xxxxxxxx.xxxxxxxx
+     用途：小型网络
+
+D类：224.0.0.0 - 239.255.255.255
+     用途：组播
+
+E类：240.0.0.0 - 255.255.255.255
+     用途：保留/实验
+</code></pre><p><strong>私有IP地址</strong>：</p>
+<pre tabindex="0"><code>10.0.0.0/8        → A类私有
+172.16.0.0/12     → B类私有
+192.168.0.0/16    → C类私有
+</code></pre><h3 id="2-子网划分">2. 子网划分
+</h3><p><strong>子网掩码作用</strong>：</p>
+<pre tabindex="0"><code>IP地址：    192.168.1.100   11000000.10101000.00000001.01100100
+子网掩码：  255.255.255.0   11111111.11111111.11111111.00000000
+─────────────────────────────────────────────────────────────
+网络地址：  192.168.1.0     11000000.10101000.00000001.00000000 (AND运算)
+</code></pre><p><strong>CIDR计算</strong>：</p>
+<pre tabindex="0"><code>CIDR    子网掩码           可用主机数    用途
+/8      255.0.0.0         16,777,214    大型网络
+/16     255.255.0.0       65,534        中型网络
+/24     255.255.255.0     254           小型网络
+/25     255.255.255.128   126           小型子网
+/26     255.255.255.192   62            更小子网
+/30     255.255.255.252   2             点对点链路
+</code></pre><p><strong>子网划分示例</strong>：</p>
+<pre tabindex="0"><code>原网络：192.168.1.0/24
+
+划分为4个子网（/26）：
+├── 192.168.1.0/26    (192.168.1.1 - 192.168.1.62)
+├── 192.168.1.64/26   (192.168.1.65 - 192.168.1.126)
+├── 192.168.1.128/26  (192.168.1.129 - 192.168.1.190)
+└── 192.168.1.192/26  (192.168.1.193 - 192.168.1.254)
+</code></pre><h3 id="3-mac地址与arp">3. MAC地址与ARP
+</h3><p><strong>MAC地址结构</strong>：</p>
+<pre tabindex="0"><code>AA:BB:CC:DD:EE:FF
+│     │  │     │
+│     │  │     └─ 设备号（厂商分配）
+│     │  └─────── 设备号
+│     └────────── 设备号
+└──────────────── OUI（厂商标识）
+
+示例：
+00:50:56:XX:XX:XX → VMware
+08:00:27:XX:XX:XX → VirtualBox
+AC:DE:48:XX:XX:XX → Apple
+</code></pre><p><strong>ARP工作流程</strong>：</p>
+<pre tabindex="0"><code>场景：主机A (192.168.1.10) 要发送数据给主机B (192.168.1.20)
+
+1. 主机A检查ARP缓存
+   └─ 没有192.168.1.20的MAC地址
+
+2. 主机A广播ARP请求
+   源MAC: aa:bb:cc:dd:ee:ff
+   源IP:  192.168.1.10
+   目标MAC: ff:ff:ff:ff:ff:ff (广播)
+   目标IP: 192.168.1.20
+   问题: &#34;192.168.1.20的MAC地址是什么？&#34;
+
+3. 主机B收到请求，单播ARP响应
+   源MAC: 11:22:33:44:55:66
+   源IP:  192.168.1.20
+   目标MAC: aa:bb:cc:dd:ee:ff
+   目标IP: 192.168.1.10
+   回答: &#34;我是192.168.1.20，MAC是11:22:33:44:55:66&#34;
+
+4. 主机A更新ARP缓存
+   192.168.1.20 → 11:22:33:44:55:66
+
+5. 主机A封装数据帧发送
+   目标MAC: 11:22:33:44:55:66 ✅
+</code></pre><h3 id="4-端口与socket">4. 端口与Socket
+</h3><p><strong>端口分类</strong>：</p>
+<pre tabindex="0"><code>0-1023      系统端口（Well-Known Ports）
+            需要管理员权限
+            示例：HTTP(80)、HTTPS(443)、SSH(22)
+
+1024-49151  注册端口（Registered Ports）
+            由IANA分配
+            示例：MySQL(3306)、Redis(6379)
+
+49152-65535 动态端口（Dynamic Ports）
+            临时端口、客户端端口
+</code></pre><p><strong>常用端口速查</strong>：</p>
+<pre tabindex="0"><code>协议/服务    端口    说明
+HTTP        80      网页浏览
+HTTPS       443     加密网页
+SSH         22      远程登录
+FTP         21      文件传输
+Telnet      23      远程终端
+SMTP        25      邮件发送
+POP3        110     邮件接收
+IMAP        143     邮件接收
+DNS         53      域名解析
+DHCP        67/68   IP地址分配
+MySQL       3306    数据库
+PostgreSQL  5432    数据库
+Redis       6379    缓存数据库
+MongoDB     27017   文档数据库
+</code></pre><p><strong>TCP Socket流程</strong>：</p>
+<pre tabindex="0"><code>服务器端：                     客户端：
+socket()                      socket()
+   ↓                             ↓
+bind()                         ---
+   ↓                             ↓
+listen()                       connect() ────→ 三次握手
+   ↓                             ↓
+accept() ←───────────────────────┘
+   ↓                             ↓
+recv() ←─────────────────────── send()
+   ↓                             ↓
+send() ─────────────────────→ recv()
+   ↓                             ↓
+close()                        close()
+</code></pre><h3 id="5-dns协议">5. DNS协议
+</h3><p><strong>DNS层级结构</strong>：</p>
+<pre tabindex="0"><code>完整域名：www.example.com.
+           │   │       │   │
+           │   │       │   └─ 根域
+           │   │       └───── 顶级域(TLD)
+           │   └─────────────二级域(SLD)
+           └─────────────────子域/主机名
+</code></pre><p><strong>DNS查询流程（递归+迭代）</strong>：</p>
+<pre tabindex="0"><code>1. 客户端 → 本地DNS服务器
+   &#34;www.example.com的IP是什么？&#34;
+
+2. 本地DNS → 根DNS服务器
+   根DNS → &#34;去问.com服务器，地址是X.X.X.X&#34;
+
+3. 本地DNS → .com DNS服务器
+   .com DNS → &#34;去问example.com的权威DNS，地址是Y.Y.Y.Y&#34;
+
+4. 本地DNS → example.com 权威DNS
+   权威DNS → &#34;www.example.com的IP是93.184.216.34&#34;
+
+5. 本地DNS → 客户端
+   &#34;答案是93.184.216.34&#34;
+
+总耗时：通常50-200ms
+</code></pre><p><strong>DNS记录类型</strong>：</p>
+<pre tabindex="0"><code>A记录     → IPv4地址        www.example.com → 93.184.216.34
+AAAA记录  → IPv6地址        www.example.com → 2606:2800:220:1:...
+CNAME记录 → 别名           blog.example.com → www.example.com
+MX记录    → 邮件服务器      example.com → mail.example.com (优先级10)
+NS记录    → 域名服务器      example.com → ns1.example.com
+TXT记录   → 文本信息        用于SPF、DKIM验证
+PTR记录   → 反向解析        IP → 域名
+</code></pre><p><strong>DNS缓存层级</strong>：</p>
+<pre tabindex="0"><code>浏览器缓存 (几分钟)
+    ↓
+操作系统缓存 (根据TTL)
+    ↓
+路由器缓存 (根据TTL)
+    ↓
+本地DNS服务器缓存 (根据TTL)
+    ↓
+权威DNS服务器 (真实数据源)
+</code></pre><h3 id="6-dhcp协议">6. DHCP协议
+</h3><p><strong>DORA四次握手</strong>：</p>
+<pre tabindex="0"><code>D - Discover   客户端广播：&#34;有DHCP服务器吗？&#34;
+O - Offer      服务器响应：&#34;这里有个IP：192.168.1.100&#34;
+R - Request    客户端广播：&#34;我要192.168.1.100&#34;
+A - Ack        服务器确认：&#34;好的，分配给你了！&#34;
+
+时间线：
+t=0ms    客户端发送Discover
+t=10ms   服务器响应Offer
+t=15ms   客户端发送Request
+t=20ms   服务器发送Ack
+         ✅ 客户端配置完成，可以上网
+</code></pre><p><strong>DHCP配置内容</strong>：</p>
+<pre tabindex="0"><code>必需配置：
+├── IP地址          192.168.1.100
+├── 子网掩码        255.255.255.0
+└── 租约时间        86400秒 (24小时)
+
+可选配置：
+├── 默认网关        192.168.1.1
+├── DNS服务器       8.8.8.8, 8.8.4.4
+├── 域名            example.com
+└── 其他参数        NTP服务器、WINS服务器等
+</code></pre><p><strong>租约时间管理</strong>：</p>
+<pre tabindex="0"><code>租约周期：24小时 (86400秒)
+
+时间点：
+0%        开始时间：2024-01-15 10:00:00
+          ↓
+50%       T1续约：  2024-01-15 22:00:00
+          (直接联系原DHCP服务器)
+          ↓
+87.5%     T2重绑：  2024-01-16 04:30:00
+          (广播寻找任何DHCP服务器)
+          ↓
+100%      到期时间：2024-01-16 10:00:00
+          (释放IP，重新DORA)
+</code></pre><hr>
+<h2 id="-知识串联">🔗 知识串联
+</h2><p>让我们把这一周的知识串联起来，看看它们如何协同工作：</p>
+<h3 id="场景你的电脑如何访问">场景：你的电脑如何访问 <a class="link" href="https://www.baidu.com"  target="_blank" rel="noopener"
+    >www.baidu.com</a>
+</h3><pre tabindex="0"><code>步骤1：获取网络配置 (DHCP)
+─────────────────────────────────
+开机 → DHCP DORA过程
+     ↓
+获得配置：
+- IP地址：192.168.1.100
+- 子网掩码：255.255.255.0
+- 网关：192.168.1.1
+- DNS：8.8.8.8
+
+步骤2：DNS域名解析
+─────────────────────────────────
+浏览器输入：www.baidu.com
+     ↓
+查询本地DNS缓存
+     ↓ (未命中)
+本地DNS → 递归查询
+     ↓
+得到IP：110.242.68.66
+
+步骤3：判断是否同一子网
+─────────────────────────────────
+目标IP：110.242.68.66
+本机IP：192.168.1.100/24
+本机网络：192.168.1.0
+
+110.242.68.66 ∉ 192.168.1.0/24
+     ↓
+需要通过网关转发
+
+步骤4：ARP获取网关MAC地址
+─────────────────────────────────
+需要发送给：192.168.1.1（网关）
+     ↓
+查询ARP缓存
+     ↓ (未命中)
+广播ARP请求：&#34;192.168.1.1的MAC是什么？&#34;
+     ↓
+收到ARP响应：&#34;MAC是aa:bb:cc:dd:ee:ff&#34;
+     ↓
+更新ARP缓存
+
+步骤5：封装数据包并发送
+─────────────────────────────────
+应用层：HTTP请求 GET / HTTP/1.1
+     ↓
+传输层：TCP段 (源端口:54321 → 目标端口:80)
+     ↓
+网络层：IP包
+        源IP: 192.168.1.100
+        目标IP: 110.242.68.66
+     ↓
+链路层：以太网帧
+        源MAC: 你的电脑MAC
+        目标MAC: aa:bb:cc:dd:ee:ff (网关MAC)
+     ↓
+发送到网关
+
+步骤6：网关转发
+─────────────────────────────────
+网关收到数据包
+     ↓
+查看目标IP：110.242.68.66
+     ↓
+查询路由表，找到下一跳
+     ↓
+转发给运营商路由器
+     ↓
+... 经过多个路由器 ...
+     ↓
+到达百度服务器
+
+步骤7：接收响应
+─────────────────────────────────
+百度服务器处理请求
+     ↓
+返回HTTP响应
+     ↓
+... 原路返回 ...
+     ↓
+到达你的电脑
+     ↓
+浏览器显示网页 ✅
+</code></pre><h3 id="完整的网络层协议栈">完整的网络层协议栈
+</h3><pre tabindex="0"><code>┌────────────────────────────────────────┐
+│         应用层                          │
+│    HTTP、FTP、SMTP、DNS                │
+├────────────────────────────────────────┤
+│         传输层                          │
+│    TCP (端口)、UDP (端口)              │
+├────────────────────────────────────────┤
+│         网络层                          │
+│    IP (地址)、ICMP、ARP                │
+├────────────────────────────────────────┤
+│         链路层                          │
+│    以太网 (MAC地址)、WiFi              │
+├────────────────────────────────────────┤
+│         物理层                          │
+│    电信号、光信号、无线电波            │
+└────────────────────────────────────────┘
+</code></pre><hr>
+<h2 id="-综合实战项目">💻 综合实战项目
+</h2><h3 id="项目网络配置诊断工具">项目：网络配置诊断工具
+</h3><p>创建一个综合工具，整合本周所学知识：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 综合诊断</span>
+</span></span><span style="display:flex;"><span>python week02_network_diagnostic.py --full
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 单项检查</span>
+</span></span><span style="display:flex;"><span>python week02_network_diagnostic.py --check-ip
+</span></span><span style="display:flex;"><span>python week02_network_diagnostic.py --check-dns
+</span></span><span style="display:flex;"><span>python week02_network_diagnostic.py --check-gateway
+</span></span></code></pre></div><p><strong>项目代码</strong>：见 <code>code/week02/week02_network_diagnostic.py</code></p>
+<p><strong>功能清单</strong>：</p>
+<ol>
+<li>✅ 显示本机IP配置（IP、掩码、网关、DNS）</li>
+<li>✅ 分析IP地址类型（公有/私有、类别）</li>
+<li>✅ 计算子网信息（网络地址、广播地址、可用主机）</li>
+<li>✅ 查看ARP缓存</li>
+<li>✅ 扫描网关可达性</li>
+<li>✅ 测试DNS解析</li>
+<li>✅ 显示DHCP租约信息</li>
+<li>✅ 检查常用端口</li>
+<li>✅ 网络连通性测试</li>
+<li>✅ 生成诊断报告</li>
+</ol>
+<hr>
+<h2 id="-知识测验">📝 知识测验
+</h2><h3 id="基础题每题10分">基础题（每题10分）
+</h3><p><strong>1. IP地址 172.16.50.100 属于哪一类？是公有IP还是私有IP？</strong></p>
+<!-- raw HTML omitted -->
+<ul>
+<li>类别：B类（第一个字节172，10xxxxxx开头）</li>
+<li>类型：私有IP（172.16.0.0/12 是B类私有地址范围）</li>
+</ul>
+<!-- raw HTML omitted -->
+<p><strong>2. 子网掩码 255.255.255.192 对应的CIDR是多少？有多少个可用主机？</strong></p>
+<!-- raw HTML omitted -->
+<ul>
+<li>CIDR：/26</li>
+<li>计算：255.255.255.192 = 11111111.11111111.11111111.11000000
+共有26个1，所以是/26</li>
+<li>可用主机数：2^(32-26) - 2 = 2^6 - 2 = 64 - 2 = 62个</li>
+</ul>
+<!-- raw HTML omitted -->
+<p><strong>3. MAC地址 00:50:56:12:34:56 是哪个厂商的设备？</strong></p>
+<!-- raw HTML omitted -->
+<ul>
+<li>厂商：VMware</li>
+<li>判断：OUI前缀 00:50:56 属于VMware</li>
+</ul>
+<!-- raw HTML omitted -->
+<p><strong>4. 端口号 3306 通常用于什么服务？</strong></p>
+<!-- raw HTML omitted -->
+<ul>
+<li>服务：MySQL数据库</li>
+<li>默认端口：3306/tcp</li>
+</ul>
+<!-- raw HTML omitted -->
+<p><strong>5. DNS的A记录和CNAME记录有什么区别？</strong></p>
+<!-- raw HTML omitted -->
+<ul>
+<li>
+<p>A记录：直接指向IPv4地址
+示例：www.example.com → 93.184.216.34</p>
+</li>
+<li>
+<p>CNAME记录：指向另一个域名（别名）
+示例：blog.example.com → <a class="link" href="https://www.example.com"  target="_blank" rel="noopener"
+    >www.example.com</a></p>
+</li>
+<li>
+<p>区别：</p>
+<ol>
+<li>A记录直接解析，CNAME需要再次查询</li>
+<li>根域名只能用A记录</li>
+<li>CNAME不能与其他记录共存</li>
+</ol>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<p><strong>6. DHCP的T1和T2分别是租约时长的多少？</strong></p>
+<!-- raw HTML omitted -->
+<ul>
+<li>T1（续约时间）：租约时长的 50%</li>
+<li>T2（重绑时间）：租约时长的 87.5%</li>
+</ul>
+<p>示例：租期24小时</p>
+<ul>
+<li>T1 = 12小时（直接联系原服务器）</li>
+<li>T2 = 21小时（广播寻找任何服务器）</li>
+<li>到期 = 24小时（释放IP）</li>
+</ul>
+<!-- raw HTML omitted -->
+<h3 id="进阶题每题15分">进阶题（每题15分）
+</h3><p><strong>7. 请计算网络 192.168.10.0/24 划分为8个等大小子网的结果。</strong></p>
+<!-- raw HTML omitted -->
+<p>划分为8个子网，需要3位（2^3=8）
+新的子网掩码：/24 + 3 = /27
+子网掩码：255.255.255.224</p>
+<p>8个子网：</p>
+<ol>
+<li>192.168.10.0/27   (192.168.10.1 - 192.168.10.30)</li>
+<li>192.168.10.32/27  (192.168.10.33 - 192.168.10.62)</li>
+<li>192.168.10.64/27  (192.168.10.65 - 192.168.10.94)</li>
+<li>192.168.10.96/27  (192.168.10.97 - 192.168.10.126)</li>
+<li>192.168.10.128/27 (192.168.10.129 - 192.168.10.158)</li>
+<li>192.168.10.160/27 (192.168.10.161 - 192.168.10.190)</li>
+<li>192.168.10.192/27 (192.168.10.193 - 192.168.10.222)</li>
+<li>192.168.10.224/27 (192.168.10.225 - 192.168.10.254)</li>
+</ol>
+<p>每个子网：30个可用主机</p>
+<!-- raw HTML omitted -->
+<p><strong>8. 描述完整的ARP请求和响应过程（包括MAC地址和IP地址）。</strong></p>
+<!-- raw HTML omitted -->
+<p>场景：主机A要与主机B通信</p>
+<p>已知信息：</p>
+<ul>
+<li>主机A：IP=192.168.1.10, MAC=aa:bb:cc:dd:ee:ff</li>
+<li>主机B：IP=192.168.1.20, MAC=11:22:33:44:55:66</li>
+</ul>
+<p>步骤：</p>
+<ol>
+<li>
+<p>ARP请求（广播）：</p>
+<ul>
+<li>源MAC：aa:bb:cc:dd:ee:ff</li>
+<li>目标MAC：ff:ff:ff:ff:ff:ff（广播）</li>
+<li>源IP：192.168.1.10</li>
+<li>目标IP：192.168.1.20</li>
+<li>询问：&ldquo;谁是192.168.1.20？请告诉192.168.1.10&rdquo;</li>
+</ul>
+</li>
+<li>
+<p>ARP响应（单播）：</p>
+<ul>
+<li>源MAC：11:22:33:44:55:66</li>
+<li>目标MAC：aa:bb:cc:dd:ee:ff</li>
+<li>源IP：192.168.1.20</li>
+<li>目标IP：192.168.1.10</li>
+<li>回答：&ldquo;我是192.168.1.20，我的MAC是11:22:33:44:55:66&rdquo;</li>
+</ul>
+</li>
+<li>
+<p>主机A更新ARP缓存表：
+192.168.1.20 → 11:22:33:44:55:66</p>
+</li>
+<li>
+<p>后续通信直接使用缓存的MAC地址</p>
+</li>
+</ol>
+<!-- raw HTML omitted -->
+<p><strong>9. 解释DNS递归查询和迭代查询的区别，并说明哪里用递归哪里用迭代。</strong></p>
+<!-- raw HTML omitted -->
+<p>递归查询（Recursive Query）：</p>
+<ul>
+<li>定义：查询者发出请求后，DNS服务器负责完成整个查询</li>
+<li>特点：&ldquo;帮我查到结果再告诉我&rdquo;</li>
+<li>返回：最终答案或错误</li>
+</ul>
+<p>迭代查询（Iterative Query）：</p>
+<ul>
+<li>定义：DNS服务器只返回下一步应该查询的服务器地址</li>
+<li>特点：&ldquo;我不知道，但你可以去问XX服务器&rdquo;</li>
+<li>返回：推荐查询的服务器地址</li>
+</ul>
+<p>实际应用：</p>
+<pre tabindex="0"><code>客户端 → 本地DNS   【递归查询】
+         ↓
+本地DNS → 根DNS     【迭代查询】
+         ↓
+本地DNS → TLD DNS   【迭代查询】
+         ↓
+本地DNS → 权威DNS   【迭代查询】
+         ↓
+本地DNS → 客户端    【递归查询】
+</code></pre><p>为什么这样设计？</p>
+<ul>
+<li>客户端用递归：简单，不需要多次查询</li>
+<li>服务器间用迭代：减轻单个服务器负担，避免递归导致的深度过深</li>
+</ul>
+<!-- raw HTML omitted -->
+<p><strong>10. 如果DHCP服务器在另一个子网，如何实现DHCP服务？</strong></p>
+<!-- raw HTML omitted -->
+<p>问题：DHCP使用广播，广播无法跨越路由器</p>
+<p>解决方案：<strong>DHCP Relay（中继代理）</strong></p>
+<p>工作原理：</p>
+<pre tabindex="0"><code>[子网1: 192.168.1.0/24]
+    ↓ 客户端广播Discover
+[路由器 - DHCP Relay]
+    ↓ 单播转发到DHCP服务器
+[子网2: 192.168.2.0/24 - DHCP服务器]
+</code></pre><p>详细流程：</p>
+<ol>
+<li>客户端在子网1广播DHCP Discover</li>
+<li>路由器（配置为DHCP Relay）收到</li>
+<li>路由器修改报文：
+<ul>
+<li>源IP改为路由器接口IP (192.168.1.1)</li>
+<li>目标IP改为DHCP服务器IP (192.168.2.100)，单播</li>
+<li>Gateway IP字段填入192.168.1.1</li>
+<li>Hops字段加1</li>
+</ul>
+</li>
+<li>DHCP服务器看到Gateway IP，知道客户端在子网1</li>
+<li>从子网1的地址池分配IP</li>
+<li>服务器单播响应给路由器</li>
+<li>路由器转发响应给客户端</li>
+</ol>
+<p>配置示例（Cisco）：</p>
+<pre tabindex="0"><code>interface GigabitEthernet0/0
+ ip address 192.168.1.1 255.255.255.0
+ ip helper-address 192.168.2.100
+</code></pre><!-- raw HTML omitted -->
+<h3 id="计分标准">计分标准
+</h3><ul>
+<li>90-100分：优秀，完全掌握本周内容</li>
+<li>75-89分：良好，大部分知识点已掌握</li>
+<li>60-74分：及格，基础知识掌握，需加强练习</li>
+<li>60分以下：需要重新学习本周内容</li>
+</ul>
+<hr>
+<h2 id="-实践建议">🎓 实践建议
+</h2><h3 id="1-动手实验">1. 动手实验
+</h3><p><strong>必做实验</strong>：</p>
+<pre tabindex="0"><code>□ 使用ipconfig/ifconfig查看本机网络配置
+□ 计算自己所在网络的子网信息
+□ 查看并分析ARP缓存表
+□ 使用nslookup/dig查询DNS
+□ 释放并重新获取DHCP地址
+□ 扫描局域网内的活跃主机
+</code></pre><p><strong>选做实验</strong>：</p>
+<pre tabindex="0"><code>□ 搭建简单的DHCP服务器（虚拟机）
+□ 配置DNS服务器（bind9）
+□ 使用Wireshark抓包分析DHCP过程
+□ 编写子网划分计算器
+□ 实现简单的ARP欺骗检测
+</code></pre><h3 id="2-工具使用">2. 工具使用
+</h3><p><strong>命令行工具</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Windows</span>
+</span></span><span style="display:flex;"><span>ipconfig /all          <span style="color:#75715e"># 查看详细网络配置</span>
+</span></span><span style="display:flex;"><span>ipconfig /displaydns   <span style="color:#75715e"># 查看DNS缓存</span>
+</span></span><span style="display:flex;"><span>arp -a                 <span style="color:#75715e"># 查看ARP缓存</span>
+</span></span><span style="display:flex;"><span>nslookup www.baidu.com <span style="color:#75715e"># DNS查询</span>
+</span></span><span style="display:flex;"><span>netstat -an            <span style="color:#75715e"># 查看端口状态</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Linux/Mac</span>
+</span></span><span style="display:flex;"><span>ifconfig / ip addr     <span style="color:#75715e"># 查看网络配置</span>
+</span></span><span style="display:flex;"><span>arp -n                 <span style="color:#75715e"># 查看ARP缓存</span>
+</span></span><span style="display:flex;"><span>dig www.baidu.com      <span style="color:#75715e"># DNS查询</span>
+</span></span><span style="display:flex;"><span>netstat -tuln          <span style="color:#75715e"># 查看监听端口</span>
+</span></span><span style="display:flex;"><span>ss -tuln               <span style="color:#75715e"># 更快的端口查看</span>
+</span></span></code></pre></div><p><strong>图形化工具</strong>：</p>
+<pre tabindex="0"><code>- Wireshark：抓包分析
+- Advanced IP Scanner：网络扫描
+- Angry IP Scanner：跨平台IP扫描
+- Fiddler：HTTP抓包
+</code></pre><h3 id="3-延伸学习">3. 延伸学习
+</h3><p><strong>推荐阅读</strong>：</p>
+<pre tabindex="0"><code>1. RFC 791  - IP协议规范
+2. RFC 826  - ARP协议规范
+3. RFC 1918 - 私有IP地址分配
+4. RFC 1035 - DNS协议规范
+5. RFC 2131 - DHCP协议规范
+6. RFC 4632 - CIDR地址分配
+</code></pre><p><strong>推荐视频/课程</strong>：</p>
+<pre tabindex="0"><code>- Wireshark网络分析教程
+- 子网划分实战演练
+- DNS深入解析
+- DHCP服务器搭建
+</code></pre><hr>
+<h2 id="-下周预告">🚀 下周预告
+</h2><p><strong>第三周：传输层协议详解</strong></p>
+<p>我们将学习：</p>
+<pre tabindex="0"><code>Day 15: TCP协议基础
+- TCP报文格式
+- TCP三次握手
+- TCP四次挥手
+- TCP状态机
+
+Day 16: TCP可靠传输
+- 序列号和确认号
+- 滑动窗口机制
+- 流量控制
+- 拥塞控制
+
+Day 17: UDP协议详解
+- UDP报文格式
+- UDP vs TCP对比
+- UDP应用场景
+- UDP编程实战
+
+Day 18: Socket编程进阶
+- 非阻塞Socket
+- Socket选项设置
+- 多路复用（select/poll/epoll）
+- 实战：聊天室服务器
+
+Day 19: HTTP协议基础
+- HTTP请求和响应
+- HTTP方法（GET/POST等）
+- HTTP状态码
+- Cookie和Session
+
+Day 20: HTTPS与安全
+- HTTPS工作原理
+- SSL/TLS握手
+- 证书验证
+- 中间人攻击防护
+
+Day 21: 第三周总结
+- 传输层协议综合复习
+- TCP/UDP深入对比
+- 综合实战项目
+</code></pre><hr>
+<h2 id="-学习进度追踪">📊 学习进度追踪
+</h2><pre tabindex="0"><code>第一周 ✅ 网络基础入门
+├─ Day 1-7 完成 ✅
+└─ 周总结完成 ✅
+
+第二周 ✅ 网络层深入
+├─ Day 8:  IP地址详解 ✅
+├─ Day 9:  子网划分 ✅
+├─ Day 10: MAC与ARP ✅
+├─ Day 11: 端口与Socket ✅
+├─ Day 12: DNS协议 ✅
+├─ Day 13: DHCP协议 ✅
+└─ Day 14: 周总结 ✅
+
+第三周 ⏳ 传输层协议
+└─ Day 15-21 待学习
+
+总进度：14/180 天 (7.8%)
+</code></pre><hr>
+<h2 id="-本周检查清单">✅ 本周检查清单
+</h2><p>在进入下一周之前，请确保：</p>
+<pre tabindex="0"><code>□ 理解IP地址分类和私有IP范围
+□ 能够计算子网掩码和CIDR
+□ 掌握子网划分的方法
+□ 理解MAC地址结构和OUI
+□ 掌握ARP工作原理
+□ 熟悉常用端口号
+□ 理解Socket编程基础
+□ 掌握DNS查询流程
+□ 理解DNS记录类型
+□ 掌握DHCP DORA过程
+□ 理解租约管理机制
+□ 完成本周所有代码练习
+□ 能够使用基本的网络诊断命令
+</code></pre><hr>
+<h2 id="-学习心得">💬 学习心得
+</h2><p>在这里记录你的学习收获和疑问：</p>
+<pre tabindex="0"><code>本周最大收获：
+_________________________________________________
+_________________________________________________
+
+还不太理解的地方：
+_________________________________________________
+_________________________________________________
+
+下周学习计划：
+_________________________________________________
+_________________________________________________
+</code></pre><hr>
+<h2 id="-总结">🎉 总结
+</h2><p>恭喜你完成第二周的学习！这一周我们深入学习了网络层的核心概念：</p>
+<ul>
+<li>✅ 掌握了IP地址体系和子网划分</li>
+<li>✅ 理解了MAC地址和ARP协议</li>
+<li>✅ 学会了端口和Socket编程</li>
+<li>✅ 深入了解DNS和DHCP协议</li>
+<li>✅ 编写了多个实用的网络工具</li>
+</ul>
+<p>这些知识是网络工程师的必备基础。在实际工作中，你会频繁地使用这些概念来：</p>
+<ul>
+<li>规划和分配IP地址</li>
+<li>排查网络连通性问题</li>
+<li>配置网络服务</li>
+<li>开发网络应用</li>
+</ul>
+<p><strong>继续保持学习的热情，我们下周见！</strong> 🚀</p>
+<hr>
+<p><strong>记住</strong>：网络知识需要大量实践才能真正掌握。多动手、多实验、多思考！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/14%E5%A4%A9%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%E6%80%BB%E7%BB%93%E4%B8%8E%E7%BB%BC%E5%90%88%E5%AE%9E%E6%88%98/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">14天：第一阶段总结与综合实战</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/13%E5%A4%A9dhcp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">13天：DHCP协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/12%E5%A4%A9dns%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">12天：DNS协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/11%E5%A4%A9%E7%AB%AF%E5%8F%A3%E5%92%8Csocket%E6%B7%B1%E5%85%A5/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">11天：端口和Socket深入</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/10%E5%A4%A9mac%E5%9C%B0%E5%9D%80%E5%92%8Carp%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">10天：MAC地址和ARP协议</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

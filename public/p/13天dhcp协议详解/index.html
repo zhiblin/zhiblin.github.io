@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第13天：DHCP协议详解 今日目标 理解DHCP的工作原理和作用 掌握DHCP四次握手过程 了解IP地址租约管理机制 学会分析DHCP数据包 实现DHCP服务器模拟器 1. 什么是DHCP？ 1.1 DHCP的定义 DHCP（Dynamic Host Configuration Protocol，动态主机配置协议） 是一种网络管理协议，用于自动分配IP地址和网络配置。\n">
+<title>13天：DHCP协议详解</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/13%E5%A4%A9dhcp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="13天：DHCP协议详解">
+<meta property='og:description' content="第13天：DHCP协议详解 今日目标 理解DHCP的工作原理和作用 掌握DHCP四次握手过程 了解IP地址租约管理机制 学会分析DHCP数据包 实现DHCP服务器模拟器 1. 什么是DHCP？ 1.1 DHCP的定义 DHCP（Dynamic Host Configuration Protocol，动态主机配置协议） 是一种网络管理协议，用于自动分配IP地址和网络配置。\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/13%E5%A4%A9dhcp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:21:40&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:21:40&#43;00:00'/>
+<meta name="twitter:title" content="13天：DHCP协议详解">
+<meta name="twitter:description" content="第13天：DHCP协议详解 今日目标 理解DHCP的工作原理和作用 掌握DHCP四次握手过程 了解IP地址租约管理机制 学会分析DHCP数据包 实现DHCP服务器模拟器 1. 什么是DHCP？ 1.1 DHCP的定义 DHCP（Dynamic Host Configuration Protocol，动态主机配置协议） 是一种网络管理协议，用于自动分配IP地址和网络配置。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-什么是dhcp">1. 什么是DHCP？</a>
+      <ul>
+        <li><a href="#11-dhcp的定义">1.1 DHCP的定义</a></li>
+        <li><a href="#12-为什么需要dhcp">1.2 为什么需要DHCP？</a></li>
+        <li><a href="#13-dhcp能配置什么">1.3 DHCP能配置什么？</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-dhcp工作原理">2. DHCP工作原理</a>
+      <ul>
+        <li><a href="#21-dhcp四次握手dora过程">2.1 DHCP四次握手（DORA过程）</a></li>
+        <li><a href="#22-详细步骤解析">2.2 详细步骤解析</a></li>
+        <li><a href="#23-特殊情况">2.3 特殊情况</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-dhcp报文格式">3. DHCP报文格式</a>
+      <ul>
+        <li><a href="#31-dhcp报文结构">3.1 DHCP报文结构</a></li>
+        <li><a href="#32-重要选项options">3.2 重要选项（Options）</a></li>
+        <li><a href="#33-报文示例">3.3 报文示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-ip地址租约管理">4. IP地址租约管理</a>
+      <ul>
+        <li><a href="#41-租约生命周期">4.1 租约生命周期</a></li>
+        <li><a href="#42-租约时间计算">4.2 租约时间计算</a></li>
+        <li><a href="#43-租约管理策略">4.3 租约管理策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-dhcp中继代理">5. DHCP中继代理</a>
+      <ul>
+        <li><a href="#51-为什么需要中继">5.1 为什么需要中继？</a></li>
+        <li><a href="#52-中继工作流程">5.2 中继工作流程</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-实战项目dhcp分析工具">6. 实战项目：DHCP分析工具</a>
+      <ul>
+        <li><a href="#61-项目功能">6.1 项目功能</a></li>
+        <li><a href="#62-工具演示">6.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-知识拓展">7. 知识拓展</a>
+      <ul>
+        <li><a href="#71-查看dhcp信息的命令">7.1 查看DHCP信息的命令</a></li>
+        <li><a href="#72-dhcp安全问题">7.2 DHCP安全问题</a></li>
+        <li><a href="#73-dhcp-vs-静态ip">7.3 DHCP vs 静态IP</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1查看本机dhcp信息">练习1：查看本机DHCP信息</a></li>
+        <li><a href="#练习2释放和重新获取ip">练习2：释放和重新获取IP</a></li>
+        <li><a href="#练习3计算租约时间">练习3：计算租约时间</a></li>
+        <li><a href="#练习4dhcp抓包分析">练习4：DHCP抓包分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-常见问题">9. 常见问题</a></li>
+    <li><a href="#10-总结">10. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/13%E5%A4%A9dhcp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">13天：DHCP协议详解</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:21:40Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-什么是dhcp">1. 什么是DHCP？</a>
+      <ul>
+        <li><a href="#11-dhcp的定义">1.1 DHCP的定义</a></li>
+        <li><a href="#12-为什么需要dhcp">1.2 为什么需要DHCP？</a></li>
+        <li><a href="#13-dhcp能配置什么">1.3 DHCP能配置什么？</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-dhcp工作原理">2. DHCP工作原理</a>
+      <ul>
+        <li><a href="#21-dhcp四次握手dora过程">2.1 DHCP四次握手（DORA过程）</a></li>
+        <li><a href="#22-详细步骤解析">2.2 详细步骤解析</a></li>
+        <li><a href="#23-特殊情况">2.3 特殊情况</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-dhcp报文格式">3. DHCP报文格式</a>
+      <ul>
+        <li><a href="#31-dhcp报文结构">3.1 DHCP报文结构</a></li>
+        <li><a href="#32-重要选项options">3.2 重要选项（Options）</a></li>
+        <li><a href="#33-报文示例">3.3 报文示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-ip地址租约管理">4. IP地址租约管理</a>
+      <ul>
+        <li><a href="#41-租约生命周期">4.1 租约生命周期</a></li>
+        <li><a href="#42-租约时间计算">4.2 租约时间计算</a></li>
+        <li><a href="#43-租约管理策略">4.3 租约管理策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-dhcp中继代理">5. DHCP中继代理</a>
+      <ul>
+        <li><a href="#51-为什么需要中继">5.1 为什么需要中继？</a></li>
+        <li><a href="#52-中继工作流程">5.2 中继工作流程</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-实战项目dhcp分析工具">6. 实战项目：DHCP分析工具</a>
+      <ul>
+        <li><a href="#61-项目功能">6.1 项目功能</a></li>
+        <li><a href="#62-工具演示">6.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-知识拓展">7. 知识拓展</a>
+      <ul>
+        <li><a href="#71-查看dhcp信息的命令">7.1 查看DHCP信息的命令</a></li>
+        <li><a href="#72-dhcp安全问题">7.2 DHCP安全问题</a></li>
+        <li><a href="#73-dhcp-vs-静态ip">7.3 DHCP vs 静态IP</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1查看本机dhcp信息">练习1：查看本机DHCP信息</a></li>
+        <li><a href="#练习2释放和重新获取ip">练习2：释放和重新获取IP</a></li>
+        <li><a href="#练习3计算租约时间">练习3：计算租约时间</a></li>
+        <li><a href="#练习4dhcp抓包分析">练习4：DHCP抓包分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-常见问题">9. 常见问题</a></li>
+    <li><a href="#10-总结">10. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第13天dhcp协议详解">第13天：DHCP协议详解
+</h1><h2 id="今日目标">今日目标
+</h2><ul>
+<li>理解DHCP的工作原理和作用</li>
+<li>掌握DHCP四次握手过程</li>
+<li>了解IP地址租约管理机制</li>
+<li>学会分析DHCP数据包</li>
+<li>实现DHCP服务器模拟器</li>
+</ul>
+<hr>
+<h2 id="1-什么是dhcp">1. 什么是DHCP？
+</h2><h3 id="11-dhcp的定义">1.1 DHCP的定义
+</h3><p><strong>DHCP（Dynamic Host Configuration Protocol，动态主机配置协议）</strong> 是一种网络管理协议，用于自动分配IP地址和网络配置。</p>
+<p><strong>生活类比</strong>：</p>
+<ul>
+<li>你去酒店入住，不需要自己决定住哪个房间</li>
+<li>前台会自动分配一个空房间给你</li>
+<li>退房后，房间可以分配给其他客人</li>
+<li>DHCP就是网络中的&quot;前台&quot;，自动分配IP地址</li>
+</ul>
+<h3 id="12-为什么需要dhcp">1.2 为什么需要DHCP？
+</h3><p><strong>没有DHCP的痛苦</strong>：</p>
+<pre tabindex="0"><code>场景1：公司有100台电脑
+❌ 手动配置每台电脑的IP地址
+❌ 记录哪些IP已被使用
+❌ 避免IP地址冲突
+❌ 新员工入职需要IT手动配置
+❌ 员工离职需要手动回收IP
+
+时间成本：每台约10分钟 × 100台 = 1000分钟
+</code></pre><p><strong>使用DHCP的好处</strong>：</p>
+<pre tabindex="0"><code>场景2：配置DHCP服务器
+✅ 电脑开机自动获取IP
+✅ 无需人工干预
+✅ 自动避免IP冲突
+✅ 新设备即插即用
+✅ 离线设备自动回收IP
+
+时间成本：配置一次DHCP服务器 ≈ 30分钟
+</code></pre><h3 id="13-dhcp能配置什么">1.3 DHCP能配置什么？
+</h3><p>DHCP不仅分配IP地址，还会配置：</p>
+<pre tabindex="0"><code>1. IP地址           192.168.1.100
+2. 子网掩码         255.255.255.0
+3. 默认网关         192.168.1.1
+4. DNS服务器        8.8.8.8, 114.114.114.114
+5. 租约时间         24小时
+6. WINS服务器       （可选）
+7. 域名             example.com
+8. NTP时间服务器    （可选）
+</code></pre><hr>
+<h2 id="2-dhcp工作原理">2. DHCP工作原理
+</h2><h3 id="21-dhcp四次握手dora过程">2.1 DHCP四次握手（DORA过程）
+</h3><p>DHCP获取IP地址需要四个步骤，称为<strong>DORA过程</strong>：</p>
+<ol>
+<li><strong>D</strong>iscover - 发现服务器</li>
+<li><strong>O</strong>ffer - 提供地址</li>
+<li><strong>R</strong>equest - 请求地址</li>
+<li><strong>A</strong>ck - 确认分配</li>
+</ol>
+<p><strong>完整流程图</strong>：</p>
+<pre tabindex="0"><code>客户端                                    DHCP服务器
+  |                                           |
+  |  1. DHCP Discover (广播)                 |
+  |  &#34;有DHCP服务器吗？我需要IP地址&#34;           |
+  |------------------------------------------&gt;|
+  |     源IP: 0.0.0.0                         |
+  |     目标IP: 255.255.255.255               |
+  |                                           |
+  |                                           | 检查可用IP
+  |                                           | 找到: 192.168.1.100
+  |                                           |
+  |  2. DHCP Offer (单播/广播)                |
+  |  &#34;我这里有个IP：192.168.1.100&#34;            |
+  |&lt;------------------------------------------|
+  |     源IP: 192.168.1.1                     |
+  |     提供IP: 192.168.1.100                 |
+  |                                           |
+  | 决定接受这个IP                             |
+  |                                           |
+  |  3. DHCP Request (广播)                   |
+  |  &#34;我要192.168.1.100这个IP&#34;                |
+  |------------------------------------------&gt;|
+  |     请求IP: 192.168.1.100                 |
+  |                                           |
+  |                                           | 确认IP可用
+  |                                           | 标记为已分配
+  |                                           |
+  |  4. DHCP Ack (单播)                       |
+  |  &#34;好的，192.168.1.100归你了，租期24小时&#34;   |
+  |&lt;------------------------------------------|
+  |     确认IP: 192.168.1.100                 |
+  |     租期: 86400秒                          |
+  |                                           |
+  | ✅ 配置IP地址                              |
+  | ✅ 可以上网了                              |
+  |                                           |
+</code></pre><h3 id="22-详细步骤解析">2.2 详细步骤解析
+</h3><p><strong>步骤1：DHCP Discover（发现）</strong></p>
+<pre tabindex="0"><code>客户端刚开机，还没有IP地址
+
+广播消息：
+┌────────────────────────────────┐
+│ 源MAC：  aa:bb:cc:dd:ee:ff    │
+│ 目标MAC：ff:ff:ff:ff:ff:ff    │ (广播)
+│ 源IP：   0.0.0.0               │ (还没有IP)
+│ 目标IP： 255.255.255.255       │ (广播)
+│ 消息：   我需要IP地址！         │
+│ 事务ID： 0x12345678            │ (用于匹配响应)
+└────────────────────────────────┘
+
+特点：
+- 使用广播，因为不知道DHCP服务器在哪
+- 源IP是0.0.0.0，因为还没有IP地址
+- 包含客户端的MAC地址（用于识别）
+</code></pre><p><strong>步骤2：DHCP Offer（提供）</strong></p>
+<pre tabindex="0"><code>服务器收到Discover后，从地址池中选择一个可用IP
+
+单播/广播响应：
+┌────────────────────────────────┐
+│ 源IP：   192.168.1.1 (DHCP服务器) │
+│ 目标IP： 192.168.1.100 或 广播   │
+│ 提供IP： 192.168.1.100          │
+│ 子网掩码：255.255.255.0         │
+│ 默认网关：192.168.1.1           │
+│ DNS：    8.8.8.8                │
+│ 租期：   86400秒 (24小时)       │
+│ 事务ID： 0x12345678 (匹配请求)  │
+└────────────────────────────────┘
+
+特点：
+- 可能有多个DHCP服务器响应
+- 提供IP但还没有分配
+- 客户端可以选择接受哪个offer
+</code></pre><p><strong>步骤3：DHCP Request（请求）</strong></p>
+<pre tabindex="0"><code>客户端选择一个offer，正式请求该IP
+
+广播消息：
+┌────────────────────────────────┐
+│ 源IP：   0.0.0.0               │ (仍然没有IP)
+│ 目标IP： 255.255.255.255       │ (广播)
+│ 请求IP： 192.168.1.100         │
+│ 服务器： 192.168.1.1           │
+│ 消息：   我要这个IP！           │
+│ 事务ID： 0x12345678            │
+└────────────────────────────────┘
+
+为什么广播？
+- 告诉所有DHCP服务器：&#34;我选择了192.168.1.1的offer&#34;
+- 其他服务器可以回收它们提供的IP
+</code></pre><p><strong>步骤4：DHCP Ack（确认）</strong></p>
+<pre tabindex="0"><code>服务器确认分配，客户端可以使用IP了
+
+单播响应：
+┌────────────────────────────────┐
+│ 源IP：   192.168.1.1           │
+│ 目标IP： 192.168.1.100         │
+│ 确认IP： 192.168.1.100         │
+│ 租期：   86400秒               │
+│ 开始时间：2024-01-15 10:00:00  │
+│ 更新时间：2024-01-15 22:00:00  │ (50%租期)
+│ 重绑时间：2024-01-16 04:30:00  │ (87.5%租期)
+│ 消息：   分配成功！             │
+└────────────────────────────────┘
+
+客户端收到Ack后：
+✅ 配置IP地址：192.168.1.100
+✅ 配置子网掩码：255.255.255.0
+✅ 配置默认网关：192.168.1.1
+✅ 配置DNS服务器：8.8.8.8
+✅ 启动租约计时器
+</code></pre><h3 id="23-特殊情况">2.3 特殊情况
+</h3><p><strong>情况1：服务器拒绝（DHCP Nak）</strong></p>
+<pre tabindex="0"><code>原因：
+- 请求的IP已被其他设备占用
+- IP地址不在分配范围内
+- 租约已过期且IP被重新分配
+
+流程：
+客户端 → DHCP Request
+服务器 → DHCP Nak (拒绝)
+客户端 → 重新开始，发送 DHCP Discover
+</code></pre><p><strong>情况2：租约续期</strong></p>
+<pre tabindex="0"><code>时间线（假设租期24小时）：
+
+t=0h        获得IP地址
+t=12h (50%) 尝试续期（直接向原服务器请求）
+t=21h (87.5%) 如果续期失败，广播续期请求
+t=24h       租约到期，释放IP，重新DORA
+
+续期过程（简化的DORA）：
+客户端 → DHCP Request (续期请求)
+服务器 → DHCP Ack (同意续期) 或 Nak (拒绝，重新DORA)
+</code></pre><p><strong>情况3：客户端重启</strong></p>
+<pre tabindex="0"><code>场景：客户端记得上次使用的IP
+
+快速重连：
+客户端 → DHCP Request (直接请求上次的IP)
+        源IP: 0.0.0.0
+        请求IP: 192.168.1.100 (上次的)
+
+服务器 → DHCP Ack (如果IP仍然可用)
+     或 DHCP Nak (IP已被占用，重新DORA)
+
+优点：
+- 跳过Discover和Offer
+- 更快获得网络连接
+- 减少网络流量
+</code></pre><hr>
+<h2 id="3-dhcp报文格式">3. DHCP报文格式
+</h2><h3 id="31-dhcp报文结构">3.1 DHCP报文结构
+</h3><p>DHCP基于<strong>BOOTP协议</strong>，使用UDP传输：</p>
+<pre tabindex="0"><code>UDP端口：
+- 客户端端口：68
+- 服务器端口：67
+
+报文格式（最小236字节）：
+┌─────────────────────────────────────┐
+│ Op (1字节)         操作码            │ 1=请求, 2=响应
+│ HType (1字节)      硬件类型          │ 1=以太网
+│ HLen (1字节)       硬件地址长度      │ 6=MAC地址
+│ Hops (1字节)       跳数              │ 中继计数
+├─────────────────────────────────────┤
+│ Transaction ID (4字节) 事务ID        │ 随机数，匹配请求和响应
+├─────────────────────────────────────┤
+│ Seconds (2字节)    开机秒数          │ 客户端开机后的秒数
+│ Flags (2字节)      标志位            │ 广播标志等
+├─────────────────────────────────────┤
+│ Client IP (4字节)  客户端IP          │ 续期时使用
+│ Your IP (4字节)    你的IP            │ 服务器分配的IP
+│ Server IP (4字节)  服务器IP          │ DHCP服务器地址
+│ Gateway IP (4字节) 网关IP            │ 中继代理地址
+├─────────────────────────────────────┤
+│ Client MAC (16字节) 客户端硬件地址   │ 前6字节是MAC
+├─────────────────────────────────────┤
+│ Server Name (64字节) 服务器名称      │ 可选
+│ Boot File (128字节)  启动文件名      │ 可选
+├─────────────────────────────────────┤
+│ Magic Cookie (4字节) 魔术字          │ 0x63825363
+├─────────────────────────────────────┤
+│ Options (可变)     选项字段          │ DHCP消息类型、参数等
+└─────────────────────────────────────┘
+</code></pre><h3 id="32-重要选项options">3.2 重要选项（Options）
+</h3><p>DHCP的核心功能在Options字段：</p>
+<pre tabindex="0"><code>格式：[选项代码][长度][数据]
+
+常用选项：
+
+Option 53 (DHCP消息类型) - 1字节
+├── 1: DHCP Discover
+├── 2: DHCP Offer
+├── 3: DHCP Request
+├── 4: DHCP Decline (拒绝)
+├── 5: DHCP Ack
+├── 6: DHCP Nak (否认)
+├── 7: DHCP Release (释放)
+└── 8: DHCP Inform (通知)
+
+Option 1 (子网掩码) - 4字节
+└── 255.255.255.0
+
+Option 3 (默认网关) - 4字节×n
+└── 192.168.1.1
+
+Option 6 (DNS服务器) - 4字节×n
+├── 8.8.8.8
+└── 8.8.4.4
+
+Option 51 (租约时间) - 4字节
+└── 86400 (秒)
+
+Option 54 (DHCP服务器标识) - 4字节
+└── 192.168.1.1
+
+Option 58 (T1续约时间) - 4字节
+└── 43200 (50%租期)
+
+Option 59 (T2重绑时间) - 4字节
+└── 75600 (87.5%租期)
+
+Option 255 (结束标记)
+└── 选项结束
+</code></pre><h3 id="33-报文示例">3.3 报文示例
+</h3><p><strong>DHCP Discover报文</strong>：</p>
+<pre tabindex="0"><code>┌─────────────────────────────────────┐
+│ Op: 1 (请求)                         │
+│ HType: 1 (以太网)                    │
+│ HLen: 6                              │
+│ Hops: 0                              │
+│ Transaction ID: 0x3d1d6b                │
+│ Seconds: 0                           │
+│ Flags: 0x0000                        │
+│ Client IP: 0.0.0.0                   │
+│ Your IP: 0.0.0.0                     │
+│ Server IP: 0.0.0.0                   │
+│ Gateway IP: 0.0.0.0                  │
+│ Client MAC: aa:bb:cc:dd:ee:ff        │
+│ Magic Cookie: 0x63825363             │
+│ Options:                             │
+│   - Option 53: 1 (Discover)          │
+│   - Option 55: 请求参数列表           │
+│     (1,3,6,15,51,54,58,59)          │
+│   - Option 255: End                  │
+└─────────────────────────────────────┘
+</code></pre><hr>
+<h2 id="4-ip地址租约管理">4. IP地址租约管理
+</h2><h3 id="41-租约生命周期">4.1 租约生命周期
+</h3><pre tabindex="0"><code>租约状态机：
+
+    [无IP]
+      ↓
+   DHCP DORA
+      ↓
+   [已绑定] ←──────┐
+      ↓ (50%租期)  │
+   [续约中] ────────┘ (续约成功)
+      ↓ (失败)
+   [重绑中] ←──────┐
+      ↓ (87.5%租期)│
+   [广播续约] ──────┘ (续约成功)
+      ↓ (失败)
+   [租约过期]
+      ↓
+    释放IP
+      ↓
+   重新DORA
+</code></pre><h3 id="42-租约时间计算">4.2 租约时间计算
+</h3><p><strong>示例：租期24小时</strong></p>
+<pre tabindex="0"><code>时间点计算：
+
+租约开始：2024-01-15 10:00:00
+租约时长：86400秒 (24小时)
+
+┌──────────────────────────────────────────┐
+│ 0%        50%       87.5%       100%      │
+│ │          │          │           │       │
+│ ├──────────┼──────────┼───────────┤       │
+│ │          │          │           │       │
+│ 10:00    22:00    04:30       10:00      │
+│ 开始      T1续约    T2重绑      过期      │
+└──────────────────────────────────────────┘
+
+T1 (Renewing Time):
+= 开始时间 + 租期 × 50%
+= 10:00 + 12小时
+= 22:00
+
+T2 (Rebinding Time):
+= 开始时间 + 租期 × 87.5%
+= 10:00 + 21小时
+= 04:30 (次日)
+
+到期时间:
+= 开始时间 + 租期
+= 10:00 + 24小时
+= 10:00 (次日)
+</code></pre><h3 id="43-租约管理策略">4.3 租约管理策略
+</h3><p><strong>服务器端地址池管理</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>地址池配置<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">├──</span> 网络<span style="color:#960050;background-color:#1e0010">：</span><span style="color:#ae81ff">192.168.1.0</span><span style="color:#f92672">/</span><span style="color:#ae81ff">24</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">├──</span> 可用范围<span style="color:#960050;background-color:#1e0010">：</span><span style="color:#ae81ff">192.168.1.100</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">192.168.1.200</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">├──</span> 保留地址<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>   <span style="color:#960050;background-color:#1e0010">├──</span> <span style="color:#ae81ff">192.168.1.1</span> (网关)
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>   <span style="color:#960050;background-color:#1e0010">├──</span> <span style="color:#ae81ff">192.168.1.2</span> (DNS)
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">│</span>   <span style="color:#960050;background-color:#1e0010">└──</span> <span style="color:#ae81ff">192.168.1.10</span><span style="color:#f92672">-</span><span style="color:#ae81ff">50</span> (静态IP)
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">└──</span> DHCP池<span style="color:#960050;background-color:#1e0010">：</span><span style="color:#ae81ff">192.168.1.100</span><span style="color:#f92672">-</span><span style="color:#ae81ff">200</span> (<span style="color:#ae81ff">101</span>个地址)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>分配策略<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1.</span> 优先分配客户端上次使用的IP
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2.</span> 选择租约最早到期的IP
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3.</span> 避免刚释放的IP<span style="color:#960050;background-color:#1e0010">（</span>等待2分钟<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">4.</span> 记录每个IP的租约信息
+</span></span></code></pre></div><p><strong>客户端租约状态</strong>：</p>
+<pre tabindex="0"><code>租约数据库（示例）：
+
+MAC地址            IP地址         租约开始            租约结束            状态
+aa:bb:cc:dd:ee:ff  192.168.1.100  2024-01-15 10:00   2024-01-16 10:00   已分配
+11:22:33:44:55:66  192.168.1.101  2024-01-15 08:30   2024-01-16 08:30   已分配
+aa:aa:aa:aa:aa:aa  192.168.1.102  2024-01-14 20:00   2024-01-15 20:00   已过期
+</code></pre><hr>
+<h2 id="5-dhcp中继代理">5. DHCP中继代理
+</h2><h3 id="51-为什么需要中继">5.1 为什么需要中继？
+</h3><p><strong>问题</strong>：DHCP使用广播，但广播不能跨越路由器</p>
+<pre tabindex="0"><code>场景：公司有多个子网
+
+[子网1: 192.168.1.0/24]
+     ↓
+  [路由器] ← 广播在这里被阻挡
+     ↓
+[子网2: 192.168.2.0/24]  ← DHCP服务器在这里
+     ↓
+[子网3: 192.168.3.0/24]
+
+问题：
+- 子网1和子网3的客户端无法联系到子网2的DHCP服务器
+- 需要每个子网都部署DHCP服务器？❌ 太麻烦
+</code></pre><p><strong>解决方案：DHCP Relay（中继代理）</strong></p>
+<pre tabindex="0"><code>[子网1客户端]
+     ↓ 广播 DHCP Discover
+[路由器/中继代理]
+     ↓ 单播转发到DHCP服务器
+[子网2 DHCP服务器]
+     ↓ 单播响应到中继代理
+[路由器/中继代理]
+     ↓ 转发给客户端
+[子网1客户端] ✅ 获得IP
+</code></pre><h3 id="52-中继工作流程">5.2 中继工作流程
+</h3><pre tabindex="0"><code>1. 客户端广播 Discover:
+   源IP: 0.0.0.0
+   目标IP: 255.255.255.255 (广播)
+
+2. 中继代理收到，修改报文:
+   源IP: 192.168.1.1 (中继代理地址)
+   目标IP: 192.168.2.100 (DHCP服务器，单播)
+   Gateway IP: 192.168.1.1 (填入中继地址)
+   Hops: 增加1
+
+3. DHCP服务器处理:
+   - 看到Gateway IP，知道客户端在子网1
+   - 从子网1的地址池分配IP
+   - 单播响应给中继代理
+
+4. 中继代理转发:
+   - 将响应转发给客户端（广播或单播）
+</code></pre><hr>
+<h2 id="6-实战项目dhcp分析工具">6. 实战项目：DHCP分析工具
+</h2><h3 id="61-项目功能">6.1 项目功能
+</h3><p>我们将实现：</p>
+<ol>
+<li>DHCP报文构建器</li>
+<li>DHCP报文解析器</li>
+<li>模拟DHCP客户端</li>
+<li>地址租约信息查看</li>
+</ol>
+<h3 id="62-工具演示">6.2 工具演示
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看本机DHCP租约信息</span>
+</span></span><span style="display:flex;"><span>python day13_dhcp_tool.py --show-lease
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 解析DHCP报文（从pcap文件）</span>
+</span></span><span style="display:flex;"><span>python day13_dhcp_tool.py --parse capture.pcap
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 模拟DHCP Discover</span>
+</span></span><span style="display:flex;"><span>python day13_dhcp_tool.py --discover
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 释放当前IP</span>
+</span></span><span style="display:flex;"><span>python day13_dhcp_tool.py --release
+</span></span></code></pre></div><hr>
+<h2 id="7-知识拓展">7. 知识拓展
+</h2><h3 id="71-查看dhcp信息的命令">7.1 查看DHCP信息的命令
+</h3><p><strong>Windows</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看DHCP租约信息</span>
+</span></span><span style="display:flex;"><span>ipconfig /all
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>输出示例：
+</span></span><span style="display:flex;"><span>以太网适配器 以太网:
+</span></span><span style="display:flex;"><span>   DHCP 已启用: 是
+</span></span><span style="display:flex;"><span>   IPv4 地址: 192.168.1.100
+</span></span><span style="display:flex;"><span>   子网掩码: 255.255.255.0
+</span></span><span style="display:flex;"><span>   默认网关: 192.168.1.1
+</span></span><span style="display:flex;"><span>   DHCP 服务器: 192.168.1.1
+</span></span><span style="display:flex;"><span>   获得租约的时间: 2024年1月15日 10:00:00
+</span></span><span style="display:flex;"><span>   租约过期的时间: 2024年1月16日 10:00:00
+</span></span><span style="display:flex;"><span>   DNS 服务器: 8.8.8.8
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 释放IP地址</span>
+</span></span><span style="display:flex;"><span>ipconfig /release
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 重新获取IP</span>
+</span></span><span style="display:flex;"><span>ipconfig /renew
+</span></span></code></pre></div><p><strong>Linux</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看网卡配置</span>
+</span></span><span style="display:flex;"><span>ip addr show
+</span></span><span style="display:flex;"><span>ifconfig
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看DHCP租约（不同发行版路径不同）</span>
+</span></span><span style="display:flex;"><span>cat /var/lib/dhcp/dhclient.leases       <span style="color:#75715e"># Debian/Ubuntu</span>
+</span></span><span style="display:flex;"><span>cat /var/lib/dhclient/dhclient.leases   <span style="color:#75715e"># CentOS/RHEL</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 释放和重新获取（使用dhclient）</span>
+</span></span><span style="display:flex;"><span>sudo dhclient -r eth0  <span style="color:#75715e"># 释放</span>
+</span></span><span style="display:flex;"><span>sudo dhclient eth0     <span style="color:#75715e"># 重新获取</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看DHCP客户端日志</span>
+</span></span><span style="display:flex;"><span>journalctl -u NetworkManager | grep -i dhcp
+</span></span></code></pre></div><p><strong>Mac</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看网络配置</span>
+</span></span><span style="display:flex;"><span>ifconfig
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 释放DHCP租约</span>
+</span></span><span style="display:flex;"><span>sudo ipconfig set en0 DHCP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看DHCP详细信息</span>
+</span></span><span style="display:flex;"><span>ipconfig getpacket en0
+</span></span></code></pre></div><h3 id="72-dhcp安全问题">7.2 DHCP安全问题
+</h3><p><strong>1. DHCP欺骗攻击</strong>：</p>
+<pre tabindex="0"><code>攻击场景：
+┌──────────────────────────────────────┐
+│ 1. 攻击者部署假DHCP服务器             │
+│ 2. 客户端发送 Discover                │
+│ 3. 假服务器快速响应 Offer              │
+│    - 分配正常IP                       │
+│    - 但网关指向攻击者                  │
+│    - DNS指向攻击者                     │
+│ 4. 客户端流量被劫持                   │
+└──────────────────────────────────────┘
+
+防护措施：
+- DHCP Snooping（交换机特性）
+- 端口安全（只允许特定端口接收DHCP响应）
+- 802.1X认证
+</code></pre><p><strong>2. DHCP饿死攻击</strong>：</p>
+<pre tabindex="0"><code>攻击原理：
+1. 攻击者伪造大量不同MAC地址
+2. 快速请求IP地址
+3. 耗尽DHCP地址池
+4. 正常用户无法获得IP
+
+防护：
+- 限制端口的MAC地址数量
+- DHCP地址池足够大
+- 启用端口安全
+</code></pre><p><strong>3. 非法DHCP服务器</strong>：</p>
+<pre tabindex="0"><code>场景：
+- 员工私自接入路由器（启用DHCP）
+- 导致网络混乱
+
+检测方法：
+- 监控网络中的DHCP响应
+- 使用DHCP Snooping
+- 定期扫描DHCP服务器
+</code></pre><h3 id="73-dhcp-vs-静态ip">7.3 DHCP vs 静态IP
+</h3><p><strong>对比表</strong>：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>DHCP（动态）</th>
+          <th>静态IP</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>配置方式</strong></td>
+          <td>自动获取</td>
+          <td>手动配置</td>
+      </tr>
+      <tr>
+          <td><strong>易用性</strong></td>
+          <td>✅ 简单，即插即用</td>
+          <td>❌ 需要手动配置</td>
+      </tr>
+      <tr>
+          <td><strong>管理成本</strong></td>
+          <td>✅ 低，集中管理</td>
+          <td>❌ 高，逐台配置</td>
+      </tr>
+      <tr>
+          <td><strong>IP冲突</strong></td>
+          <td>✅ 自动避免</td>
+          <td>❌ 可能冲突</td>
+      </tr>
+      <tr>
+          <td><strong>稳定性</strong></td>
+          <td>⚠️ 依赖DHCP服务器</td>
+          <td>✅ 不依赖服务器</td>
+      </tr>
+      <tr>
+          <td><strong>IP固定</strong></td>
+          <td>❌ 可能变化</td>
+          <td>✅ 永久不变</td>
+      </tr>
+      <tr>
+          <td><strong>适用场景</strong></td>
+          <td>普通客户端、移动设备</td>
+          <td>服务器、网络设备</td>
+      </tr>
+  </tbody>
+</table></div>
+<p><strong>推荐策略</strong>：</p>
+<pre tabindex="0"><code>使用静态IP：
+- 服务器（Web、DNS、DHCP等）
+- 网络设备（路由器、交换机）
+- 打印机、网络摄像头
+- 需要端口映射的设备
+
+使用DHCP：
+- 普通办公电脑
+- 笔记本电脑
+- 移动设备（手机、平板）
+- 访客设备
+
+混合方案：
+- DHCP + 保留地址（根据MAC分配固定IP）
+  优点：既自动配置，又IP固定
+</code></pre><hr>
+<h2 id="8-今日练习">8. 今日练习
+</h2><h3 id="练习1查看本机dhcp信息">练习1：查看本机DHCP信息
+</h3><p>在你的电脑上查看：</p>
+<pre tabindex="0"><code>1. 当前IP地址
+2. DHCP服务器地址
+3. 租约开始时间
+4. 租约结束时间
+5. DNS服务器地址
+6. 默认网关地址
+</code></pre><h3 id="练习2释放和重新获取ip">练习2：释放和重新获取IP
+</h3><pre tabindex="0"><code>步骤：
+1. 记录当前IP地址
+2. 释放IP地址（ipconfig /release）
+3. 观察网络状态（无法上网）
+4. 重新获取IP（ipconfig /renew）
+5. 对比前后IP是否相同
+6. 分析为什么相同/不同
+</code></pre><h3 id="练习3计算租约时间">练习3：计算租约时间
+</h3><pre tabindex="0"><code>已知：
+- 租约开始：2024-01-15 14:00:00
+- 租约时长：48小时
+
+计算：
+1. T1（续约时间）
+2. T2（重绑时间）
+3. 租约到期时间
+4. 从开始到T1的间隔（秒）
+</code></pre><h3 id="练习4dhcp抓包分析">练习4：DHCP抓包分析
+</h3><pre tabindex="0"><code>使用Wireshark抓包：
+1. 释放当前IP
+2. 启动Wireshark，过滤 &#34;dhcp&#34;
+3. 重新获取IP
+4. 观察DORA四个报文
+5. 分析每个报文的内容
+</code></pre><hr>
+<h2 id="9-常见问题">9. 常见问题
+</h2><p><strong>Q1：为什么DHCP Request要广播而不是单播？</strong></p>
+<p>A：两个原因：</p>
+<ol>
+<li>告诉所有DHCP服务器&quot;我选择了哪个offer&quot;，其他服务器可以回收IP</li>
+<li>此时客户端还没有正式的IP，使用单播可能有问题</li>
+</ol>
+<p><strong>Q2：如果有多个DHCP服务器，会发生什么？</strong></p>
+<p>A：</p>
+<ul>
+<li>客户端会收到多个Offer</li>
+<li>客户端通常选择第一个收到的Offer</li>
+<li>其他服务器看到Request后，会回收它们提供的IP</li>
+</ul>
+<p><strong>Q3：DHCP能跨网段工作吗？</strong></p>
+<p>A：</p>
+<ul>
+<li>直接不能（广播无法跨越路由器）</li>
+<li>需要配置DHCP Relay（中继代理）</li>
+<li>路由器将广播转换为单播转发</li>
+</ul>
+<p><strong>Q4：租约到期后没有续约会怎样？</strong></p>
+<p>A：</p>
+<ul>
+<li>IP地址被释放</li>
+<li>客户端失去网络连接</li>
+<li>需要重新发起DORA获取新IP</li>
+<li>通常客户端会在到期前自动续约</li>
+</ul>
+<p><strong>Q5：为什么有时候IP地址会变化？</strong></p>
+<p>A：可能原因：</p>
+<ul>
+<li>租约到期后获得不同的IP</li>
+<li>DHCP服务器重启，地址池重置</li>
+<li>长时间离线，原IP被分配给其他设备</li>
+<li>更换了网络（连接不同的WiFi）</li>
+</ul>
+<hr>
+<h2 id="10-总结">10. 总结
+</h2><p>今天我们学习了：</p>
+<h3 id="核心知识点">核心知识点
+</h3><ol>
+<li>
+<p><strong>DHCP基础</strong>：</p>
+<ul>
+<li>动态主机配置协议</li>
+<li>自动分配IP和网络参数</li>
+<li>简化网络管理</li>
+</ul>
+</li>
+<li>
+<p><strong>DORA过程</strong>：</p>
+<ul>
+<li>Discover：寻找DHCP服务器</li>
+<li>Offer：服务器提供IP</li>
+<li>Request：客户端请求IP</li>
+<li>Ack：服务器确认分配</li>
+</ul>
+</li>
+<li>
+<p><strong>租约管理</strong>：</p>
+<ul>
+<li>租约生命周期</li>
+<li>T1续约（50%）、T2重绑（87.5%）</li>
+<li>租约到期处理</li>
+</ul>
+</li>
+<li>
+<p><strong>DHCP报文</strong>：</p>
+<ul>
+<li>基于BOOTP协议</li>
+<li>UDP端口67/68</li>
+<li>丰富的Options字段</li>
+</ul>
+</li>
+<li>
+<p><strong>高级特性</strong>：</p>
+<ul>
+<li>DHCP中继（跨网段）</li>
+<li>安全问题（欺骗、饿死攻击）</li>
+<li>地址保留</li>
+</ul>
+</li>
+</ol>
+<h3 id="重点回顾">重点回顾
+</h3><pre tabindex="0"><code>DHCP = 自动网络配置
+过程 = DORA（4次握手）
+管理 = 租约机制
+安全 = DHCP Snooping
+
+好处：
+✅ 自动化配置
+✅ 避免IP冲突
+✅ 集中管理
+✅ 提高效率
+</code></pre><h3 id="明天预告">明天预告
+</h3><p><strong>第14天：第二周总结与实战</strong></p>
+<p>内容预览：</p>
+<ul>
+<li>本周知识串讲（Day 8-13）</li>
+<li>IP、子网、MAC、端口、DNS、DHCP综合应用</li>
+<li>综合项目：网络配置助手</li>
+<li>知识测验</li>
+</ul>
+<hr>
+<p><strong>继续加油！🚀</strong></p>
+<p>今天我们深入学习了DHCP协议，理解了网络设备如何自动获取IP地址和配置。DHCP极大地简化了网络管理，是现代网络不可或缺的基础服务。掌握DHCP不仅能帮你理解网络自动化配置，还能在排查网络问题时快速定位。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/12%E5%A4%A9dns%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">12天：DNS协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/11%E5%A4%A9%E7%AB%AF%E5%8F%A3%E5%92%8Csocket%E6%B7%B1%E5%85%A5/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">11天：端口和Socket深入</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/10%E5%A4%A9mac%E5%9C%B0%E5%9D%80%E5%92%8Carp%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">10天：MAC地址和ARP协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/9%E5%A4%A9%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86%E5%AE%9E%E6%88%98/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">9天：子网划分实战</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/8%E5%A4%A9ip%E5%9C%B0%E5%9D%80%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">8天：IP地址详解</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

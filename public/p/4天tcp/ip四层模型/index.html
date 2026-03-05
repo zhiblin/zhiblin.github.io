@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第4天：TCP/IP四层模型 &ldquo;理论是OSI，实战是TCP/IP。&rdquo;\n📚 今日目标 理解TCP/IP四层模型 掌握TCP/IP与OSI的区别和联系 学会分析真实的网络数据包 编写程序捕获和解析数据包 🎯 为什么需要TCP/IP模型？ OSI vs TCP/IP OSI七层模型：\n">
+<title>4天：TCP/IP四层模型</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/4%E5%A4%A9tcp/ip%E5%9B%9B%E5%B1%82%E6%A8%A1%E5%9E%8B/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="4天：TCP/IP四层模型">
+<meta property='og:description' content="第4天：TCP/IP四层模型 &ldquo;理论是OSI，实战是TCP/IP。&rdquo;\n📚 今日目标 理解TCP/IP四层模型 掌握TCP/IP与OSI的区别和联系 学会分析真实的网络数据包 编写程序捕获和解析数据包 🎯 为什么需要TCP/IP模型？ OSI vs TCP/IP OSI七层模型：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/4%E5%A4%A9tcp/ip%E5%9B%9B%E5%B1%82%E6%A8%A1%E5%9E%8B/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T14:39:37&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T14:39:37&#43;00:00'/>
+<meta name="twitter:title" content="4天：TCP/IP四层模型">
+<meta name="twitter:description" content="第4天：TCP/IP四层模型 &ldquo;理论是OSI，实战是TCP/IP。&rdquo;\n📚 今日目标 理解TCP/IP四层模型 掌握TCP/IP与OSI的区别和联系 学会分析真实的网络数据包 编写程序捕获和解析数据包 🎯 为什么需要TCP/IP模型？ OSI vs TCP/IP OSI七层模型：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#-为什么需要tcpip模型">🎯 为什么需要TCP/IP模型？</a>
+      <ul>
+        <li><a href="#osi-vs-tcpip">OSI vs TCP/IP</a></li>
+        <li><a href="#类比理解">类比理解</a></li>
+      </ul>
+    </li>
+    <li><a href="#-tcpip四层模型">📊 TCP/IP四层模型</a>
+      <ul>
+        <li><a href="#层次对应关系">层次对应关系</a></li>
+        <li><a href="#tcpip各层详解">TCP/IP各层详解</a></li>
+      </ul>
+    </li>
+    <li><a href="#-tcpip数据封装">📦 TCP/IP数据封装</a>
+      <ul>
+        <li><a href="#发送数据的封装过程">发送数据的封装过程</a></li>
+        <li><a href="#各层添加的信息">各层添加的信息</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战项目数据包分析器">🔧 实战项目：数据包分析器</a>
+      <ul>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#运行说明">运行说明</a></li>
+        <li><a href="#预期输出">预期输出</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识小结">🎓 知识小结</a>
+      <ul>
+        <li><a href="#今天学到了什么">今天学到了什么？</a></li>
+        <li><a href="#tcpip四层对应表">TCP/IP四层对应表</a></li>
+        <li><a href="#重要协议">重要协议</a></li>
+      </ul>
+    </li>
+    <li><a href="#-练习题">💪 练习题</a>
+      <ul>
+        <li><a href="#练习1协议识别">练习1：协议识别</a></li>
+        <li><a href="#练习2层次判断">练习2：层次判断</a></li>
+        <li><a href="#练习3绘制数据包结构">练习3：绘制数据包结构</a></li>
+        <li><a href="#练习4代码扩展">练习4：代码扩展</a></li>
+        <li><a href="#练习5思考题">练习5：思考题</a></li>
+      </ul>
+    </li>
+    <li><a href="#-扩展阅读">📚 扩展阅读</a>
+      <ul>
+        <li><a href="#tcpip协议族">TCP/IP协议族</a></li>
+        <li><a href="#常见端口号记忆">常见端口号记忆</a></li>
+        <li><a href="#实际应用场景">实际应用场景</a></li>
+      </ul>
+    </li>
+    <li><a href="#-明天预告">🎯 明天预告</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/4%E5%A4%A9tcp/ip%E5%9B%9B%E5%B1%82%E6%A8%A1%E5%9E%8B/">4天：TCP/IP四层模型</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T14:39:37Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#-为什么需要tcpip模型">🎯 为什么需要TCP/IP模型？</a>
+      <ul>
+        <li><a href="#osi-vs-tcpip">OSI vs TCP/IP</a></li>
+        <li><a href="#类比理解">类比理解</a></li>
+      </ul>
+    </li>
+    <li><a href="#-tcpip四层模型">📊 TCP/IP四层模型</a>
+      <ul>
+        <li><a href="#层次对应关系">层次对应关系</a></li>
+        <li><a href="#tcpip各层详解">TCP/IP各层详解</a></li>
+      </ul>
+    </li>
+    <li><a href="#-tcpip数据封装">📦 TCP/IP数据封装</a>
+      <ul>
+        <li><a href="#发送数据的封装过程">发送数据的封装过程</a></li>
+        <li><a href="#各层添加的信息">各层添加的信息</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战项目数据包分析器">🔧 实战项目：数据包分析器</a>
+      <ul>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#运行说明">运行说明</a></li>
+        <li><a href="#预期输出">预期输出</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识小结">🎓 知识小结</a>
+      <ul>
+        <li><a href="#今天学到了什么">今天学到了什么？</a></li>
+        <li><a href="#tcpip四层对应表">TCP/IP四层对应表</a></li>
+        <li><a href="#重要协议">重要协议</a></li>
+      </ul>
+    </li>
+    <li><a href="#-练习题">💪 练习题</a>
+      <ul>
+        <li><a href="#练习1协议识别">练习1：协议识别</a></li>
+        <li><a href="#练习2层次判断">练习2：层次判断</a></li>
+        <li><a href="#练习3绘制数据包结构">练习3：绘制数据包结构</a></li>
+        <li><a href="#练习4代码扩展">练习4：代码扩展</a></li>
+        <li><a href="#练习5思考题">练习5：思考题</a></li>
+      </ul>
+    </li>
+    <li><a href="#-扩展阅读">📚 扩展阅读</a>
+      <ul>
+        <li><a href="#tcpip协议族">TCP/IP协议族</a></li>
+        <li><a href="#常见端口号记忆">常见端口号记忆</a></li>
+        <li><a href="#实际应用场景">实际应用场景</a></li>
+      </ul>
+    </li>
+    <li><a href="#-明天预告">🎯 明天预告</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第4天tcpip四层模型">第4天：TCP/IP四层模型
+</h1>
+    <blockquote>
+        <p>&ldquo;理论是OSI，实战是TCP/IP。&rdquo;</p>
+
+    </blockquote>
+<h2 id="-今日目标">📚 今日目标
+</h2><ul>
+<li>理解TCP/IP四层模型</li>
+<li>掌握TCP/IP与OSI的区别和联系</li>
+<li>学会分析真实的网络数据包</li>
+<li>编写程序捕获和解析数据包</li>
+</ul>
+<h2 id="-为什么需要tcpip模型">🎯 为什么需要TCP/IP模型？
+</h2><h3 id="osi-vs-tcpip">OSI vs TCP/IP
+</h3><p><strong>OSI七层模型</strong>：</p>
+<ul>
+<li>📖 理论模型，由ISO制定</li>
+<li>🎓 教学用途，帮助理解网络概念</li>
+<li>📚 过于复杂，实际应用较少</li>
+</ul>
+<p><strong>TCP/IP四层模型</strong>：</p>
+<ul>
+<li>💻 实际使用的模型</li>
+<li>🌐 互联网的基础</li>
+<li>🚀 简单实用，广泛应用</li>
+</ul>
+<h3 id="类比理解">类比理解
+</h3><pre tabindex="0"><code>OSI模型 = 理想的建筑设计图纸（7层楼）
+TCP/IP模型 = 实际建造的房子（4层楼，但功能齐全）
+</code></pre><h2 id="-tcpip四层模型">📊 TCP/IP四层模型
+</h2><h3 id="层次对应关系">层次对应关系
+</h3><pre tabindex="0"><code>┌──────────────────┐
+│   OSI七层模型    │            TCP/IP四层模型
+├──────────────────┤
+│  7. 应用层       │ \
+│  6. 表示层       │  \       ┌──────────────────┐
+│  5. 会话层       │   } ───&gt; │  4. 应用层       │
+└──────────────────┘  /       │  (Application)   │
+┌──────────────────┐ /        └──────────────────┘
+│  4. 传输层       │ ───────&gt; ┌──────────────────┐
+└──────────────────┘          │  3. 传输层       │
+┌──────────────────┐          │  (Transport)     │
+│  3. 网络层       │ ───────&gt; └──────────────────┘
+└──────────────────┘          ┌──────────────────┐
+┌──────────────────┐          │  2. 网际层       │
+│  2. 数据链路层   │ \        │  (Internet)      │
+│  1. 物理层       │  } ───&gt;  └──────────────────┘
+└──────────────────┘ /        ┌──────────────────┐
+                               │  1. 网络接口层   │
+                               │  (Network Access)│
+                               └──────────────────┘
+</code></pre><h3 id="tcpip各层详解">TCP/IP各层详解
+</h3><h4 id="第4层应用层application-layer">第4层：应用层（Application Layer）
+</h4><p><strong>对应OSI</strong>：应用层 + 表示层 + 会话层</p>
+<p><strong>主要协议</strong>：</p>
+<ul>
+<li>🌐 HTTP/HTTPS：网页浏览</li>
+<li>📧 SMTP/POP3/IMAP：邮件</li>
+<li>📁 FTP：文件传输</li>
+<li>🔍 DNS：域名解析</li>
+<li>🔐 SSH：远程登录</li>
+<li>💬 MQTT：物联网通信</li>
+</ul>
+<p><strong>作用</strong>：为用户提供各种网络服务</p>
+<p><strong>例子</strong>：</p>
+<pre tabindex="0"><code>浏览器访问 www.baidu.com
+↓
+应用层：生成HTTP请求
+GET / HTTP/1.1
+Host: www.baidu.com
+</code></pre><hr>
+<h4 id="第3层传输层transport-layer">第3层：传输层（Transport Layer）
+</h4><p><strong>对应OSI</strong>：传输层</p>
+<p><strong>主要协议</strong>：</p>
+<ul>
+<li>🚚 TCP：可靠传输，面向连接</li>
+<li>📦 UDP：快速传输，无连接</li>
+</ul>
+<p><strong>作用</strong>：提供端到端的数据传输</p>
+<p><strong>关键概念</strong>：</p>
+<ul>
+<li><strong>端口号</strong>：标识应用程序
+<ul>
+<li>HTTP: 80</li>
+<li>HTTPS: 443</li>
+<li>SSH: 22</li>
+<li>MySQL: 3306</li>
+</ul>
+</li>
+</ul>
+<p><strong>TCP vs UDP</strong>：</p>
+<pre tabindex="0"><code>TCP = 打电话（需要接通，可靠）
+UDP = 发短信（直接发，不保证送达）
+</code></pre><hr>
+<h4 id="第2层网际层internet-layer">第2层：网际层（Internet Layer）
+</h4><p><strong>对应OSI</strong>：网络层</p>
+<p><strong>主要协议</strong>：</p>
+<ul>
+<li>🌐 IP：网际协议（IPv4/IPv6）</li>
+<li>📡 ICMP：控制消息协议</li>
+<li>🗺️ ARP：地址解析协议</li>
+<li>🔀 IGMP：组管理协议</li>
+</ul>
+<p><strong>作用</strong>：路由和寻址，在网络间传输数据</p>
+<p><strong>关键概念</strong>：</p>
+<ul>
+<li><strong>IP地址</strong>：设备的网络地址
+<ul>
+<li>192.168.1.100（私网）</li>
+<li>8.8.8.8（公网）</li>
+</ul>
+</li>
+</ul>
+<p><strong>例子</strong>：</p>
+<pre tabindex="0"><code>从北京的电脑访问上海的服务器
+↓
+网际层：选择最佳路径
+北京 → 路由器1 → 路由器2 → ... → 上海
+</code></pre><hr>
+<h4 id="第1层网络接口层network-access-layer">第1层：网络接口层（Network Access Layer）
+</h4><p><strong>对应OSI</strong>：数据链路层 + 物理层</p>
+<p><strong>主要协议</strong>：</p>
+<ul>
+<li>🔗 Ethernet：以太网</li>
+<li>📶 WiFi：无线局域网</li>
+<li>🔌 PPP：点对点协议</li>
+</ul>
+<p><strong>作用</strong>：在物理网络上传输数据帧</p>
+<p><strong>关键概念</strong>：</p>
+<ul>
+<li><strong>MAC地址</strong>：网卡的物理地址
+<ul>
+<li>AA:BB:CC:DD:EE:FF</li>
+</ul>
+</li>
+</ul>
+<p><strong>例子</strong>：</p>
+<pre tabindex="0"><code>同一个局域网内的两台电脑通信
+↓
+网络接口层：通过MAC地址直接传输
+电脑A的网卡 → 交换机 → 电脑B的网卡
+</code></pre><h2 id="-tcpip数据封装">📦 TCP/IP数据封装
+</h2><h3 id="发送数据的封装过程">发送数据的封装过程
+</h3><pre tabindex="0"><code>应用层：
+[HTTP请求数据]
+    ↓
+传输层：
+[TCP头部 | HTTP请求数据]  ← Segment（段）
+    ↓
+网际层：
+[IP头部 | TCP头部 | HTTP请求数据]  ← Packet（包）
+    ↓
+网络接口层：
+[以太网帧头 | IP头部 | TCP头部 | HTTP请求数据 | 帧尾]  ← Frame（帧）
+    ↓
+物理层：
+01010101...  ← Bits（比特流）
+</code></pre><h3 id="各层添加的信息">各层添加的信息
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>层次</th>
+          <th>添加的信息</th>
+          <th>目的</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>应用层</td>
+          <td>应用数据</td>
+          <td>用户数据</td>
+      </tr>
+      <tr>
+          <td>传输层</td>
+          <td>源端口、目标端口</td>
+          <td>标识应用程序</td>
+      </tr>
+      <tr>
+          <td>网际层</td>
+          <td>源IP、目标IP</td>
+          <td>标识主机位置</td>
+      </tr>
+      <tr>
+          <td>网络接口层</td>
+          <td>源MAC、目标MAC</td>
+          <td>标识网卡</td>
+      </tr>
+  </tbody>
+</table></div>
+<h2 id="-实战项目数据包分析器">🔧 实战项目：数据包分析器
+</h2><p>让我们编写一个程序，捕获和分析真实的网络数据包！</p>
+<h3 id="代码实现">代码实现
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># day04_packet_analyzer.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 功能：捕获并分析网络数据包（TCP/IP各层信息）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> struct
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> textwrap
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">ethernet_frame</span>(data):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    解析以太网帧（网络接口层）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    以太网帧格式：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    [目标MAC(6字节) | 源MAC(6字节) | 类型(2字节) | 数据 | CRC(4字节)]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 提取MAC地址和类型</span>
+</span></span><span style="display:flex;"><span>    dest_mac, src_mac, eth_type <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>unpack(<span style="color:#e6db74">&#39;! 6s 6s H&#39;</span>, data[:<span style="color:#ae81ff">14</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 格式化MAC地址</span>
+</span></span><span style="display:flex;"><span>    dest_mac <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;:&#39;</span><span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{:02x}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(b) <span style="color:#66d9ef">for</span> b <span style="color:#f92672">in</span> dest_mac)
+</span></span><span style="display:flex;"><span>    src_mac <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;:&#39;</span><span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{:02x}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(b) <span style="color:#66d9ef">for</span> b <span style="color:#f92672">in</span> src_mac)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 以太网类型</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 0x0800 = IPv4, 0x86DD = IPv6, 0x0806 = ARP</span>
+</span></span><span style="display:flex;"><span>    eth_type <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>htons(eth_type)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 返回MAC地址、类型和剩余数据</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> dest_mac, src_mac, eth_type, data[<span style="color:#ae81ff">14</span>:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">ipv4_packet</span>(data):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    解析IPv4数据包（网际层）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    IPv4头部格式（20字节）：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    [版本+头长(1) | 服务类型(1) | 总长度(2) | 标识(2) | 标志+偏移(2) |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">     TTL(1) | 协议(1) | 校验和(2) | 源IP(4) | 目标IP(4)]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 解析IPv4头部的前20字节</span>
+</span></span><span style="display:flex;"><span>    version_header_length <span style="color:#f92672">=</span> data[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    version <span style="color:#f92672">=</span> version_header_length <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">4</span>  <span style="color:#75715e"># 高4位是版本</span>
+</span></span><span style="display:flex;"><span>    header_length <span style="color:#f92672">=</span> (version_header_length <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">15</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">4</span>  <span style="color:#75715e"># 低4位是头长（单位：4字节）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 提取TTL、协议、源IP、目标IP</span>
+</span></span><span style="display:flex;"><span>    ttl, proto, src, target <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>unpack(<span style="color:#e6db74">&#39;! 8x B B 2x 4s 4s&#39;</span>, data[:<span style="color:#ae81ff">20</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 格式化IP地址</span>
+</span></span><span style="display:flex;"><span>    src_ip <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;.&#39;</span><span style="color:#f92672">.</span>join(map(str, src))
+</span></span><span style="display:flex;"><span>    target_ip <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;.&#39;</span><span style="color:#f92672">.</span>join(map(str, target))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 协议号对应的协议名</span>
+</span></span><span style="display:flex;"><span>    protocols <span style="color:#f92672">=</span> {<span style="color:#ae81ff">1</span>: <span style="color:#e6db74">&#39;ICMP&#39;</span>, <span style="color:#ae81ff">6</span>: <span style="color:#e6db74">&#39;TCP&#39;</span>, <span style="color:#ae81ff">17</span>: <span style="color:#e6db74">&#39;UDP&#39;</span>}
+</span></span><span style="display:flex;"><span>    proto_name <span style="color:#f92672">=</span> protocols<span style="color:#f92672">.</span>get(proto, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Other(</span><span style="color:#e6db74">{</span>proto<span style="color:#e6db74">}</span><span style="color:#e6db74">)&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> version, header_length, ttl, proto_name, src_ip, target_ip, data[header_length:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">tcp_segment</span>(data):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    解析TCP段（传输层）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    TCP头部格式（至少20字节）：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    [源端口(2) | 目标端口(2) | 序号(4) | 确认号(4) |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">     头长+标志(2) | 窗口(2) | 校验和(2) | 紧急指针(2)]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    src_port, dest_port, sequence, acknowledgment, offset_reserved_flags <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>unpack(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;! H H L L H&#39;</span>, data[:<span style="color:#ae81ff">14</span>]
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 提取头部长度（高4位）</span>
+</span></span><span style="display:flex;"><span>    offset <span style="color:#f92672">=</span> (offset_reserved_flags <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">12</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 提取TCP标志位</span>
+</span></span><span style="display:flex;"><span>    flag_urg <span style="color:#f92672">=</span> (offset_reserved_flags <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">32</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>    flag_ack <span style="color:#f92672">=</span> (offset_reserved_flags <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>    flag_psh <span style="color:#f92672">=</span> (offset_reserved_flags <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">8</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>    flag_rst <span style="color:#f92672">=</span> (offset_reserved_flags <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">4</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    flag_syn <span style="color:#f92672">=</span> (offset_reserved_flags <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    flag_fin <span style="color:#f92672">=</span> offset_reserved_flags <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> src_port, dest_port, sequence, acknowledgment, flag_urg, flag_ack, \
+</span></span><span style="display:flex;"><span>           flag_psh, flag_rst, flag_syn, flag_fin, data[offset:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">udp_segment</span>(data):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    解析UDP段（传输层）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    UDP头部格式（8字节）：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    [源端口(2) | 目标端口(2) | 长度(2) | 校验和(2)]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    src_port, dest_port, length <span style="color:#f92672">=</span> struct<span style="color:#f92672">.</span>unpack(<span style="color:#e6db74">&#39;! H H 2x H&#39;</span>, data[:<span style="color:#ae81ff">8</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> src_port, dest_port, length, data[<span style="color:#ae81ff">8</span>:]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">format_multi_line</span>(prefix, string, size<span style="color:#f92672">=</span><span style="color:#ae81ff">80</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;格式化多行输出&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    size <span style="color:#f92672">-=</span> len(prefix)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> isinstance(string, bytes):
+</span></span><span style="display:flex;"><span>        string <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;\x</span><span style="color:#e6db74">{:02x}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(byte) <span style="color:#66d9ef">for</span> byte <span style="color:#f92672">in</span> string)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> size <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>            size <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>join([prefix <span style="color:#f92672">+</span> line <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> textwrap<span style="color:#f92672">.</span>wrap(string, size)])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    主函数：捕获并分析数据包
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">80</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;TCP/IP数据包分析器&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">80</span>))
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">80</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">📡 正在监听网络接口...&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;💡 提示：访问一个网站或ping一个地址来生成流量&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;⚠️  按Ctrl+C停止捕获</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">80</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 创建原始套接字</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 注意：在某些系统上可能需要root权限</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Windows</span>
+</span></span><span style="display:flex;"><span>        conn <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_RAW, socket<span style="color:#f92672">.</span>IPPROTO_IP)
+</span></span><span style="display:flex;"><span>        conn<span style="color:#f92672">.</span>bind((<span style="color:#e6db74">&#39;&#39;</span>, <span style="color:#ae81ff">0</span>))
+</span></span><span style="display:flex;"><span>        conn<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>IPPROTO_IP, socket<span style="color:#f92672">.</span>IP_HDRINCL, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        conn<span style="color:#f92672">.</span>ioctl(socket<span style="color:#f92672">.</span>SIO_RCVALL, socket<span style="color:#f92672">.</span>RCVALL_ON)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">AttributeError</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Linux/Mac</span>
+</span></span><span style="display:flex;"><span>        conn <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_PACKET, socket<span style="color:#f92672">.</span>SOCK_RAW, socket<span style="color:#f92672">.</span>ntohs(<span style="color:#ae81ff">3</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    packet_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 接收数据</span>
+</span></span><span style="display:flex;"><span>            raw_data, addr <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span>recvfrom(<span style="color:#ae81ff">65535</span>)
+</span></span><span style="display:flex;"><span>            packet_count <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;▼&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">40</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;📦 数据包 #</span><span style="color:#e6db74">{</span>packet_count<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;▼&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">40</span><span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 1. 解析以太网帧（网络接口层）</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                dest_mac, src_mac, eth_type, data <span style="color:#f92672">=</span> ethernet_frame(raw_data)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🔗 网络接口层（以太网帧）&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   源MAC地址: </span><span style="color:#e6db74">{</span>src_mac<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   目标MAC地址: </span><span style="color:#e6db74">{</span>dest_mac<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   协议类型: 0x</span><span style="color:#e6db74">{</span>eth_type<span style="color:#e6db74">:</span><span style="color:#e6db74">04x</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 某些系统可能不包含以太网头</span>
+</span></span><span style="display:flex;"><span>                eth_type <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x0800</span>
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> raw_data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 2. 解析IP数据包（网际层）</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> eth_type <span style="color:#f92672">==</span> <span style="color:#ae81ff">0x0800</span>:  <span style="color:#75715e"># IPv4</span>
+</span></span><span style="display:flex;"><span>                version, header_length, ttl, proto, src_ip, target_ip, data <span style="color:#f92672">=</span> ipv4_packet(data)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">🌐 网际层（IP数据包）&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   IP版本: IPv</span><span style="color:#e6db74">{</span>version<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   头部长度: </span><span style="color:#e6db74">{</span>header_length<span style="color:#e6db74">}</span><span style="color:#e6db74">字节&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   TTL: </span><span style="color:#e6db74">{</span>ttl<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   协议: </span><span style="color:#e6db74">{</span>proto<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   源IP地址: </span><span style="color:#e6db74">{</span>src_ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   目标IP地址: </span><span style="color:#e6db74">{</span>target_ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 3. 解析传输层</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> proto <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;TCP&#39;</span>:
+</span></span><span style="display:flex;"><span>                    src_port, dest_port, sequence, acknowledgment, flag_urg, flag_ack, \
+</span></span><span style="display:flex;"><span>                    flag_psh, flag_rst, flag_syn, flag_fin, data <span style="color:#f92672">=</span> tcp_segment(data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">🚚 传输层（TCP段）&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   源端口: </span><span style="color:#e6db74">{</span>src_port<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   目标端口: </span><span style="color:#e6db74">{</span>dest_port<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   序列号: </span><span style="color:#e6db74">{</span>sequence<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   确认号: </span><span style="color:#e6db74">{</span>acknowledgment<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   标志位: &#34;</span>, end<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    flags <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> flag_syn: flags<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;SYN&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> flag_ack: flags<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;ACK&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> flag_fin: flags<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;FIN&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> flag_rst: flags<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;RST&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> flag_psh: flags<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;PSH&#34;</span>)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> flag_urg: flags<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;URG&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">&#34;, &#34;</span><span style="color:#f92672">.</span>join(flags) <span style="color:#66d9ef">if</span> flags <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#34;无&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e"># 4. 应用层数据</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> len(data) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">📱 应用层数据&#34;</span>)
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   数据长度: </span><span style="color:#e6db74">{</span>len(data)<span style="color:#e6db74">}</span><span style="color:#e6db74">字节&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e"># 尝试解析HTTP</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                            data_str <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf-8&#39;</span>, errors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ignore&#39;</span>)
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">if</span> data_str<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#39;HTTP&#39;</span>) <span style="color:#f92672">or</span> data_str<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#39;GET&#39;</span>) <span style="color:#f92672">or</span> \
+</span></span><span style="display:flex;"><span>                               data_str<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#39;POST&#39;</span>):
+</span></span><span style="display:flex;"><span>                                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   协议: HTTP&#34;</span>)
+</span></span><span style="display:flex;"><span>                                lines <span style="color:#f92672">=</span> data_str<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">r</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">n&#39;</span>)[:<span style="color:#ae81ff">5</span>]  <span style="color:#75715e"># 只显示前5行</span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> lines:
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">if</span> line:
+</span></span><span style="display:flex;"><span>                                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   </span><span style="color:#e6db74">{</span>line<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>                            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   数据预览: </span><span style="color:#e6db74">{</span>data[:<span style="color:#ae81ff">50</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">elif</span> proto <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;UDP&#39;</span>:
+</span></span><span style="display:flex;"><span>                    src_port, dest_port, length, data <span style="color:#f92672">=</span> udp_segment(data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">📦 传输层（UDP段）&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   源端口: </span><span style="color:#e6db74">{</span>src_port<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   目标端口: </span><span style="color:#e6db74">{</span>dest_port<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   长度: </span><span style="color:#e6db74">{</span>length<span style="color:#e6db74">}</span><span style="color:#e6db74">字节&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e"># DNS查询/响应</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> src_port <span style="color:#f92672">==</span> <span style="color:#ae81ff">53</span> <span style="color:#f92672">or</span> dest_port <span style="color:#f92672">==</span> <span style="color:#ae81ff">53</span>:
+</span></span><span style="display:flex;"><span>                        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   应用协议: DNS&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">elif</span> proto <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;ICMP&#39;</span>:
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">📡 传输层（ICMP）&#34;</span>)
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   这是一个ping或traceroute数据包&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">80</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 只捕获前10个包作为演示</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> packet_count <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">10</span>:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">✅ 已捕获</span><span style="color:#e6db74">{</span>packet_count<span style="color:#e6db74">}</span><span style="color:#e6db74">个数据包，停止监听&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">KeyboardInterrupt</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">✋ 用户停止捕获&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;📊 总共捕获了 </span><span style="color:#e6db74">{</span>packet_count<span style="color:#e6db74">}</span><span style="color:#e6db74"> 个数据包&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">finally</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Windows需要关闭混杂模式</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            conn<span style="color:#f92672">.</span>ioctl(socket<span style="color:#f92672">.</span>SIO_RCVALL, socket<span style="color:#f92672">.</span>RCVALL_OFF)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>        conn<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">80</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> sys<span style="color:#f92672">.</span>platform <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;win32&#39;</span> <span style="color:#f92672">or</span> sys<span style="color:#f92672">.</span>platform <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;linux&#39;</span> <span style="color:#f92672">or</span> sys<span style="color:#f92672">.</span>platform <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;darwin&#39;</span>:
+</span></span><span style="display:flex;"><span>        main()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;⚠️  此程序可能需要管理员/root权限&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;💡 Linux/Mac: sudo python day04_packet_analyzer.py&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;💡 Windows: 以管理员身份运行&#34;</span>)
+</span></span></code></pre></div><h3 id="运行说明">运行说明
+</h3><p><strong>Linux/Mac</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo python code/day04/day04_packet_analyzer.py
+</span></span></code></pre></div><p><strong>Windows</strong>：
+以管理员身份运行命令提示符，然后：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python code<span style="color:#ae81ff">\d</span>ay04<span style="color:#ae81ff">\d</span>ay04_packet_analyzer.py
+</span></span></code></pre></div><h3 id="预期输出">预期输出
+</h3><p>程序会实时显示捕获到的数据包的各层信息。</p>
+<h2 id="-知识小结">🎓 知识小结
+</h2><h3 id="今天学到了什么">今天学到了什么？
+</h3><ol>
+<li>✅ TCP/IP四层模型是实际使用的网络模型</li>
+<li>✅ TCP/IP比OSI更简洁实用</li>
+<li>✅ 每一层都有特定的协议和作用</li>
+<li>✅ 数据包包含多层的头部信息</li>
+</ol>
+<h3 id="tcpip四层对应表">TCP/IP四层对应表
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>TCP/IP层</th>
+          <th>主要协议</th>
+          <th>关键信息</th>
+          <th>设备</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>应用层</td>
+          <td>HTTP、DNS、FTP</td>
+          <td>应用数据</td>
+          <td>-</td>
+      </tr>
+      <tr>
+          <td>传输层</td>
+          <td>TCP、UDP</td>
+          <td>端口号</td>
+          <td>-</td>
+      </tr>
+      <tr>
+          <td>网际层</td>
+          <td>IP、ICMP</td>
+          <td>IP地址</td>
+          <td>路由器</td>
+      </tr>
+      <tr>
+          <td>网络接口层</td>
+          <td>Ethernet、WiFi</td>
+          <td>MAC地址</td>
+          <td>交换机、网卡</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="重要协议">重要协议
+</h3><p><strong>应用层</strong>：</p>
+<ul>
+<li>HTTP（80）：网页</li>
+<li>HTTPS（443）：加密网页</li>
+<li>DNS（53）：域名解析</li>
+<li>FTP（21）：文件传输</li>
+<li>SSH（22）：远程登录</li>
+<li>SMTP（25）：发送邮件</li>
+</ul>
+<p><strong>传输层</strong>：</p>
+<ul>
+<li>TCP：可靠传输</li>
+<li>UDP：快速传输</li>
+</ul>
+<p><strong>网际层</strong>：</p>
+<ul>
+<li>IP：寻址和路由</li>
+<li>ICMP：错误报告和诊断</li>
+</ul>
+<p><strong>网络接口层</strong>：</p>
+<ul>
+<li>Ethernet：有线网络</li>
+<li>WiFi：无线网络</li>
+</ul>
+<h2 id="-练习题">💪 练习题
+</h2><h3 id="练习1协议识别">练习1：协议识别
+</h3><p>以下端口号对应什么协议？</p>
+<ol>
+<li>80</li>
+<li>443</li>
+<li>22</li>
+<li>3306</li>
+<li>27017</li>
+</ol>
+<h3 id="练习2层次判断">练习2：层次判断
+</h3><p>以下信息分别属于哪一层？</p>
+<ol>
+<li>192.168.1.1</li>
+<li>AA:BB:CC:DD:EE:FF</li>
+<li>端口8080</li>
+<li>HTTP/1.1</li>
+<li>TCP序列号12345</li>
+</ol>
+<h3 id="练习3绘制数据包结构">练习3：绘制数据包结构
+</h3><p>画出一个完整的HTTP请求数据包的结构，标注每一层的头部。</p>
+<h3 id="练习4代码扩展">练习4：代码扩展
+</h3><p>扩展数据包分析器：</p>
+<ol>
+<li>添加数据包过滤功能（只显示特定协议）</li>
+<li>统计各协议的数据包数量</li>
+<li>将捕获的数据包保存到文件</li>
+</ol>
+<h3 id="练习5思考题">练习5：思考题
+</h3><ol>
+<li>为什么TCP/IP模型只有4层而OSI有7层？</li>
+<li>路由器工作在哪一层？交换机呢？</li>
+<li>防火墙可能工作在哪几层？</li>
+</ol>
+<h2 id="-扩展阅读">📚 扩展阅读
+</h2><h3 id="tcpip协议族">TCP/IP协议族
+</h3><p>TCP/IP不仅仅是TCP和IP两个协议，而是一整个协议族：</p>
+<pre tabindex="0"><code>应用层：
+┌────────────────────────────────────┐
+│ HTTP  FTP   DNS   SMTP  SSH  等... │
+└────────────────────────────────────┘
+
+传输层：
+┌──────────┬──────────┐
+│   TCP    │   UDP    │
+└──────────┴──────────┘
+
+网际层：
+┌────────────────────────────┐
+│   IP   ICMP   ARP   IGMP   │
+└────────────────────────────┘
+
+网络接口层：
+┌────────────────────────────┐
+│  Ethernet  WiFi  PPP  等... │
+└────────────────────────────┘
+</code></pre><h3 id="常见端口号记忆">常见端口号记忆
+</h3><p><strong>HTTP家族</strong>：</p>
+<ul>
+<li>80：HTTP</li>
+<li>443：HTTPS</li>
+<li>8080：HTTP代理</li>
+</ul>
+<p><strong>文件传输</strong>：</p>
+<ul>
+<li>20/21：FTP</li>
+<li>22：SFTP（SSH）</li>
+<li>69：TFTP</li>
+</ul>
+<p><strong>邮件</strong>：</p>
+<ul>
+<li>25：SMTP（发送）</li>
+<li>110：POP3（接收）</li>
+<li>143：IMAP（接收）</li>
+</ul>
+<p><strong>数据库</strong>：</p>
+<ul>
+<li>3306：MySQL</li>
+<li>5432：PostgreSQL</li>
+<li>27017：MongoDB</li>
+<li>6379：Redis</li>
+</ul>
+<p><strong>远程</strong>：</p>
+<ul>
+<li>22：SSH</li>
+<li>23：Telnet</li>
+<li>3389：RDP（Windows远程桌面）</li>
+</ul>
+<h3 id="实际应用场景">实际应用场景
+</h3><ol>
+<li>
+<p><strong>浏览网页</strong>：</p>
+<pre tabindex="0"><code>应用层：HTTP请求 www.baidu.com
+传输层：TCP 端口80
+网际层：IP地址 220.181.38.148
+网络接口层：通过以太网发送
+</code></pre></li>
+<li>
+<p><strong>发送邮件</strong>：</p>
+<pre tabindex="0"><code>应用层：SMTP协议
+传输层：TCP 端口25
+网际层：IP地址（邮件服务器）
+网络接口层：WiFi
+</code></pre></li>
+<li>
+<p><strong>ping命令</strong>：</p>
+<pre tabindex="0"><code>应用层：无（ICMP是网际层协议）
+传输层：无
+网际层：ICMP echo request
+网络接口层：以太网
+</code></pre></li>
+</ol>
+<h2 id="-明天预告">🎯 明天预告
+</h2><p><strong>第5天：网络命令入门 - ping</strong></p>
+<p>我们将学习：</p>
+<ul>
+<li>ping命令的工作原理</li>
+<li>ICMP协议详解</li>
+<li>RTT（往返时间）的计算</li>
+<li>编写自己的ping工具</li>
+</ul>
+<hr>
+<p>💡 <strong>今日金句</strong>：掌握TCP/IP，就掌握了互联网的语言！</p>
+<p>👉 <a class="link" href="day03.md" >上一天：OSI七层模型</a> | <a class="link" href="../../README.md" >返回目录</a> | <a class="link" href="day05.md" >下一天：ping命令详解</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/3%E5%A4%A9osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">3天：OSI七层模型</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/2%E5%A4%A9%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">2天：网络的分类和拓扑结构</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/1%E5%A4%A9%E8%AE%A4%E8%AF%86%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">1天：认识计算机网络</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

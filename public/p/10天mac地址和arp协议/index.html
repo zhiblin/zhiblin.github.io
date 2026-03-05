@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第10天：MAC地址和ARP协议 &ldquo;IP地址是逻辑地址，MAC地址是物理地址。&rdquo;\n📚 今日目标 理解MAC地址的概念和格式 掌握MAC地址和IP地址的区别 理解ARP协议的工作原理 学会查看和管理ARP缓存 编写ARP扫描工具 🎯 什么是MAC地址？ 生活中的例子 MAC地址 = 身份证号 身份证号：终身不变，唯一标识一个人 MAC地址：出厂固化，唯一标识一块网卡 IP地址 = 家庭住址 家庭住址：可以搬家更换 IP地址：可以更换网络而改变 MAC地址（Media Access Control Address，媒体访问控制地址）是网卡（网络接口卡）的物理地址，用于在数据链路层标识网络设备。\n">
+<title>10天：MAC地址和ARP协议</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/10%E5%A4%A9mac%E5%9C%B0%E5%9D%80%E5%92%8Carp%E5%8D%8F%E8%AE%AE/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="10天：MAC地址和ARP协议">
+<meta property='og:description' content="第10天：MAC地址和ARP协议 &ldquo;IP地址是逻辑地址，MAC地址是物理地址。&rdquo;\n📚 今日目标 理解MAC地址的概念和格式 掌握MAC地址和IP地址的区别 理解ARP协议的工作原理 学会查看和管理ARP缓存 编写ARP扫描工具 🎯 什么是MAC地址？ 生活中的例子 MAC地址 = 身份证号 身份证号：终身不变，唯一标识一个人 MAC地址：出厂固化，唯一标识一块网卡 IP地址 = 家庭住址 家庭住址：可以搬家更换 IP地址：可以更换网络而改变 MAC地址（Media Access Control Address，媒体访问控制地址）是网卡（网络接口卡）的物理地址，用于在数据链路层标识网络设备。\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/10%E5%A4%A9mac%E5%9C%B0%E5%9D%80%E5%92%8Carp%E5%8D%8F%E8%AE%AE/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:21:37&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:21:37&#43;00:00'/>
+<meta name="twitter:title" content="10天：MAC地址和ARP协议">
+<meta name="twitter:description" content="第10天：MAC地址和ARP协议 &ldquo;IP地址是逻辑地址，MAC地址是物理地址。&rdquo;\n📚 今日目标 理解MAC地址的概念和格式 掌握MAC地址和IP地址的区别 理解ARP协议的工作原理 学会查看和管理ARP缓存 编写ARP扫描工具 🎯 什么是MAC地址？ 生活中的例子 MAC地址 = 身份证号 身份证号：终身不变，唯一标识一个人 MAC地址：出厂固化，唯一标识一块网卡 IP地址 = 家庭住址 家庭住址：可以搬家更换 IP地址：可以更换网络而改变 MAC地址（Media Access Control Address，媒体访问控制地址）是网卡（网络接口卡）的物理地址，用于在数据链路层标识网络设备。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#-什么是mac地址">🎯 什么是MAC地址？</a>
+      <ul>
+        <li><a href="#生活中的例子">生活中的例子</a></li>
+        <li><a href="#mac地址的特点">MAC地址的特点</a></li>
+      </ul>
+    </li>
+    <li><a href="#-mac地址格式">📊 MAC地址格式</a>
+      <ul>
+        <li><a href="#标准格式">标准格式</a></li>
+        <li><a href="#mac地址结构">MAC地址结构</a></li>
+        <li><a href="#特殊mac地址">特殊MAC地址</a></li>
+      </ul>
+    </li>
+    <li><a href="#-mac地址-vs-ip地址">🔍 MAC地址 vs IP地址</a>
+      <ul>
+        <li><a href="#对比表">对比表</a></li>
+        <li><a href="#为什么需要两个地址">为什么需要两个地址？</a></li>
+        <li><a href="#数据传输过程">数据传输过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#-arp协议">📡 ARP协议</a>
+      <ul>
+        <li><a href="#什么是arp">什么是ARP？</a></li>
+        <li><a href="#arp工作原理">ARP工作原理</a></li>
+        <li><a href="#arp报文格式">ARP报文格式</a></li>
+        <li><a href="#arp缓存">ARP缓存</a></li>
+        <li><a href="#查看arp缓存">查看ARP缓存</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战项目arp扫描工具">🔧 实战项目：ARP扫描工具</a>
+      <ul>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#运行程序">运行程序</a></li>
+      </ul>
+    </li>
+    <li><a href="#-代码详解">🔍 代码详解</a>
+      <ul>
+        <li><a href="#1-arp工作流程">1. ARP工作流程</a></li>
+        <li><a href="#2-并发扫描提速">2. 并发扫描提速</a></li>
+        <li><a href="#3-mac地址厂商识别">3. MAC地址厂商识别</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识小结">🎓 知识小结</a>
+      <ul>
+        <li><a href="#重要概念">重要概念</a></li>
+      </ul>
+    </li>
+    <li><a href="#-练习题">💪 练习题</a>
+      <ul>
+        <li><a href="#练习1查看本机信息">练习1：查看本机信息</a></li>
+        <li><a href="#练习2理解arp">练习2：理解ARP</a></li>
+        <li><a href="#练习3实践操作">练习3：实践操作</a></li>
+        <li><a href="#练习4安全思考">练习4：安全思考</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/10%E5%A4%A9mac%E5%9C%B0%E5%9D%80%E5%92%8Carp%E5%8D%8F%E8%AE%AE/">10天：MAC地址和ARP协议</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:21:37Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#-什么是mac地址">🎯 什么是MAC地址？</a>
+      <ul>
+        <li><a href="#生活中的例子">生活中的例子</a></li>
+        <li><a href="#mac地址的特点">MAC地址的特点</a></li>
+      </ul>
+    </li>
+    <li><a href="#-mac地址格式">📊 MAC地址格式</a>
+      <ul>
+        <li><a href="#标准格式">标准格式</a></li>
+        <li><a href="#mac地址结构">MAC地址结构</a></li>
+        <li><a href="#特殊mac地址">特殊MAC地址</a></li>
+      </ul>
+    </li>
+    <li><a href="#-mac地址-vs-ip地址">🔍 MAC地址 vs IP地址</a>
+      <ul>
+        <li><a href="#对比表">对比表</a></li>
+        <li><a href="#为什么需要两个地址">为什么需要两个地址？</a></li>
+        <li><a href="#数据传输过程">数据传输过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#-arp协议">📡 ARP协议</a>
+      <ul>
+        <li><a href="#什么是arp">什么是ARP？</a></li>
+        <li><a href="#arp工作原理">ARP工作原理</a></li>
+        <li><a href="#arp报文格式">ARP报文格式</a></li>
+        <li><a href="#arp缓存">ARP缓存</a></li>
+        <li><a href="#查看arp缓存">查看ARP缓存</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战项目arp扫描工具">🔧 实战项目：ARP扫描工具</a>
+      <ul>
+        <li><a href="#代码实现">代码实现</a></li>
+        <li><a href="#运行程序">运行程序</a></li>
+      </ul>
+    </li>
+    <li><a href="#-代码详解">🔍 代码详解</a>
+      <ul>
+        <li><a href="#1-arp工作流程">1. ARP工作流程</a></li>
+        <li><a href="#2-并发扫描提速">2. 并发扫描提速</a></li>
+        <li><a href="#3-mac地址厂商识别">3. MAC地址厂商识别</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识小结">🎓 知识小结</a>
+      <ul>
+        <li><a href="#重要概念">重要概念</a></li>
+      </ul>
+    </li>
+    <li><a href="#-练习题">💪 练习题</a>
+      <ul>
+        <li><a href="#练习1查看本机信息">练习1：查看本机信息</a></li>
+        <li><a href="#练习2理解arp">练习2：理解ARP</a></li>
+        <li><a href="#练习3实践操作">练习3：实践操作</a></li>
+        <li><a href="#练习4安全思考">练习4：安全思考</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第10天mac地址和arp协议">第10天：MAC地址和ARP协议
+</h1>
+    <blockquote>
+        <p>&ldquo;IP地址是逻辑地址，MAC地址是物理地址。&rdquo;</p>
+
+    </blockquote>
+<h2 id="-今日目标">📚 今日目标
+</h2><ul>
+<li>理解MAC地址的概念和格式</li>
+<li>掌握MAC地址和IP地址的区别</li>
+<li>理解ARP协议的工作原理</li>
+<li>学会查看和管理ARP缓存</li>
+<li>编写ARP扫描工具</li>
+</ul>
+<h2 id="-什么是mac地址">🎯 什么是MAC地址？
+</h2><h3 id="生活中的例子">生活中的例子
+</h3><pre tabindex="0"><code>MAC地址 = 身份证号
+
+身份证号：终身不变，唯一标识一个人
+MAC地址：出厂固化，唯一标识一块网卡
+
+IP地址 = 家庭住址
+
+家庭住址：可以搬家更换
+IP地址：可以更换网络而改变
+</code></pre><p><strong>MAC地址</strong>（Media Access Control Address，媒体访问控制地址）是网卡（网络接口卡）的物理地址，用于在数据链路层标识网络设备。</p>
+<h3 id="mac地址的特点">MAC地址的特点
+</h3><ol>
+<li><strong>全球唯一</strong>：理论上世界上没有两块网卡有相同的MAC地址</li>
+<li><strong>固化在硬件</strong>：出厂时写入ROM，一般不可更改</li>
+<li><strong>48位（6字节）</strong>：通常用12位十六进制数表示</li>
+<li><strong>数据链路层</strong>：工作在OSI模型的第2层</li>
+</ol>
+<h2 id="-mac地址格式">📊 MAC地址格式
+</h2><h3 id="标准格式">标准格式
+</h3><pre tabindex="0"><code>常见表示方法：
+
+1. 冒号分隔（Linux/Unix）
+   AA:BB:CC:DD:EE:FF
+
+2. 横线分隔（Windows）
+   AA-BB-CC-DD-EE-FF
+
+3. 点分隔（Cisco）
+   AABB.CCDD.EEFF
+
+4. 连续（无分隔符）
+   AABBCCDDEEFF
+
+都是同一个MAC地址！
+</code></pre><h3 id="mac地址结构">MAC地址结构
+</h3><pre tabindex="0"><code>MAC地址分为两部分：
+
+┌─────────────────┬─────────────────┐
+│  OUI (24位)     │  设备标识(24位) │
+│  厂商标识       │  序列号         │
+└─────────────────┴─────────────────┘
+  AA:BB:CC         DD:EE:FF
+
+OUI（Organizationally Unique Identifier）：
+- 前3个字节（24位）
+- IEEE分配给厂商的唯一标识
+- 例如：
+  - 00:50:56 → VMware虚拟网卡
+  - 00:1C:42 → Parallels虚拟网卡
+  - DC:A6:32 → Raspberry Pi
+  - 3C:A9:F4 → 小米设备
+
+设备标识：
+- 后3个字节（24位）
+- 厂商自行分配的序列号
+- 理论上可产生 2^24 = 16,777,216 个地址
+</code></pre><h3 id="特殊mac地址">特殊MAC地址
+</h3><pre tabindex="0"><code>1. 广播MAC地址
+   FF:FF:FF:FF:FF:FF
+   用于向局域网内所有设备发送数据
+
+2. 组播MAC地址
+   第一个字节的最低位为1
+   例如：01:00:5E:XX:XX:XX（IPv4组播）
+
+3. 单播MAC地址
+   第一个字节的最低位为0
+   普通的设备地址
+</code></pre><h2 id="-mac地址-vs-ip地址">🔍 MAC地址 vs IP地址
+</h2><h3 id="对比表">对比表
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>MAC地址</th>
+          <th>IP地址</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>层次</td>
+          <td>数据链路层（第2层）</td>
+          <td>网络层（第3层）</td>
+      </tr>
+      <tr>
+          <td>长度</td>
+          <td>48位（6字节）</td>
+          <td>32位（IPv4）或128位（IPv6）</td>
+      </tr>
+      <tr>
+          <td>表示</td>
+          <td>十六进制</td>
+          <td>十进制（点分）</td>
+      </tr>
+      <tr>
+          <td>分配</td>
+          <td>厂商分配，固化在硬件</td>
+          <td>网络管理员或DHCP分配</td>
+      </tr>
+      <tr>
+          <td>唯一性</td>
+          <td>全球唯一</td>
+          <td>网络内唯一</td>
+      </tr>
+      <tr>
+          <td>可变性</td>
+          <td>理论上不可变</td>
+          <td>可以更换</td>
+      </tr>
+      <tr>
+          <td>作用范围</td>
+          <td>局域网内</td>
+          <td>可跨越多个网络</td>
+      </tr>
+      <tr>
+          <td>路由</td>
+          <td>不能路由</td>
+          <td>可以路由</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="为什么需要两个地址">为什么需要两个地址？
+</h3><pre tabindex="0"><code>类比：快递系统
+
+MAC地址 = 楼层和房间号
+- 在一栋楼内找到具体房间
+- 只在本楼有效
+- 固定不变
+
+IP地址 = 城市和街道地址
+- 跨城市寻找目标
+- 可以搬家（更换网络）
+- 可变
+
+过程：
+1. 快递先通过城市地址找到目标城市（IP路由）
+2. 到达后通过楼层房间号找到具体位置（MAC寻址）
+</code></pre><h3 id="数据传输过程">数据传输过程
+</h3><pre tabindex="0"><code>北京的电脑A → 上海的电脑B
+
+1. 应用层：生成数据
+2. 传输层：添加端口号
+3. 网络层：添加IP地址
+   源IP：北京A的IP
+   目标IP：上海B的IP
+4. 数据链路层：添加MAC地址
+   源MAC：当前路由器的MAC
+   目标MAC：下一跳路由器的MAC
+
+重点：
+- IP地址从头到尾不变（北京A → 上海B）
+- MAC地址每一跳都会变化（每段链路使用不同的MAC）
+</code></pre><h2 id="-arp协议">📡 ARP协议
+</h2><h3 id="什么是arp">什么是ARP？
+</h3><p><strong>ARP</strong>（Address Resolution Protocol，地址解析协议）用于将IP地址转换为MAC地址。</p>
+<pre tabindex="0"><code>问题：我知道目标的IP地址，但要发送数据需要MAC地址
+
+ARP的作用：
+IP地址（192.168.1.100） → ARP查询 → MAC地址（AA:BB:CC:DD:EE:FF）
+</code></pre><h3 id="arp工作原理">ARP工作原理
+</h3><h4 id="场景主机a192168110要发送数据给主机b192168120">场景：主机A（192.168.1.10）要发送数据给主机B（192.168.1.20）
+</h4><pre tabindex="0"><code>步骤1：检查ARP缓存
+主机A首先查看本地ARP缓存表
+- 如果有192.168.1.20的MAC地址 → 直接使用
+- 如果没有 → 发送ARP请求
+
+步骤2：发送ARP请求（广播）
+主机A发送广播包：
+┌─────────────────────────────────────┐
+│ 谁是192.168.1.20？                  │
+│ 请告诉192.168.1.10                  │
+│ 我的MAC是AA:AA:AA:AA:AA:AA          │
+└─────────────────────────────────────┘
+目标MAC：FF:FF:FF:FF:FF:FF（广播）
+
+步骤3：所有主机接收
+局域网内所有主机都收到这个广播包
+- 主机B：这是问我的！
+- 其他主机：不是问我的，丢弃
+
+步骤4：主机B发送ARP响应（单播）
+主机B回复：
+┌─────────────────────────────────────┐
+│ 我是192.168.1.20                    │
+│ 我的MAC是BB:BB:BB:BB:BB:BB          │
+└─────────────────────────────────────┘
+目标MAC：AA:AA:AA:AA:AA:AA（单播给A）
+
+步骤5：主机A更新ARP缓存
+主机A记录：
+192.168.1.20 → BB:BB:BB:BB:BB:BB
+
+步骤6：开始通信
+现在主机A知道了主机B的MAC地址，可以发送数据了
+</code></pre><h3 id="arp报文格式">ARP报文格式
+</h3><pre tabindex="0"><code>ARP请求/响应报文：
+
+┌────────────────────────────────────┐
+│ 硬件类型（2字节）                  │ 1 = 以太网
+├────────────────────────────────────┤
+│ 协议类型（2字节）                  │ 0x0800 = IP
+├────────────────────────────────────┤
+│ 硬件地址长度（1字节）              │ 6 = MAC地址6字节
+├────────────────────────────────────┤
+│ 协议地址长度（1字节）              │ 4 = IP地址4字节
+├────────────────────────────────────┤
+│ 操作码（2字节）                    │ 1=请求，2=响应
+├────────────────────────────────────┤
+│ 发送方MAC地址（6字节）             │
+├────────────────────────────────────┤
+│ 发送方IP地址（4字节）              │
+├────────────────────────────────────┤
+│ 目标MAC地址（6字节）               │ 请求时为全0
+├────────────────────────────────────┤
+│ 目标IP地址（4字节）                │
+└────────────────────────────────────┘
+</code></pre><h3 id="arp缓存">ARP缓存
+</h3><p>为了提高效率，系统会缓存ARP解析的结果。</p>
+<pre tabindex="0"><code>ARP缓存表示例：
+
+IP地址           MAC地址              类型     过期时间
+192.168.1.1     AA:BB:CC:DD:EE:FF    动态     120秒
+192.168.1.20    11:22:33:44:55:66    动态     120秒
+192.168.1.100   FF:EE:DD:CC:BB:AA    静态     永久
+
+类型：
+- 动态：通过ARP协议自动学习，有过期时间
+- 静态：手动配置，永久有效
+</code></pre><h3 id="查看arp缓存">查看ARP缓存
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Windows</span>
+</span></span><span style="display:flex;"><span>arp -a
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Linux/Mac</span>
+</span></span><span style="display:flex;"><span>arp -n
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看特定IP的MAC</span>
+</span></span><span style="display:flex;"><span>arp -n 192.168.1.1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 清空ARP缓存（需要管理员权限）</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Windows</span>
+</span></span><span style="display:flex;"><span>arp -d
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Linux</span>
+</span></span><span style="display:flex;"><span>sudo ip -s -s neigh flush all
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Mac</span>
+</span></span><span style="display:flex;"><span>sudo arp -d -a
+</span></span></code></pre></div><h2 id="-实战项目arp扫描工具">🔧 实战项目：ARP扫描工具
+</h2><p>让我们编写一个ARP扫描工具，用于发现局域网内的所有设备！</p>
+<h3 id="代码实现">代码实现
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># day10_arp_scanner.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 功能：ARP扫描工具</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> struct
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> concurrent.futures <span style="color:#f92672">import</span> ThreadPoolExecutor
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ARPScanner</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;ARP扫描器&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># OUI数据库（部分常见厂商）</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>oui_database <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;00:50:56&#39;</span>: <span style="color:#e6db74">&#39;VMware&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;00:0C:29&#39;</span>: <span style="color:#e6db74">&#39;VMware&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;00:1C:42&#39;</span>: <span style="color:#e6db74">&#39;Parallels&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;08:00:27&#39;</span>: <span style="color:#e6db74">&#39;VirtualBox&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;DC:A6:32&#39;</span>: <span style="color:#e6db74">&#39;Raspberry Pi&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;3C:A9:F4&#39;</span>: <span style="color:#e6db74">&#39;小米&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;28:6C:07&#39;</span>: <span style="color:#e6db74">&#39;小米&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;F8:A4:5F&#39;</span>: <span style="color:#e6db74">&#39;华为&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;00:E0:4C&#39;</span>: <span style="color:#e6db74">&#39;华为&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;AC:DE:48&#39;</span>: <span style="color:#e6db74">&#39;Apple&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;00:03:93&#39;</span>: <span style="color:#e6db74">&#39;Apple&#39;</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_mac_vendor</span>(self, mac):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        根据MAC地址获取厂商信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            mac: MAC地址字符串
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            厂商名称
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 提取OUI（前3个字节）</span>
+</span></span><span style="display:flex;"><span>        oui <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;:&#39;</span><span style="color:#f92672">.</span>join(mac<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;:&#39;</span>)[:<span style="color:#ae81ff">3</span>])<span style="color:#f92672">.</span>upper()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>oui_database<span style="color:#f92672">.</span>get(oui, <span style="color:#e6db74">&#39;未知厂商&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_local_ip</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        获取本机IP地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            sock <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_DGRAM)
+</span></span><span style="display:flex;"><span>            sock<span style="color:#f92672">.</span>connect((<span style="color:#e6db74">&#34;8.8.8.8&#34;</span>, <span style="color:#ae81ff">80</span>))
+</span></span><span style="display:flex;"><span>            local_ip <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>getsockname()[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>            sock<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> local_ip
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_mac_address</span>(self, ip):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        通过ARP获取指定IP的MAC地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            ip: 目标IP地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            MAC地址字符串，如果失败返回None
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        工作原理：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            发送ARP请求，等待响应
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 在Windows上使用arp命令</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">import</span> subprocess
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">import</span> platform
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            system <span style="color:#f92672">=</span> platform<span style="color:#f92672">.</span>system()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> system <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;Windows&#39;</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># Windows: arp -a IP</span>
+</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;arp -a </span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>,
+</span></span><span style="display:flex;"><span>                    shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>                    stderr<span style="color:#f92672">=</span>subprocess<span style="color:#f92672">.</span>DEVNULL
+</span></span><span style="display:flex;"><span>                )<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;gbk&#39;</span>, errors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ignore&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 解析输出</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> result<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>):
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> ip <span style="color:#f92672">in</span> line:
+</span></span><span style="display:flex;"><span>                        parts <span style="color:#f92672">=</span> line<span style="color:#f92672">.</span>split()
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> len(parts) <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>                            mac <span style="color:#f92672">=</span> parts[<span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;-&#39;</span>, <span style="color:#e6db74">&#39;:&#39;</span>)
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">return</span> mac
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># Linux/Mac: arp -n IP</span>
+</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;arp -n </span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>,
+</span></span><span style="display:flex;"><span>                    shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>                    stderr<span style="color:#f92672">=</span>subprocess<span style="color:#f92672">.</span>DEVNULL
+</span></span><span style="display:flex;"><span>                )<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf-8&#39;</span>, errors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ignore&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> result<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>):
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> ip <span style="color:#f92672">in</span> line:
+</span></span><span style="display:flex;"><span>                        parts <span style="color:#f92672">=</span> line<span style="color:#f92672">.</span>split()
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> len(parts) <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">3</span>:
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">return</span> parts[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">ping_and_get_mac</span>(self, ip):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        先ping一下IP（触发ARP），然后获取MAC地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            ip: 目标IP地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            (ip, mac, vendor) 元组，失败返回None
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">import</span> subprocess
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">import</span> platform
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            system <span style="color:#f92672">=</span> platform<span style="color:#f92672">.</span>system()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 先ping一下，触发ARP</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> system <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;Windows&#39;</span>:
+</span></span><span style="display:flex;"><span>                ping_cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;ping -n 1 -w 500 </span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                ping_cmd <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;ping -c 1 -W 1 </span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            subprocess<span style="color:#f92672">.</span>run(
+</span></span><span style="display:flex;"><span>                ping_cmd,
+</span></span><span style="display:flex;"><span>                shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>                stdout<span style="color:#f92672">=</span>subprocess<span style="color:#f92672">.</span>DEVNULL,
+</span></span><span style="display:flex;"><span>                stderr<span style="color:#f92672">=</span>subprocess<span style="color:#f92672">.</span>DEVNULL,
+</span></span><span style="display:flex;"><span>                timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 获取MAC地址</span>
+</span></span><span style="display:flex;"><span>            mac <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>get_mac_address(ip)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> mac <span style="color:#f92672">and</span> mac <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;(incomplete)&#39;</span> <span style="color:#f92672">and</span> <span style="color:#e6db74">&#39;ff:ff:ff:ff:ff:ff&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> mac<span style="color:#f92672">.</span>lower():
+</span></span><span style="display:flex;"><span>                vendor <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>get_mac_vendor(mac)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> (ip, mac, vendor)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">scan_network</span>(self, network, max_workers<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        扫描整个网络
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            network: 网络地址（如 &#34;192.168.1.0/24&#34;）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            max_workers: 最大线程数
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        返回：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            发现的设备列表
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">import</span> ipaddress
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🔍 开始扫描网络: </span><span style="color:#e6db74">{</span>network<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;⏳ 请稍候...</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 解析网络</span>
+</span></span><span style="display:flex;"><span>        net <span style="color:#f92672">=</span> ipaddress<span style="color:#f92672">.</span>ip_network(network, strict<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>        total <span style="color:#f92672">=</span> net<span style="color:#f92672">.</span>num_addresses <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        devices <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        scanned <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 使用线程池并发扫描</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> ThreadPoolExecutor(max_workers<span style="color:#f92672">=</span>max_workers) <span style="color:#66d9ef">as</span> executor:
+</span></span><span style="display:flex;"><span>            futures <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                executor<span style="color:#f92672">.</span>submit(self<span style="color:#f92672">.</span>ping_and_get_mac, str(ip)): ip
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> ip <span style="color:#f92672">in</span> net<span style="color:#f92672">.</span>hosts()
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">from</span> concurrent.futures <span style="color:#f92672">import</span> as_completed
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> future <span style="color:#f92672">in</span> as_completed(futures):
+</span></span><span style="display:flex;"><span>                scanned <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> future<span style="color:#f92672">.</span>result()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> result:
+</span></span><span style="display:flex;"><span>                    devices<span style="color:#f92672">.</span>append(result)
+</span></span><span style="display:flex;"><span>                    ip, mac, vendor <span style="color:#f92672">=</span> result
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;✅ </span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;15</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span>mac<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;17</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span>vendor<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 显示进度</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> scanned <span style="color:#f92672">%</span> <span style="color:#ae81ff">20</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                    progress <span style="color:#f92672">=</span> (scanned <span style="color:#f92672">/</span> total) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>                    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;   进度: </span><span style="color:#e6db74">{</span>progress<span style="color:#e6db74">:</span><span style="color:#e6db74">.1f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">% (</span><span style="color:#e6db74">{</span>scanned<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>total<span style="color:#e6db74">}</span><span style="color:#e6db74">)&#34;</span>, end<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> devices
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">display_results</span>(self, devices):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        显示扫描结果
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            devices: 设备列表
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;扫描完成！共发现 </span><span style="color:#e6db74">{</span>len(devices)<span style="color:#e6db74">}</span><span style="color:#e6db74"> 台设备&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> devices:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;IP地址&#39;</span><span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;15</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;MAC地址&#39;</span><span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;17</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span><span style="color:#e6db74">&#39;厂商&#39;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> ip, mac, vendor <span style="color:#f92672">in</span> sorted(devices):
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;15</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span>mac<span style="color:#e6db74">:</span><span style="color:#e6db74">&lt;17</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">{</span>vendor<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">view_arp_cache</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    查看系统ARP缓存
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> subprocess
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> platform
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;系统ARP缓存表&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">70</span>))
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        system <span style="color:#f92672">=</span> platform<span style="color:#f92672">.</span>system()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> system <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;Windows&#39;</span>:
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(<span style="color:#e6db74">&#39;arp -a&#39;</span>, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;gbk&#39;</span>, errors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ignore&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(<span style="color:#e6db74">&#39;arp -n&#39;</span>, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf-8&#39;</span>, errors<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ignore&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(result)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;❌ 无法获取ARP缓存: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    主函数
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    scanner <span style="color:#f92672">=</span> ARPScanner()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;ARP扫描工具&#34;</span><span style="color:#f92672">.</span>center(<span style="color:#ae81ff">70</span>))
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+</span></span><span style="display:flex;"><span>    print()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 获取本机IP</span>
+</span></span><span style="display:flex;"><span>    local_ip <span style="color:#f92672">=</span> scanner<span style="color:#f92672">.</span>get_local_ip()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> local_ip:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;💻 本机IP: </span><span style="color:#e6db74">{</span>local_ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 推断网络</span>
+</span></span><span style="display:flex;"><span>        ip_parts <span style="color:#f92672">=</span> local_ip<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;.&#39;</span>)
+</span></span><span style="display:flex;"><span>        network <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>ip_parts[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">.</span><span style="color:#e6db74">{</span>ip_parts[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">.</span><span style="color:#e6db74">{</span>ip_parts[<span style="color:#ae81ff">2</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">.0/24&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🌐 推断网络: </span><span style="color:#e6db74">{</span>network<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        network <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;192.168.1.0/24&#34;</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;🌐 使用默认网络: </span><span style="color:#e6db74">{</span>network<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;请选择功能:&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;1. 扫描局域网设备（推荐）&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;2. 扫描自定义网络&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;3. 查看ARP缓存表&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;0. 退出&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    choice <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请输入选项: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>:
+</span></span><span style="display:flex;"><span>        devices <span style="color:#f92672">=</span> scanner<span style="color:#f92672">.</span>scan_network(network)
+</span></span><span style="display:flex;"><span>        scanner<span style="color:#f92672">.</span>display_results(devices)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;2&#39;</span>:
+</span></span><span style="display:flex;"><span>        custom_network <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请输入网络地址（如192.168.1.0/24）: &#34;</span>)<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> custom_network:
+</span></span><span style="display:flex;"><span>            devices <span style="color:#f92672">=</span> scanner<span style="color:#f92672">.</span>scan_network(custom_network)
+</span></span><span style="display:flex;"><span>            scanner<span style="color:#f92672">.</span>display_results(devices)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;3&#39;</span>:
+</span></span><span style="display:flex;"><span>        view_arp_cache()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> choice <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;0&#39;</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">再见！&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><h3 id="运行程序">运行程序
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python code/day10/day10_arp_scanner.py
+</span></span></code></pre></div><h2 id="-代码详解">🔍 代码详解
+</h2><h3 id="1-arp工作流程">1. ARP工作流程
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 1. Ping触发ARP</span>
+</span></span><span style="display:flex;"><span>subprocess<span style="color:#f92672">.</span>run(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;ping -c 1 </span><span style="color:#e6db74">{</span>ip<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>, <span style="color:#f92672">...</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 系统自动发送ARP请求</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 目标主机响应</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 系统缓存ARP表项</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 5. 读取ARP缓存</span>
+</span></span><span style="display:flex;"><span>subprocess<span style="color:#f92672">.</span>check_output(<span style="color:#e6db74">&#39;arp -n&#39;</span>, <span style="color:#f92672">...</span>)
+</span></span></code></pre></div><h3 id="2-并发扫描提速">2. 并发扫描提速
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 使用线程池并发扫描多个IP</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> ThreadPoolExecutor(max_workers<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>) <span style="color:#66d9ef">as</span> executor:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 50个线程同时工作</span>
+</span></span><span style="display:flex;"><span>    futures <span style="color:#f92672">=</span> {executor<span style="color:#f92672">.</span>submit(ping_and_get_mac, ip): ip
+</span></span><span style="display:flex;"><span>               <span style="color:#66d9ef">for</span> ip <span style="color:#f92672">in</span> net<span style="color:#f92672">.</span>hosts()}
+</span></span></code></pre></div><h3 id="3-mac地址厂商识别">3. MAC地址厂商识别
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 通过MAC地址前3个字节（OUI）识别厂商</span>
+</span></span><span style="display:flex;"><span>oui <span style="color:#f92672">=</span> mac[:<span style="color:#ae81ff">8</span>]  <span style="color:#75715e"># 如 &#34;00:50:56&#34;</span>
+</span></span><span style="display:flex;"><span>vendor <span style="color:#f92672">=</span> oui_database<span style="color:#f92672">.</span>get(oui, <span style="color:#e6db74">&#39;未知厂商&#39;</span>)
+</span></span></code></pre></div><h2 id="-知识小结">🎓 知识小结
+</h2><p>今天学习了：</p>
+<ol>
+<li>✅ MAC地址是网卡的物理地址，全球唯一</li>
+<li>✅ MAC地址工作在数据链路层</li>
+<li>✅ ARP协议用于IP地址到MAC地址的转换</li>
+<li>✅ ARP使用广播请求，单播响应</li>
+<li>✅ 系统会缓存ARP解析结果</li>
+</ol>
+<h3 id="重要概念">重要概念
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>概念</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>MAC地址</td>
+          <td>48位物理地址，固化在网卡</td>
+      </tr>
+      <tr>
+          <td>OUI</td>
+          <td>MAC地址前24位，厂商标识</td>
+      </tr>
+      <tr>
+          <td>ARP</td>
+          <td>地址解析协议，IP→MAC</td>
+      </tr>
+      <tr>
+          <td>ARP缓存</td>
+          <td>系统缓存的IP-MAC映射表</td>
+      </tr>
+      <tr>
+          <td>广播MAC</td>
+          <td>FF:FF:FF:FF:FF:FF</td>
+      </tr>
+  </tbody>
+</table></div>
+<h2 id="-练习题">💪 练习题
+</h2><h3 id="练习1查看本机信息">练习1：查看本机信息
+</h3><ol>
+<li>查看本机的MAC地址</li>
+<li>查看本机的ARP缓存</li>
+<li>找出路由器的MAC地址</li>
+</ol>
+<h3 id="练习2理解arp">练习2：理解ARP
+</h3><ol>
+<li>画出ARP请求和响应的完整过程</li>
+<li>解释为什么ARP请求使用广播</li>
+<li>ARP缓存的作用是什么？</li>
+</ol>
+<h3 id="练习3实践操作">练习3：实践操作
+</h3><ol>
+<li>清空ARP缓存</li>
+<li>Ping一个局域网内的设备</li>
+<li>再次查看ARP缓存，观察变化</li>
+</ol>
+<h3 id="练习4安全思考">练习4：安全思考
+</h3><ol>
+<li>什么是ARP欺骗（ARP Spoofing）？</li>
+<li>如何防范ARP攻击？</li>
+<li>为什么ARP协议不安全？</li>
+</ol>
+<hr>
+<p>💡 <strong>今日金句</strong>：MAC地址是网络世界的身份证！</p>
+<p>👉 <a class="link" href="day09.md" >上一天：子网划分实战</a> | <a class="link" href="../../README.md" >返回目录</a> | <a class="link" href="day11.md" >下一天：端口和Socket深入</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/9%E5%A4%A9%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86%E5%AE%9E%E6%88%98/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">9天：子网划分实战</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/8%E5%A4%A9ip%E5%9C%B0%E5%9D%80%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">8天：IP地址详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/7%E5%A4%A9wireshark%E6%8A%93%E5%8C%85%E5%85%A5%E9%97%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">7天：Wireshark抓包入门</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%B8%80%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">一周总结：网络基础入门</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/6%E5%A4%A9%E7%BD%91%E7%BB%9C%E5%91%BD%E4%BB%A4%E8%BF%9B%E9%98%B6-traceroute/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">6天：网络命令进阶 - traceroute</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

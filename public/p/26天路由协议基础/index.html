@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第26天：路由协议基础 今日目标 理解路由的基本概念 掌握路由表的结构和查找过程 学习静态路由配置 理解动态路由协议的分类 深入学习RIP协议 了解OSPF协议基础 实现路由表模拟器 1. 路由基础概念 1.1 什么是路由？ 路由 = Routing\n">
+<title>26天：路由协议基础</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/26%E5%A4%A9%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="26天：路由协议基础">
+<meta property='og:description' content="第26天：路由协议基础 今日目标 理解路由的基本概念 掌握路由表的结构和查找过程 学习静态路由配置 理解动态路由协议的分类 深入学习RIP协议 了解OSPF协议基础 实现路由表模拟器 1. 路由基础概念 1.1 什么是路由？ 路由 = Routing\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/26%E5%A4%A9%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:25:41&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:25:41&#43;00:00'/>
+<meta name="twitter:title" content="26天：路由协议基础">
+<meta name="twitter:description" content="第26天：路由协议基础 今日目标 理解路由的基本概念 掌握路由表的结构和查找过程 学习静态路由配置 理解动态路由协议的分类 深入学习RIP协议 了解OSPF协议基础 实现路由表模拟器 1. 路由基础概念 1.1 什么是路由？ 路由 = Routing\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-路由基础概念">1. 路由基础概念</a>
+      <ul>
+        <li><a href="#11-什么是路由">1.1 什么是路由？</a></li>
+        <li><a href="#12-路由vs交换">1.2 路由vs交换</a></li>
+        <li><a href="#13-直连路由vs间接路由">1.3 直连路由vs间接路由</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-路由表">2. 路由表</a>
+      <ul>
+        <li><a href="#21-路由表结构">2.1 路由表结构</a></li>
+        <li><a href="#22-查看路由表">2.2 查看路由表</a></li>
+        <li><a href="#23-路由查找过程">2.3 路由查找过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-静态路由">3. 静态路由</a>
+      <ul>
+        <li><a href="#31-静态路由配置">3.1 静态路由配置</a></li>
+        <li><a href="#32-静态路由的优缺点">3.2 静态路由的优缺点</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-动态路由协议">4. 动态路由协议</a>
+      <ul>
+        <li><a href="#41-动态路由概述">4.1 动态路由概述</a></li>
+        <li><a href="#42-动态路由协议分类">4.2 动态路由协议分类</a></li>
+        <li><a href="#43-路由度量metric">4.3 路由度量（Metric）</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-rip协议详解">5. RIP协议详解</a>
+      <ul>
+        <li><a href="#51-rip概述">5.1 RIP概述</a></li>
+        <li><a href="#52-rip工作原理">5.2 RIP工作原理</a></li>
+        <li><a href="#53-rip配置示例">5.3 RIP配置示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-ospf协议基础">6. OSPF协议基础</a>
+      <ul>
+        <li><a href="#61-ospf概述">6.1 OSPF概述</a></li>
+        <li><a href="#62-ospf工作原理">6.2 OSPF工作原理</a></li>
+        <li><a href="#63-ospf配置示例">6.3 OSPF配置示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-实战项目路由表模拟器">7. 实战项目：路由表模拟器</a>
+      <ul>
+        <li><a href="#71-项目需求">7.1 项目需求</a></li>
+        <li><a href="#72-工具演示">7.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1查看本机路由表">练习1：查看本机路由表</a></li>
+        <li><a href="#练习2静态路由实验">练习2：静态路由实验</a></li>
+        <li><a href="#练习3路由查找练习">练习3：路由查找练习</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-常见问题">9. 常见问题</a></li>
+    <li><a href="#10-总结">10. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#练习3答案">练习3答案</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/26%E5%A4%A9%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">26天：路由协议基础</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:25:41Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-路由基础概念">1. 路由基础概念</a>
+      <ul>
+        <li><a href="#11-什么是路由">1.1 什么是路由？</a></li>
+        <li><a href="#12-路由vs交换">1.2 路由vs交换</a></li>
+        <li><a href="#13-直连路由vs间接路由">1.3 直连路由vs间接路由</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-路由表">2. 路由表</a>
+      <ul>
+        <li><a href="#21-路由表结构">2.1 路由表结构</a></li>
+        <li><a href="#22-查看路由表">2.2 查看路由表</a></li>
+        <li><a href="#23-路由查找过程">2.3 路由查找过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-静态路由">3. 静态路由</a>
+      <ul>
+        <li><a href="#31-静态路由配置">3.1 静态路由配置</a></li>
+        <li><a href="#32-静态路由的优缺点">3.2 静态路由的优缺点</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-动态路由协议">4. 动态路由协议</a>
+      <ul>
+        <li><a href="#41-动态路由概述">4.1 动态路由概述</a></li>
+        <li><a href="#42-动态路由协议分类">4.2 动态路由协议分类</a></li>
+        <li><a href="#43-路由度量metric">4.3 路由度量（Metric）</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-rip协议详解">5. RIP协议详解</a>
+      <ul>
+        <li><a href="#51-rip概述">5.1 RIP概述</a></li>
+        <li><a href="#52-rip工作原理">5.2 RIP工作原理</a></li>
+        <li><a href="#53-rip配置示例">5.3 RIP配置示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-ospf协议基础">6. OSPF协议基础</a>
+      <ul>
+        <li><a href="#61-ospf概述">6.1 OSPF概述</a></li>
+        <li><a href="#62-ospf工作原理">6.2 OSPF工作原理</a></li>
+        <li><a href="#63-ospf配置示例">6.3 OSPF配置示例</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-实战项目路由表模拟器">7. 实战项目：路由表模拟器</a>
+      <ul>
+        <li><a href="#71-项目需求">7.1 项目需求</a></li>
+        <li><a href="#72-工具演示">7.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1查看本机路由表">练习1：查看本机路由表</a></li>
+        <li><a href="#练习2静态路由实验">练习2：静态路由实验</a></li>
+        <li><a href="#练习3路由查找练习">练习3：路由查找练习</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-常见问题">9. 常见问题</a></li>
+    <li><a href="#10-总结">10. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#练习3答案">练习3答案</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第26天路由协议基础">第26天：路由协议基础
+</h1><h2 id="今日目标">今日目标
+</h2><ul>
+<li>理解路由的基本概念</li>
+<li>掌握路由表的结构和查找过程</li>
+<li>学习静态路由配置</li>
+<li>理解动态路由协议的分类</li>
+<li>深入学习RIP协议</li>
+<li>了解OSPF协议基础</li>
+<li>实现路由表模拟器</li>
+</ul>
+<hr>
+<h2 id="1-路由基础概念">1. 路由基础概念
+</h2><h3 id="11-什么是路由">1.1 什么是路由？
+</h3><p><strong>路由 = Routing</strong></p>
+<pre tabindex="0"><code>路由的定义：
+确定数据包从源到目的地的传输路径
+
+生活比喻：
+路由就像导航系统
+
+场景：你要从北京到上海
+- 可以坐飞机（快，贵）
+- 可以坐高铁（较快，适中）
+- 可以开车（灵活，慢）
+
+路由器就是&#34;导航&#34;：
+- 分析目的地
+- 选择最佳路径
+- 指引数据包前进
+
+关键问题：
+1. 去哪里？→ 目标网络
+2. 怎么走？→ 下一跳
+3. 有几条路？→ 多条路径
+4. 哪条最好？→ 路由度量
+</code></pre><p><strong>路由器的作用</strong>：</p>
+<pre tabindex="0"><code>路由器 = Router
+
+功能：
+1. 路径选择
+   - 根据路由表选择最佳路径
+   - 转发数据包
+
+2. 连接不同网络
+   - 连接多个子网
+   - 隔离广播域
+
+3. 流量控制
+   - QoS（服务质量）
+   - 流量整形
+
+4. 安全防护
+   - 访问控制列表（ACL）
+   - 防火墙功能
+
+工作过程：
+┌──────────────────────────────────────┐
+│         路由器工作流程               │
+├──────────────────────────────────────┤
+│ 1. 接收数据包                        │
+│ 2. 检查目标IP地址                    │
+│ 3. 查找路由表                        │
+│ 4. 确定出口接口和下一跳              │
+│ 5. 修改以太网头部（源/目标MAC）      │
+│ 6. TTL减1                            │
+│ 7. 重新计算校验和                    │
+│ 8. 转发数据包                        │
+└──────────────────────────────────────┘
+
+示例：
+网络A: 192.168.1.0/24
+   ↓
+路由器R1
+   ↓
+网络B: 192.168.2.0/24
+
+主机A (192.168.1.10) → 主机B (192.168.2.20)
+1. A发送数据包，目标IP: 192.168.2.20
+2. A发现目标不在本地网络
+3. A发送给默认网关（路由器R1）
+4. R1接收，查路由表
+5. R1确定从接口2转发
+6. R1修改以太网头部，转发到网络B
+7. 主机B接收
+</code></pre><h3 id="12-路由vs交换">1.2 路由vs交换
+</h3><pre tabindex="0"><code>路由（Routing）vs 交换（Switching）
+
+┌──────────────┬────────────────┬────────────────┐
+│    特性      │     交换机     │    路由器      │
+├──────────────┼────────────────┼────────────────┤
+│ OSI层        │    第2层       │    第3层       │
+│ 工作地址     │   MAC地址      │   IP地址       │
+│ 转发依据     │   MAC地址表    │   路由表       │
+│ 广播域       │   不隔离       │   隔离         │
+│ 冲突域       │   隔离         │   隔离         │
+│ 主要功能     │   局域网连接   │   网络互连     │
+│ 转发速度     │   快           │   较慢         │
+│ 智能程度     │   低           │   高           │
+└──────────────┴────────────────┴────────────────┘
+
+交换机：
+- 在局域网内转发
+- 基于MAC地址
+- 维护MAC地址表
+- 不修改IP包
+
+路由器：
+- 在网络间转发
+- 基于IP地址
+- 维护路由表
+- 修改以太网头部
+- TTL减1
+
+三层交换机：
+- 结合交换和路由功能
+- 硬件转发，速度快
+- 适合大型局域网
+</code></pre><h3 id="13-直连路由vs间接路由">1.3 直连路由vs间接路由
+</h3><pre tabindex="0"><code>直连路由（Direct Routing）：
+目标网络直接连接在路由器接口上
+
+示例：
+路由器R1有两个接口：
+- eth0: 192.168.1.1/24
+- eth1: 192.168.2.1/24
+
+路由表自动包含：
+192.168.1.0/24 dev eth0
+192.168.2.0/24 dev eth1
+
+数据流向：
+192.168.1.10 → 192.168.1.20
+- 直接在同一网段
+- 不需要路由器（或路由器直接转发）
+
+间接路由（Indirect Routing）：
+目标网络需要通过其他路由器到达
+
+示例：
+网络拓扑：
+192.168.1.0/24 ← R1 ← 10.0.0.0/30 → R2 → 192.168.3.0/24
+
+R1的路由表：
+192.168.1.0/24 dev eth0 (直连)
+10.0.0.0/30 dev eth1 (直连)
+192.168.3.0/24 via 10.0.0.2 (间接，通过R2)
+
+数据流向：
+192.168.1.10 → 192.168.3.20
+1. 发送给R1（默认网关）
+2. R1查路由表：192.168.3.0/24 via 10.0.0.2
+3. R1转发给R2（下一跳）
+4. R2接收，直连192.168.3.0/24
+5. R2直接转发到目标主机
+
+下一跳（Next Hop）：
+- 到达目标网络的&#34;下一个&#34;路由器
+- 必须是直连的（能直接到达）
+</code></pre><hr>
+<h2 id="2-路由表">2. 路由表
+</h2><h3 id="21-路由表结构">2.1 路由表结构
+</h3><p><strong>路由表条目</strong>：</p>
+<pre tabindex="0"><code>路由表 = Routing Table
+
+每个条目包含：
+
+1. 目标网络（Destination）
+   - 目标网络地址
+   - 示例：192.168.1.0/24
+
+2. 子网掩码（Netmask）
+   - 确定网络部分
+   - 示例：255.255.255.0
+
+3. 下一跳/网关（Gateway/Next Hop）
+   - 下一个路由器的IP
+   - 直连则为0.0.0.0或接口
+   - 示例：192.168.2.1
+
+4. 接口（Interface）
+   - 出口网络接口
+   - 示例：eth0, eth1
+
+5. 度量（Metric）
+   - 路径的&#34;代价&#34;
+   - 数值越小越优
+   - 示例：跳数、带宽
+
+6. 标志（Flags）
+   - U: Up，路由有效
+   - G: Gateway，需要网关
+   - H: Host，主机路由
+   - D: Dynamic，动态路由
+   - M: Modified，被修改
+
+示例路由表：
+
+Destination     Gateway         Netmask         Flags  Metric  Interface
+0.0.0.0         192.168.1.1     0.0.0.0         UG     100     eth0
+192.168.1.0     0.0.0.0         255.255.255.0   U      0       eth0
+192.168.2.0     192.168.1.254   255.255.255.0   UG     10      eth0
+10.0.0.0        192.168.1.254   255.0.0.0       UG     20      eth0
+
+解释：
+第1行：默认路由（0.0.0.0/0）
+- 所有未匹配的流量走这里
+- 网关：192.168.1.1
+- 接口：eth0
+
+第2行：直连路由（192.168.1.0/24）
+- 本地网络
+- 无需网关（0.0.0.0）
+- 直接从eth0转发
+
+第3行：间接路由（192.168.2.0/24）
+- 通过网关192.168.1.254到达
+- 度量：10
+
+第4行：聚合路由（10.0.0.0/8）
+- 包含所有10.x.x.x网络
+- 度量：20
+</code></pre><h3 id="22-查看路由表">2.2 查看路由表
+</h3><p><strong>Linux/macOS</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Linux - 使用ip route</span>
+</span></span><span style="display:flex;"><span>ip route show
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>输出示例：
+</span></span><span style="display:flex;"><span>default via 192.168.1.1 dev eth0 proto dhcp metric <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10 metric <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>192.168.2.0/24 via 192.168.1.254 dev eth0 metric <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Linux - 使用route（老命令）</span>
+</span></span><span style="display:flex;"><span>route -n
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>输出示例：
+</span></span><span style="display:flex;"><span>Kernel IP routing table
+</span></span><span style="display:flex;"><span>Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+</span></span><span style="display:flex;"><span>0.0.0.0         192.168.1.1     0.0.0.0         UG    <span style="color:#ae81ff">100</span>    <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">0</span> eth0
+</span></span><span style="display:flex;"><span>192.168.1.0     0.0.0.0         255.255.255.0   U     <span style="color:#ae81ff">100</span>    <span style="color:#ae81ff">0</span>        <span style="color:#ae81ff">0</span> eth0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># macOS - 使用netstat</span>
+</span></span><span style="display:flex;"><span>netstat -rn
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>输出示例：
+</span></span><span style="display:flex;"><span>Routing tables
+</span></span><span style="display:flex;"><span>Internet:
+</span></span><span style="display:flex;"><span>Destination        Gateway            Flags        Netif Expire
+</span></span><span style="display:flex;"><span>default            192.168.1.1        UGSc           en0
+</span></span><span style="display:flex;"><span>192.168.1.0/24     link#4             UCS            en0
+</span></span></code></pre></div><p><strong>Windows</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span># 查看路由表
+</span></span><span style="display:flex;"><span>route print
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>输出示例：
+</span></span><span style="display:flex;"><span>===========================================================================
+</span></span><span style="display:flex;"><span>Interface List
+</span></span><span style="display:flex;"><span>  3...aa-bb-cc-dd-ee-ff ......Ethernet
+</span></span><span style="display:flex;"><span>===========================================================================
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>IPv4 Route Table
+</span></span><span style="display:flex;"><span>===========================================================================
+</span></span><span style="display:flex;"><span>Active Routes:
+</span></span><span style="display:flex;"><span>Network Destination        Netmask          Gateway       Interface  Metric
+</span></span><span style="display:flex;"><span>          0.0.0.0          0.0.0.0      192.168.1.1    192.168.1.10     25
+</span></span><span style="display:flex;"><span>        192.168.1.0    255.255.255.0         On-link     192.168.1.10    281
+</span></span><span style="display:flex;"><span>===========================================================================
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 添加路由
+</span></span><span style="display:flex;"><span>route add 192.168.2.0 mask 255.255.255.0 192.168.1.254
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 删除路由
+</span></span><span style="display:flex;"><span>route delete 192.168.2.0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 修改路由
+</span></span><span style="display:flex;"><span>route change 192.168.2.0 mask 255.255.255.0 192.168.1.253
+</span></span></code></pre></div><h3 id="23-路由查找过程">2.3 路由查找过程
+</h3><p><strong>最长前缀匹配（Longest Prefix Match）</strong>：</p>
+<pre tabindex="0"><code>路由查找算法：
+选择匹配前缀最长的路由
+
+为什么？
+更具体的路由优先于一般路由
+
+示例：
+路由表：
+1. 0.0.0.0/0          (默认路由)
+2. 10.0.0.0/8         (A类网络)
+3. 10.1.0.0/16        (更具体)
+4. 10.1.2.0/24        (最具体)
+5. 10.1.2.10/32       (主机路由)
+
+查询：10.1.2.10
+
+匹配过程：
+10.1.2.10 &amp; 0.0.0.0/0        = 0.0.0.0      ✅ 匹配（0位）
+10.1.2.10 &amp; 10.0.0.0/8       = 10.0.0.0     ✅ 匹配（8位）
+10.1.2.10 &amp; 10.1.0.0/16      = 10.1.0.0     ✅ 匹配（16位）
+10.1.2.10 &amp; 10.1.2.0/24      = 10.1.2.0     ✅ 匹配（24位）
+10.1.2.10 &amp; 10.1.2.10/32     = 10.1.2.10    ✅ 匹配（32位）
+
+结果：选择10.1.2.10/32（最长前缀）
+
+优先级：
+主机路由（/32）&gt; 子网路由（/24）&gt; 聚合路由（/16, /8）&gt; 默认路由（/0）
+
+实际例子：
+
+路由表：
+192.168.0.0/16 via R1
+192.168.1.0/24 via R2
+
+查询：192.168.1.100
+- 匹配192.168.0.0/16（16位前缀）
+- 匹配192.168.1.0/24（24位前缀）
+- 选择192.168.1.0/24（更长）→ via R2
+
+查询：192.168.2.100
+- 匹配192.168.0.0/16（16位前缀）
+- 不匹配192.168.1.0/24
+- 选择192.168.0.0/16 → via R1
+</code></pre><p><strong>查找流程</strong>：</p>
+<pre tabindex="0"><code>完整路由查找流程：
+
+1. 接收数据包
+   ↓
+2. 提取目标IP地址
+   ↓
+3. 查找路由表
+   a. 精确匹配（主机路由，/32）
+   b. 网络匹配（按前缀长度排序）
+   c. 默认路由（0.0.0.0/0）
+   ↓
+4. 找到匹配？
+   是 → 转发到下一跳
+   否 → 无法路由，丢弃包，发送ICMP目标不可达
+   ↓
+5. 确定出口接口
+   ↓
+6. 查ARP表获取下一跳MAC
+   ↓
+7. 封装以太网帧
+   ↓
+8. 转发
+
+多条匹配时：
+1. 最长前缀优先
+2. 前缀长度相同，比较度量（Metric）
+3. 度量相同，负载均衡（ECMP）
+</code></pre><hr>
+<h2 id="3-静态路由">3. 静态路由
+</h2><h3 id="31-静态路由配置">3.1 静态路由配置
+</h3><p><strong>Linux</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 添加静态路由</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 格式：ip route add &lt;目标网络&gt; via &lt;网关&gt; dev &lt;接口&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 添加网络路由</span>
+</span></span><span style="display:flex;"><span>sudo ip route add 192.168.2.0/24 via 192.168.1.254 dev eth0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 添加主机路由</span>
+</span></span><span style="display:flex;"><span>sudo ip route add 10.1.1.100/32 via 192.168.1.254
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 添加默认路由</span>
+</span></span><span style="display:flex;"><span>sudo ip route add default via 192.168.1.1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 删除路由</span>
+</span></span><span style="display:flex;"><span>sudo ip route del 192.168.2.0/24
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 修改路由</span>
+</span></span><span style="display:flex;"><span>sudo ip route replace 192.168.2.0/24 via 192.168.1.253 dev eth0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 持久化配置（Ubuntu/Debian）</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 编辑 /etc/network/interfaces</span>
+</span></span><span style="display:flex;"><span>auto eth0
+</span></span><span style="display:flex;"><span>iface eth0 inet static
+</span></span><span style="display:flex;"><span>    address 192.168.1.10
+</span></span><span style="display:flex;"><span>    netmask 255.255.255.0
+</span></span><span style="display:flex;"><span>    gateway 192.168.1.1
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 添加静态路由</span>
+</span></span><span style="display:flex;"><span>    up ip route add 192.168.2.0/24 via 192.168.1.254 dev eth0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 持久化配置（CentOS/RHEL）</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建 /etc/sysconfig/network-scripts/route-eth0</span>
+</span></span><span style="display:flex;"><span>192.168.2.0/24 via 192.168.1.254 dev eth0
+</span></span></code></pre></div><p><strong>Windows</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span># 添加静态路由
+</span></span><span style="display:flex;"><span>route add 192.168.2.0 mask 255.255.255.0 192.168.1.254
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 添加持久路由（-p参数）
+</span></span><span style="display:flex;"><span>route add -p 192.168.2.0 mask 255.255.255.0 192.168.1.254
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 删除路由
+</span></span><span style="display:flex;"><span>route delete 192.168.2.0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 修改路由
+</span></span><span style="display:flex;"><span>route change 192.168.2.0 mask 255.255.255.0 192.168.1.253
+</span></span></code></pre></div><p><strong>Cisco路由器</strong>：</p>
+<pre tabindex="0"><code># 进入配置模式
+Router&gt; enable
+Router# configure terminal
+
+# 添加静态路由
+Router(config)# ip route &lt;目标网络&gt; &lt;子网掩码&gt; &lt;下一跳或接口&gt;
+
+# 示例
+Router(config)# ip route 192.168.2.0 255.255.255.0 192.168.1.254
+Router(config)# ip route 192.168.2.0 255.255.255.0 GigabitEthernet0/1
+
+# 添加默认路由
+Router(config)# ip route 0.0.0.0 0.0.0.0 192.168.1.1
+
+# 查看路由表
+Router# show ip route
+
+Codes: C - connected, S - static, R - RIP, O - OSPF
+       * - candidate default
+
+Gateway of last resort is 192.168.1.1 to network 0.0.0.0
+
+C    192.168.1.0/24 is directly connected, GigabitEthernet0/0
+C    192.168.3.0/24 is directly connected, GigabitEthernet0/1
+S    192.168.2.0/24 [1/0] via 192.168.1.254
+S*   0.0.0.0/0 [1/0] via 192.168.1.1
+</code></pre><h3 id="32-静态路由的优缺点">3.2 静态路由的优缺点
+</h3><pre tabindex="0"><code>优点：
+✅ 配置简单
+✅ 无需协议开销
+✅ 不占用CPU和带宽
+✅ 安全（不会被欺骗）
+✅ 可预测（路径固定）
+✅ 适合小型网络
+
+缺点：
+❌ 不能自动适应网络变化
+❌ 链路故障无法自动切换
+❌ 大型网络配置繁琐
+❌ 人工配置容易出错
+❌ 维护成本高
+❌ 扩展性差
+
+使用场景：
+✅ 小型网络（&lt;10个路由器）
+✅ 简单拓扑
+✅ 末端网络（Stub Network）
+✅ 默认路由
+✅ 特定安全需求
+✅ 实验和测试环境
+</code></pre><hr>
+<h2 id="4-动态路由协议">4. 动态路由协议
+</h2><h3 id="41-动态路由概述">4.1 动态路由概述
+</h3><pre tabindex="0"><code>动态路由 = Dynamic Routing
+
+特点：
+- 路由器自动学习路由
+- 自动适应网络变化
+- 链路故障自动切换
+- 路由器之间交换信息
+
+工作原理：
+1. 路由器启动
+2. 发现邻居路由器
+3. 交换路由信息
+4. 计算最佳路径
+5. 更新路由表
+6. 定期更新或事件触发更新
+
+优点：
+✅ 自动学习路由
+✅ 自动适应变化
+✅ 链路冗余和负载均衡
+✅ 适合大型网络
+✅ 减少人工配置
+
+缺点：
+❌ 占用带宽（协议报文）
+❌ 占用CPU（路由计算）
+❌ 占用内存（路由表）
+❌ 配置复杂
+❌ 收敛时间（网络变化到稳定的时间）
+❌ 可能被攻击
+
+何时使用？
+- 大型网络
+- 复杂拓扑
+- 需要自动故障恢复
+- 网络经常变化
+</code></pre><h3 id="42-动态路由协议分类">4.2 动态路由协议分类
+</h3><p><strong>按工作范围分类</strong>：</p>
+<pre tabindex="0"><code>1. IGP（Interior Gateway Protocol）
+   内部网关协议
+   - 在自治系统（AS）内使用
+   - 示例：RIP, OSPF, IS-IS, EIGRP
+
+2. EGP（Exterior Gateway Protocol）
+   外部网关协议
+   - 在自治系统之间使用
+   - 示例：BGP
+
+自治系统（AS）：
+- 由单一组织管理的网络集合
+- 有统一的路由策略
+- 分配唯一的AS号
+- 示例：
+  - AS 4134：中国电信
+  - AS 15169：Google
+  - AS 32934：Facebook
+
+┌─────────────────────────────────────────┐
+│          互联网                         │
+├──────────────┬──────────────┬───────────┤
+│   AS 100     │   AS 200     │  AS 300   │
+│   (公司A)    │   (公司B)    │  (ISP)    │
+├──────────────┼──────────────┼───────────┤
+│  内部使用    │  内部使用    │ 内部使用  │
+│  OSPF (IGP)  │  RIP (IGP)   │ OSPF (IGP)│
+├──────────────┴──────────────┴───────────┤
+│        AS之间使用BGP (EGP)              │
+└─────────────────────────────────────────┘
+</code></pre><p><strong>按算法分类</strong>：</p>
+<pre tabindex="0"><code>1. 距离矢量（Distance Vector）
+   - 基于Bellman-Ford算法
+   - 只知道方向和距离
+   - 定期广播整个路由表
+   - 收敛慢
+   - 协议：RIP, IGRP
+
+   特点：
+   - &#34;谣言路由&#34;
+   - 路由器只从邻居学习
+   - 不知道完整拓扑
+
+   比喻：
+   问路：&#34;去火车站怎么走？&#34;
+   答：&#34;我不知道在哪，但往前走3个路口，问那边的人&#34;
+
+2. 链路状态（Link State）
+   - 基于Dijkstra算法（SPF）
+   - 知道整个网络拓扑
+   - 只传播链路状态变化
+   - 收敛快
+   - 协议：OSPF, IS-IS
+
+   特点：
+   - 每个路由器有完整拓扑图
+   - 独立计算最短路径
+   - 更准确，更快
+
+   比喻：
+   有一张完整地图，自己计算最短路径
+
+3. 混合型（Hybrid）
+   - 结合两者优点
+   - 协议：EIGRP（Cisco专有）
+
+对比：
+┌──────────────┬────────────────┬────────────────┐
+│    特性      │   距离矢量     │    链路状态    │
+├──────────────┼────────────────┼────────────────┤
+│ 拓扑知识     │   部分（邻居） │   完整         │
+│ 路由计算     │   分布式       │   独立         │
+│ 更新方式     │   整个路由表   │   链路状态变化 │
+│ 收敛速度     │   慢           │   快           │
+│ CPU占用      │   低           │   高           │
+│ 内存占用     │   低           │   高           │
+│ 带宽占用     │   高（定期）   │   低（变化时） │
+│ 扩展性       │   差           │   好           │
+└──────────────┴────────────────┴────────────────┘
+</code></pre><h3 id="43-路由度量metric">4.3 路由度量（Metric）
+</h3><pre tabindex="0"><code>度量 = Metric = 路由的&#34;代价&#34;
+
+作用：
+- 评估路径的优劣
+- 选择最佳路径
+- 数值越小越好
+
+常见度量类型：
+
+1. 跳数（Hop Count）
+   - 经过的路由器数量
+   - RIP使用
+   - 简单但不准确
+   - 最大15跳
+
+   示例：
+   路径1: A → B → C → D (3跳)
+   路径2: A → E → D (2跳，选择此路径)
+   但路径2可能是慢速链路！
+
+2. 带宽（Bandwidth）
+   - 链路速度
+   - OSPF默认使用
+   - Cost = 10^8 / 带宽(bps)
+
+   示例：
+   100Mbps链路：Cost = 10^8 / 10^8 = 1
+   10Mbps链路：Cost = 10^8 / 10^7 = 10
+   1Mbps链路：Cost = 10^8 / 10^6 = 100
+
+3. 延迟（Delay）
+   - 传输时间
+   - EIGRP考虑
+   - 单位：微秒
+
+4. 负载（Load）
+   - 链路利用率
+   - EIGRP考虑
+
+5. 可靠性（Reliability）
+   - 链路质量
+   - 丢包率
+   - EIGRP考虑
+
+6. MTU（最大传输单元）
+   - EIGRP考虑
+
+复合度量：
+EIGRP度量 = [K1×带宽 + (K2×带宽)/(256-负载) + K3×延迟] × [K5/(可靠性+K4)]
+
+默认：K1=K3=1, K2=K4=K5=0
+简化为：度量 = 带宽 + 延迟
+</code></pre><hr>
+<h2 id="5-rip协议详解">5. RIP协议详解
+</h2><h3 id="51-rip概述">5.1 RIP概述
+</h3><pre tabindex="0"><code>RIP = Routing Information Protocol
+路由信息协议
+
+版本：
+- RIP v1（1988）：有类路由，不支持VLSM
+- RIP v2（1993）：无类路由，支持VLSM，支持认证
+- RIPng：IPv6版本
+
+特点：
+- 距离矢量协议
+- 度量：跳数
+- 最大跳数：15（16表示不可达）
+- 更新周期：30秒
+- 失效时间：180秒
+- 刷新时间：240秒
+- 端口：UDP 520
+- 管理距离：120
+
+适用场景：
+✅ 小型网络
+✅ 简单拓扑
+✅ 兼容性要求高
+✅ 设备性能有限
+
+不适用场景：
+❌ 大型网络（&gt;15跳）
+❌ 需要快速收敛
+❌ 复杂拓扑
+❌ 需要精确控制
+</code></pre><h3 id="52-rip工作原理">5.2 RIP工作原理
+</h3><p><strong>路由更新</strong>：</p>
+<pre tabindex="0"><code>RIP更新机制：
+
+1. 定期更新（每30秒）
+   - 路由器广播整个路由表
+   - 地址：
+     * RIPv1: 255.255.255.255（广播）
+     * RIPv2: 224.0.0.9（组播）
+
+2. 触发更新
+   - 路由变化时立即发送
+   - 防止路由环路
+
+3. 邻居发现
+   - 通过接收更新发现邻居
+   - 没有Hello机制
+
+路由表项包含：
+- 目标网络
+- 度量（跳数）
+- 下一跳
+- 超时定时器
+
+示例：
+
+路由器R1连接：
+- 网络A: 192.168.1.0/24（直连，度量0）
+- 网络B: 192.168.2.0/24（直连，度量0）
+
+R1广播更新给邻居R2：
+Network         Metric
+192.168.1.0/24    1      (度量+1)
+192.168.2.0/24    1      (度量+1)
+
+R2接收并更新路由表：
+Network         Next Hop    Metric
+192.168.1.0/24  R1          1
+192.168.2.0/24  R1          1
+192.168.3.0/24  直连        0
+
+R2再广播给R3...
+</code></pre><p><strong>防环机制</strong>：</p>
+<pre tabindex="0"><code>RIP防环机制：
+
+问题：距离矢量协议容易产生路由环路
+
+示例：
+R1 ← → R2 ← → R3
+ ↓
+网络A
+
+正常情况：
+R1: 网络A, 度量0（直连）
+R2: 网络A via R1, 度量1
+R3: 网络A via R2, 度量2
+
+R1-网络A链路断开：
+R1: 网络A不可达
+R2: 还记录着网络A via R1, 度量1（未更新）
+R1收到R2的更新：认为可以通过R2到达网络A, 度量2
+R2收到R1的更新：更新为度量3
+...无限计数！
+
+防环机制：
+
+1. 最大跳数（Maximum Hop Count）
+   - 16表示不可达
+   - 限制无限计数
+   - 但限制了网络规模
+
+2. 水平分割（Split Horizon）
+   - 不向接收路由的接口发回该路由
+   - 示例：
+     R1从R2学到网络A
+     R1不会向R2通告网络A
+
+3. 毒性逆转（Poison Reverse）
+   - 向源接口通告不可达（度量16）
+   - 比水平分割更积极
+   - 示例：
+     R1从R2学到网络A
+     R1向R2通告：网络A度量16（不可达）
+
+4. 抑制定时器（Holddown Timer）
+   - 路由失效后，在一定时间内不接受更新
+   - 防止错误路由信息
+   - 典型：180秒
+
+5. 触发更新（Triggered Update）
+   - 路由变化立即发送
+   - 加快收敛
+</code></pre><h3 id="53-rip配置示例">5.3 RIP配置示例
+</h3><p><strong>Cisco路由器</strong>：</p>
+<pre tabindex="0"><code># 启用RIP
+Router(config)# router rip
+
+# 指定版本
+Router(config-router)# version 2
+
+# 通告网络（有类网络）
+Router(config-router)# network 192.168.1.0
+Router(config-router)# network 192.168.2.0
+
+# 关闭自动汇总（RIPv2）
+Router(config-router)# no auto-summary
+
+# 配置被动接口（不发送更新）
+Router(config-router)# passive-interface GigabitEthernet0/0
+
+# 配置默认路由传播
+Router(config-router)# default-information originate
+
+# 查看RIP配置
+Router# show ip protocols
+
+# 查看RIP数据库
+Router# show ip rip database
+
+# 调试RIP
+Router# debug ip rip
+</code></pre><p><strong>Linux（Quagga/FRRouting）</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 安装Quagga</span>
+</span></span><span style="display:flex;"><span>sudo apt-get install quagga
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 配置RIP</span>
+</span></span><span style="display:flex;"><span>sudo vtysh
+</span></span><span style="display:flex;"><span>configure terminal
+</span></span><span style="display:flex;"><span>router rip
+</span></span><span style="display:flex;"><span>  version <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  network 192.168.1.0/24
+</span></span><span style="display:flex;"><span>  network 192.168.2.0/24
+</span></span><span style="display:flex;"><span>  exit
+</span></span><span style="display:flex;"><span>exit
+</span></span><span style="display:flex;"><span>write memory
+</span></span></code></pre></div><hr>
+<h2 id="6-ospf协议基础">6. OSPF协议基础
+</h2><h3 id="61-ospf概述">6.1 OSPF概述
+</h3><pre tabindex="0"><code>OSPF = Open Shortest Path First
+开放最短路径优先
+
+特点：
+- 链路状态协议
+- 基于Dijkstra算法（SPF）
+- 度量：Cost（基于带宽）
+- 支持VLSM和CIDR
+- 快速收敛
+- 分层设计（区域）
+- 支持认证
+- 协议：IP协议89
+- 管理距离：110
+
+版本：
+- OSPFv2：IPv4
+- OSPFv3：IPv6
+
+优点：
+✅ 快速收敛
+✅ 无环路
+✅ 支持大型网络
+✅ 精确度量（带宽）
+✅ 分层设计
+✅ 负载均衡
+
+缺点：
+❌ 配置复杂
+❌ 占用CPU和内存
+❌ 需要规划区域
+</code></pre><h3 id="62-ospf工作原理">6.2 OSPF工作原理
+</h3><p><strong>邻居关系</strong>：</p>
+<pre tabindex="0"><code>OSPF邻居建立过程：
+
+1. Down状态
+   - 初始状态
+   - 未发送Hello
+
+2. Init状态
+   - 发送Hello包
+   - 尚未收到邻居的Hello
+
+3. 2-Way状态
+   - 收到对方Hello
+   - 看到自己的Router ID
+   - 邻居关系建立
+   - 选举DR/BDR（如果在多路访问网络）
+
+4. ExStart状态
+   - 决定主从关系
+   - Router ID大的为主
+
+5. Exchange状态
+   - 交换数据库描述（DBD）
+   - 描述链路状态数据库
+
+6. Loading状态
+   - 请求完整LSA
+   - 发送LSR（链路状态请求）
+   - 接收LSU（链路状态更新）
+
+7. Full状态
+   - 数据库同步完成
+   - 邻接关系建立
+   - 可以转发流量
+
+Hello包内容：
+- Router ID
+- Area ID
+- 认证信息
+- Hello间隔
+- Dead间隔
+- 优先级
+- DR和BDR
+- 邻居列表
+
+Hello间隔：
+- 默认10秒（点对点、广播）
+- 30秒（NBMA）
+
+Dead间隔：
+- 默认40秒（4倍Hello）
+</code></pre><p><strong>区域概念</strong>：</p>
+<pre tabindex="0"><code>OSPF区域设计：
+
+为什么需要区域？
+- 减少LSA泛洪
+- 减小路由表
+- 加快收敛
+- 隔离故障
+
+区域类型：
+
+1. 骨干区域（Area 0）
+   - 所有区域必须连接到Area 0
+   - 核心区域
+   - 不能分割
+
+2. 常规区域（Regular Area）
+   - 标准OSPF区域
+   - 接收所有LSA类型
+
+3. 末端区域（Stub Area）
+   - 不接收外部LSA（Type 5）
+   - 使用默认路由
+   - 减少路由表
+
+4. 完全末端区域（Totally Stub Area）
+   - 只有默认路由和区域内路由
+   - Cisco专有
+
+5. NSSA（Not-So-Stubby Area）
+   - 类似Stub，但允许注入外部路由（Type 7）
+
+拓扑示例：
+         ┌──────────────┐
+         │   Area 0     │
+         │   (骨干)     │
+         └───┬──────┬───┘
+             │      │
+      ┌──────┴──┐ ┌─┴──────┐
+      │ Area 1  │ │ Area 2 │
+      └─────────┘ └────────┘
+
+路由器类型：
+- 内部路由器（IR）：所有接口在同一区域
+- 骨干路由器（BR）：至少一个接口在Area 0
+- 区域边界路由器（ABR）：连接多个区域
+- 自治系统边界路由器（ASBR）：连接其他AS
+</code></pre><h3 id="63-ospf配置示例">6.3 OSPF配置示例
+</h3><p><strong>Cisco路由器</strong>：</p>
+<pre tabindex="0"><code># 启用OSPF（进程号100）
+Router(config)# router ospf 100
+
+# 设置Router ID
+Router(config-router)# router-id 1.1.1.1
+
+# 通告网络（精确匹配）
+Router(config-router)# network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)# network 192.168.2.0 0.0.0.255 area 1
+
+# 配置被动接口
+Router(config-router)# passive-interface GigabitEthernet0/0
+
+# 修改Cost
+Router(config)# interface GigabitEthernet0/1
+Router(config-if)# ip ospf cost 10
+
+# 修改Hello间隔
+Router(config-if)# ip ospf hello-interval 5
+Router(config-if)# ip ospf dead-interval 20
+
+# 查看OSPF邻居
+Router# show ip ospf neighbor
+
+# 查看OSPF数据库
+Router# show ip ospf database
+
+# 查看OSPF接口
+Router# show ip ospf interface
+
+# 查看OSPF路由
+Router# show ip route ospf
+</code></pre><hr>
+<h2 id="7-实战项目路由表模拟器">7. 实战项目：路由表模拟器
+</h2><h3 id="71-项目需求">7.1 项目需求
+</h3><pre tabindex="0"><code>功能需求：
+1. 路由表管理
+   - 添加/删除路由
+   - 查看路由表
+   - 导入/导出
+
+2. 路由查找
+   - 最长前缀匹配
+   - 查找路径
+   - 性能测试
+
+3. 路由协议模拟
+   - 静态路由
+   - 简单RIP模拟
+   - 路由收敛演示
+
+4. 可视化
+   - 路由表显示
+   - 查找过程展示
+   - 网络拓扑图
+
+技术要求：
+- Python实现
+- 支持IPv4/IPv6
+- 命令行界面
+- 友好的输出
+</code></pre><h3 id="72-工具演示">7.2 工具演示
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 路由表管理</span>
+</span></span><span style="display:flex;"><span>python day26_routing_sim.py --add 192.168.2.0/24 --via 192.168.1.254
+</span></span><span style="display:flex;"><span>python day26_routing_sim.py --show
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 路由查找</span>
+</span></span><span style="display:flex;"><span>python day26_routing_sim.py --lookup 192.168.2.100
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># RIP模拟</span>
+</span></span><span style="display:flex;"><span>python day26_routing_sim.py --simulate-rip
+</span></span></code></pre></div><hr>
+<h2 id="8-今日练习">8. 今日练习
+</h2><h3 id="练习1查看本机路由表">练习1：查看本机路由表
+</h3><pre tabindex="0"><code>1. Linux/macOS:
+   ip route show
+   或
+   netstat -rn
+
+   分析：
+   - 有多少条路由？
+   - 默认网关是什么？
+   - 有直连路由吗？
+
+2. Windows:
+   route print
+
+   分析：
+   - 默认路由的度量是多少？
+   - 有多个网卡吗？
+</code></pre><h3 id="练习2静态路由实验">练习2：静态路由实验
+</h3><pre tabindex="0"><code>虚拟机实验：
+
+拓扑：
+VM1 (192.168.1.10) ← → VM2 (192.168.1.1/192.168.2.1) ← → VM3 (192.168.2.10)
+
+步骤：
+1. 配置VM2为路由器（启用IP转发）
+   sudo sysctl -w net.ipv4.ip_forward=1
+
+2. VM1添加到192.168.2.0/24的路由
+   sudo ip route add 192.168.2.0/24 via 192.168.1.1
+
+3. VM3添加到192.168.1.0/24的路由
+   sudo ip route add 192.168.1.0/24 via 192.168.2.1
+
+4. 测试连通性
+   从VM1 ping VM3
+
+5. 查看数据包路径
+   traceroute从VM1到VM3
+</code></pre><h3 id="练习3路由查找练习">练习3：路由查找练习
+</h3><pre tabindex="0"><code>给定路由表：
+1. 0.0.0.0/0 via 192.168.1.1
+2. 10.0.0.0/8 via 192.168.1.2
+3. 10.1.0.0/16 via 192.168.1.3
+4. 10.1.2.0/24 via 192.168.1.4
+5. 192.168.0.0/16 via 192.168.1.5
+
+查找以下目标IP的路由：
+1. 10.1.2.100 → ?
+2. 10.1.3.100 → ?
+3. 10.2.1.100 → ?
+4. 192.168.100.1 → ?
+5. 8.8.8.8 → ?
+
+（答案见文末）
+</code></pre><hr>
+<h2 id="9-常见问题">9. 常见问题
+</h2><p><strong>Q1：静态路由和动态路由能同时使用吗？</strong></p>
+<p>A：
+可以！实际网络常常混合使用</p>
+<ul>
+<li>默认路由：静态</li>
+<li>内部网络：动态（OSPF）</li>
+<li>特定路由：静态</li>
+</ul>
+<p>管理距离决定优先级：</p>
+<ul>
+<li>直连：0</li>
+<li>静态：1</li>
+<li>OSPF：110</li>
+<li>RIP：120</li>
+</ul>
+<p><strong>Q2：路由环路怎么检测？</strong></p>
+<p>A：</p>
+<ul>
+<li>TTL：每经过路由器减1，为0丢弃</li>
+<li>Traceroute：显示路径，可见环路</li>
+<li>路由协议防环机制</li>
+</ul>
+<p><strong>Q3：为什么需要默认路由？</strong></p>
+<p>A：</p>
+<ul>
+<li>不可能配置所有路由</li>
+<li>互联网上几十万条路由</li>
+<li>默认路由：匹配所有</li>
+<li>通常指向ISP</li>
+</ul>
+<p><strong>Q4：RIP和OSPF如何选择？</strong></p>
+<p>A：
+小型网络（&lt;15跳）：RIP</p>
+<ul>
+<li>配置简单</li>
+<li>资源占用低</li>
+</ul>
+<p>大型网络：OSPF</p>
+<ul>
+<li>快速收敛</li>
+<li>无跳数限制</li>
+<li>更精确</li>
+</ul>
+<p><strong>Q5：什么是管理距离？</strong></p>
+<p>A：
+管理距离（AD）= 路由信息的可信度</p>
+<ul>
+<li>值越小越可信</li>
+<li>用于选择路由来源</li>
+</ul>
+<p>常见AD：</p>
+<ul>
+<li>直连：0</li>
+<li>静态：1</li>
+<li>EIGRP：90</li>
+<li>OSPF：110</li>
+<li>RIP：120</li>
+<li>外部：255（不可信）</li>
+</ul>
+<hr>
+<h2 id="10-总结">10. 总结
+</h2><p>今天我们学习了：</p>
+<h3 id="核心知识点">核心知识点
+</h3><ol>
+<li>
+<p><strong>路由基础</strong>：</p>
+<ul>
+<li>路由的作用和原理</li>
+<li>直连路由vs间接路由</li>
+<li>下一跳概念</li>
+</ul>
+</li>
+<li>
+<p><strong>路由表</strong>：</p>
+<ul>
+<li>路由表结构</li>
+<li>最长前缀匹配</li>
+<li>路由查找过程</li>
+</ul>
+</li>
+<li>
+<p><strong>静态路由</strong>：</p>
+<ul>
+<li>配置方法</li>
+<li>优缺点</li>
+<li>使用场景</li>
+</ul>
+</li>
+<li>
+<p><strong>动态路由分类</strong>：</p>
+<ul>
+<li>IGP vs EGP</li>
+<li>距离矢量 vs 链路状态</li>
+<li>路由度量</li>
+</ul>
+</li>
+<li>
+<p><strong>RIP协议</strong>：</p>
+<ul>
+<li>距离矢量协议</li>
+<li>跳数度量</li>
+<li>防环机制</li>
+<li>配置方法</li>
+</ul>
+</li>
+<li>
+<p><strong>OSPF基础</strong>：</p>
+<ul>
+<li>链路状态协议</li>
+<li>区域设计</li>
+<li>邻居关系</li>
+<li>快速收敛</li>
+</ul>
+</li>
+</ol>
+<h3 id="重点回顾">重点回顾
+</h3><pre tabindex="0"><code>路由查找：
+最长前缀匹配 → 主机路由优先 → 网络路由 → 默认路由
+
+动态路由分类：
+距离矢量（RIP）：简单，慢，适合小网络
+链路状态（OSPF）：复杂，快，适合大网络
+
+RIP防环：
+- 最大跳数（15）
+- 水平分割
+- 毒性逆转
+- 抑制定时器
+- 触发更新
+
+OSPF特点：
+- 快速收敛
+- 区域设计
+- Cost度量
+- LSA泛洪
+</code></pre><h3 id="练习3答案">练习3答案
+</h3><pre tabindex="0"><code>1. 10.1.2.100 → via 192.168.1.4（/24最长）
+2. 10.1.3.100 → via 192.168.1.3（/16）
+3. 10.2.1.100 → via 192.168.1.2（/8）
+4. 192.168.100.1 → via 192.168.1.5（/16）
+5. 8.8.8.8 → via 192.168.1.1（默认路由）
+</code></pre><h3 id="明天预告">明天预告
+</h3><p><strong>第27天：第四周综合实战</strong></p>
+<p>内容预览：</p>
+<ul>
+<li>网络层知识回顾</li>
+<li>综合实战项目</li>
+<li>网络排错案例</li>
+<li>性能优化</li>
+<li>周总结</li>
+</ul>
+<hr>
+<p><strong>继续加油！</strong> 🚀</p>
+<p>今天我们深入学习了路由协议，理解了网络层最核心的概念之一。从静态路由到动态路由，从RIP到OSPF，这些都是网络工程师必备的知识。明天我们将进行第四周的综合实战，巩固本周所学！</p>
+<p><strong>进度：26/180天（14.4%）</strong></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/25%E5%A4%A9arp%E5%8D%8F%E8%AE%AE%E5%92%8C%E9%93%BE%E8%B7%AF%E5%B1%82/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">25天：ARP协议和链路层</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/24%E5%A4%A9icmp%E5%92%8C%E7%BD%91%E7%BB%9C%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">24天：ICMP和网络诊断工具</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/23%E5%A4%A9ipv6%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">23天：IPv6详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/22%E5%A4%A9ip%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">22天：IP协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/21%E5%A4%A9%E7%AC%AC%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AE%9E%E6%88%98/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">21天：第三周总结与实战</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

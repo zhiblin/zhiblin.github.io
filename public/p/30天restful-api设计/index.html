@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第30天：RESTful API设计 &ldquo;好的API设计就像好的用户界面，让使用者感到直观和愉悦！&rdquo;\n📚 今日目标 理解REST架构风格 掌握RESTful API设计原则 学习HTTP方法的正确使用 理解资源和URI设计 掌握API版本控制和错误处理 实现一个简单的RESTful API 1. REST基础概念 1.1 什么是REST？ REST (Representational State Transfer) 表述性状态转移 核心思想： - 资源（Resource）为中心 - 使用标准HTTP方法 - 无状态通信 - 统一接口 REST不是协议，而是一种架构风格 类比： REST API = 图书馆管理系统 - 资源 = 书籍 - URI = 书籍编号 - HTTP方法 = 操作（借、还、查、删） - 状态码 = 操作结果（成功、失败、未找到） 例如： GET /books/123 → 查询123号书 POST /books → 新增一本书 PUT /books/123 → 更新123号书 DELETE /books/123 → 删除123号书 1.2 REST的六大约束 1. 客户端-服务器分离 (Client-Server) - 客户端和服务器独立演化 - 前后端分离 2. 无状态 (Stateless) - 每个请求包含所有必要信息 - 服务器不保存客户端状态 - 易于扩展和负载均衡 3. 可缓存 (Cacheable) - 响应可以被缓存 - 提高性能 4. 分层系统 (Layered System) - 客户端不知道直接连接的是服务器还是中间层 - 可以加入负载均衡、缓存等 5. 统一接口 (Uniform Interface) - 资源标识（URI） - 通过表述操作资源 - 自描述消息 - 超媒体驱动（HATEOAS） 6. 按需代码（可选）(Code on Demand) - 服务器可以返回可执行代码 - 如JavaScript 2. RESTful API设计原则 2.1 资源和URI设计 资源设计原则： 1. 使用名词，不使用动词 ✅ 好的设计: GET /users # 获取用户列表 GET /users/123 # 获取ID为123的用户 POST /users # 创建新用户 ❌ 不好的设计: GET /getUsers POST /createUser GET /user/delete/123 2. 使用复数形式 ✅ 好: /users, /products, /orders ❌ 差: /user, /product, /order 3. 使用小写字母和连字符 ✅ 好: /user-profiles, /product-categories ❌ 差: /UserProfiles, /product_categories 4. 资源嵌套表示关系 ✅ 好: /users/123/orders # 用户123的订单 /orders/456/items # 订单456的商品 但不要嵌套太深（最多2-3层） ❌ 差: /users/123/orders/456/items/789/reviews 5. 使用查询参数进行过滤、排序、分页 /users?role=admin # 过滤 /users?sort=created_at&amp;order=desc # 排序 /users?page=2&amp;limit=20 # 分页 /users?fields=id,name,email # 字段选择 2.2 HTTP方法使用 标准HTTP方法及其用途： ┌────────┬──────────┬─────────┬─────────┬──────────┐ │ 方法 │ 用途 │ 安全性 │ 幂等性 │ 可缓存 │ ├────────┼──────────┼─────────┼─────────┼──────────┤ │ GET │ 获取资源 │ 是 │ 是 │ 是 │ │ POST │ 创建资源 │ 否 │ 否 │ 否 │ │ PUT │ 更新资源 │ 否 │ 是 │ 否 │ │ PATCH │ 部分更新 │ 否 │ 否 │ 否 │ │ DELETE │ 删除资源 │ 否 │ 是 │ 否 │ │ HEAD │ 获取头部 │ 是 │ 是 │ 是 │ │ OPTIONS│ 获取选项 │ 是 │ 是 │ 否 │ └────────┴──────────┴─────────┴─────────┴──────────┘ 详细说明： GET - 获取资源 GET /users → 获取所有用户 GET /users/123 → 获取ID为123的用户 特点：安全、幂等、可缓存 POST - 创建新资源 POST /users Body: {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;} 特点：不安全、不幂等 PUT - 完整更新资源 PUT /users/123 Body: {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;new@example.com&#34;, &#34;age&#34;: 30} 特点：幂等（多次执行结果相同） 要求：必须提供完整的资源数据 PATCH - 部分更新资源 PATCH /users/123 Body: {&#34;email&#34;: &#34;new@example.com&#34;} 特点：只更新提供的字段 更灵活，推荐使用 DELETE - 删除资源 DELETE /users/123 特点：幂等（删除多次结果相同） HEAD - 获取资源元数据 HEAD /users/123 返回：只返回响应头，不返回响应体 用途：检查资源是否存在、获取资源大小等 OPTIONS - 获取资源支持的方法 OPTIONS /users 返回：Allow: GET, POST, PUT, DELETE 用途：CORS预检请求 2.3 状态码使用 HTTP状态码分类： 1xx - 信息性 100 Continue # 继续请求 2xx - 成功 200 OK # 成功（GET, PUT, PATCH） 201 Created # 创建成功（POST） 202 Accepted # 已接受，处理中（异步操作） 204 No Content # 成功，无返回内容（DELETE） 3xx - 重定向 301 Moved Permanently # 永久重定向 302 Found # 临时重定向 304 Not Modified # 未修改（缓存有效） 4xx - 客户端错误 400 Bad Request # 请求参数错误 401 Unauthorized # 未认证 403 Forbidden # 无权限 404 Not Found # 资源不存在 405 Method Not Allowed # 方法不允许 409 Conflict # 资源冲突 422 Unprocessable Entity # 验证失败 429 Too Many Requests # 请求过多 5xx - 服务器错误 500 Internal Server Error # 服务器内部错误 502 Bad Gateway # 网关错误 503 Service Unavailable # 服务不可用 504 Gateway Timeout # 网关超时 最常用的状态码： ┌──────────────────┬─────────────────────────┐ │ 操作 │ 状态码 │ ├──────────────────┼─────────────────────────┤ │ GET成功 │ 200 OK │ │ POST创建成功 │ 201 Created │ │ PUT/PATCH成功 │ 200 OK │ │ DELETE成功 │ 204 No Content │ │ 参数错误 │ 400 Bad Request │ │ 未登录 │ 401 Unauthorized │ │ 无权限 │ 403 Forbidden │ │ 资源不存在 │ 404 Not Found │ │ 验证失败 │ 422 Unprocessable Entity│ │ 服务器错误 │ 500 Internal Server Error│ └──────────────────┴─────────────────────────┘ 2.4 响应数据格式 标准JSON响应格式： 成功响应： { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: { &#34;id&#34;: 123, &#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34; }, &#34;message&#34;: &#34;操作成功&#34; } 列表响应（带分页）： { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: [ {&#34;id&#34;: 1, &#34;name&#34;: &#34;张三&#34;}, {&#34;id&#34;: 2, &#34;name&#34;: &#34;李四&#34;} ], &#34;pagination&#34;: { &#34;total&#34;: 100, &#34;page&#34;: 1, &#34;limit&#34;: 20, &#34;pages&#34;: 5 }, &#34;message&#34;: &#34;获取成功&#34; } 错误响应： { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: &#34;VALIDATION_ERROR&#34;, &#34;message&#34;: &#34;验证失败&#34;, &#34;details&#34;: [ { &#34;field&#34;: &#34;email&#34;, &#34;message&#34;: &#34;邮箱格式不正确&#34; }, { &#34;field&#34;: &#34;password&#34;, &#34;message&#34;: &#34;密码长度至少8位&#34; } ] } } 统一字段说明： - status: 状态（success/error） - data: 数据内容 - message: 提示信息 - error: 错误详情 - pagination: 分页信息 3. 高级特性 3.1 版本控制 API版本控制的三种方式： 1. URI版本控制（推荐） https://api.example.com/v1/users https://api.example.com/v2/users 优点：清晰、直观 缺点：URI变化 2. 请求头版本控制 GET /users Headers: Accept: application/vnd.example.v1+json 优点：URI不变 缺点：不够直观 3. 参数版本控制 GET /users?version=1 优点：简单 缺点：容易忽略，不够规范 推荐做法： - 使用URI版本控制 - 主版本号（v1, v2） - 保持向后兼容 - 明确废弃策略 3.2 分页、过滤、排序 分页参数： GET /users?page=2&amp;limit=20 或使用offset和limit： GET /users?offset=20&amp;limit=20 响应包含分页信息： { &#34;data&#34;: [...], &#34;pagination&#34;: { &#34;total&#34;: 1000, # 总记录数 &#34;page&#34;: 2, # 当前页 &#34;limit&#34;: 20, # 每页数量 &#34;pages&#34;: 50, # 总页数 &#34;prev&#34;: 1, # 上一页 &#34;next&#34;: 3 # 下一页 } } --- 过滤参数： GET /users?role=admin&amp;status=active GET /products?category=electronics&amp;price_min=100&amp;price_max=1000 GET /orders?created_after=2024-01-01&amp;created_before=2024-12-31 --- 排序参数： GET /users?sort=created_at&amp;order=desc GET /products?sort=-price # 减号表示降序 GET /users?sort=name,created_at # 多字段排序 --- 字段选择（稀疏字段集）： GET /users?fields=id,name,email 只返回指定的字段，减少数据传输 --- 搜索： GET /users?search=张三 GET /products?q=手机 3.3 认证和授权 常见认证方式： 1. Basic Auth（基础认证） Authorization: Basic base64(username:password) 优点：简单 缺点：不够安全（需HTTPS） 2. API Key GET /users?api_key=your_api_key 或 Headers: X-API-Key: your_api_key 优点：简单、易于管理 缺点：密钥泄露风险 3. JWT (JSON Web Token)（推荐） Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... 优点：无状态、可扩展、信息丰富 缺点：令牌较大 4. OAuth 2.0 用于第三方授权 流程： 1. 客户端请求授权 2. 用户同意授权 3. 获取访问令牌 4. 使用令牌访问资源 JWT结构： Header.Payload.Signature { &#34;alg&#34;: &#34;HS256&#34;, # 算法 &#34;typ&#34;: &#34;JWT&#34; # 类型 } . { &#34;sub&#34;: &#34;123&#34;, # 用户ID &#34;name&#34;: &#34;张三&#34;, &#34;iat&#34;: 1516239022, # 签发时间 &#34;exp&#34;: 1516242622 # 过期时间 } . HMACSHA256( base64UrlEncode(header) + &#34;.&#34; + base64UrlEncode(payload), secret ) 3.4 HATEOAS HATEOAS (Hypermedia as the Engine of Application State) 超媒体驱动的应用状态 原则： API响应中包含相关操作的链接 示例： GET /users/123 响应： { &#34;id&#34;: 123, &#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;, &#34;links&#34;: [ { &#34;rel&#34;: &#34;self&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;GET&#34; }, { &#34;rel&#34;: &#34;update&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;PUT&#34; }, { &#34;rel&#34;: &#34;delete&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;DELETE&#34; }, { &#34;rel&#34;: &#34;orders&#34;, &#34;href&#34;: &#34;/users/123/orders&#34;, &#34;method&#34;: &#34;GET&#34; } ] } 优点： - API自解释 - 客户端不需要硬编码URL - 易于演化 缺点： - 增加响应大小 - 实现复杂 4. 实战项目：用户管理API 4.1 API设计 用户管理API设计： 资源：Users（用户） 端点设计： ┌────────┬─────────────────┬──────────────────┬─────────┐ │ 方法 │ URI │ 描述 │ 状态码 │ ├────────┼─────────────────┼──────────────────┼─────────┤ │ GET │ /api/v1/users │ 获取用户列表 │ 200 │ │ GET │ /api/v1/users/1 │ 获取指定用户 │ 200/404 │ │ POST │ /api/v1/users │ 创建新用户 │ 201 │ │ PUT │ /api/v1/users/1 │ 更新用户（完整） │ 200/404 │ │ PATCH │ /api/v1/users/1 │ 更新用户（部分） │ 200/404 │ │ DELETE │ /api/v1/users/1 │ 删除用户 │ 204/404 │ └────────┴─────────────────┴──────────────────┴─────────┘ 查询参数： - ?page=1&amp;limit=20 # 分页 - ?role=admin # 按角色过滤 - ?search=张 # 搜索 - ?sort=created_at # 排序 4.2 代码实现 # day30_restful_api.py # 功能：简单的RESTful API实现 from flask import Flask, request, jsonify from datetime import datetime import uuid app = Flask(__name__) # 模拟数据库 users_db = {} # 初始化一些测试数据 def init_data(): &#34;&#34;&#34;初始化测试数据&#34;&#34;&#34; users = [ {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;, &#34;role&#34;: &#34;admin&#34;}, {&#34;name&#34;: &#34;李四&#34;, &#34;email&#34;: &#34;li@example.com&#34;, &#34;role&#34;: &#34;user&#34;}, {&#34;name&#34;: &#34;王五&#34;, &#34;email&#34;: &#34;wang@example.com&#34;, &#34;role&#34;: &#34;user&#34;}, ] for user_data in users: user_id = str(uuid.uuid4()) users_db[user_id] = { &#34;id&#34;: user_id, **user_data, &#34;created_at&#34;: datetime.now().isoformat(), &#34;updated_at&#34;: datetime.now().isoformat() } init_data() def success_response(data=None, message=&#34;操作成功&#34;, status_code=200): &#34;&#34;&#34; 成功响应格式 参数： data: 返回的数据 message: 提示信息 status_code: HTTP状态码 &#34;&#34;&#34; response = { &#34;status&#34;: &#34;success&#34;, &#34;message&#34;: message } if data is not None: response[&#34;data&#34;] = data return jsonify(response), status_code def error_response(message=&#34;操作失败&#34;, code=&#34;ERROR&#34;, details=None, status_code=400): &#34;&#34;&#34; 错误响应格式 参数： message: 错误信息 code: 错误代码 details: 错误详情 status_code: HTTP状态码 &#34;&#34;&#34; response = { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: code, &#34;message&#34;: message } } if details: response[&#34;error&#34;][&#34;details&#34;] = details return jsonify(response), status_code # ============================================================ # 用户管理API # ============================================================ @app.route(&#39;/api/v1/users&#39;, methods=[&#39;GET&#39;]) def get_users(): &#34;&#34;&#34; 获取用户列表 查询参数： page: 页码（默认1） limit: 每页数量（默认20） role: 角色过滤 search: 搜索（姓名或邮箱） sort: 排序字段 order: 排序顺序（asc/desc） &#34;&#34;&#34; # 获取查询参数 page = int(request.args.get(&#39;page&#39;, 1)) limit = int(request.args.get(&#39;limit&#39;, 20)) role = request.args.get(&#39;role&#39;) search = request.args.get(&#39;search&#39;) sort_field = request.args.get(&#39;sort&#39;, &#39;created_at&#39;) sort_order = request.args.get(&#39;order&#39;, &#39;desc&#39;) # 获取所有用户 users_list = list(users_db.values()) # 过滤 if role: users_list = [u for u in users_list if u.get(&#39;role&#39;) == role] if search: users_list = [ u for u in users_list if search.lower() in u.get(&#39;name&#39;, &#39;&#39;).lower() or search.lower() in u.get(&#39;email&#39;, &#39;&#39;).lower() ] # 排序 reverse = (sort_order == &#39;desc&#39;) users_list.sort(key=lambda x: x.get(sort_field, &#39;&#39;), reverse=reverse) # 分页 total = len(users_list) start = (page - 1) * limit end = start + limit users_page = users_list[start:end] # 构造响应 response_data = { &#34;users&#34;: users_page, &#34;pagination&#34;: { &#34;total&#34;: total, &#34;page&#34;: page, &#34;limit&#34;: limit, &#34;pages&#34;: (total + limit - 1) // limit } } return success_response(response_data, &#34;获取用户列表成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;GET&#39;]) def get_user(user_id): &#34;&#34;&#34; 获取指定用户 路径参数： user_id: 用户ID &#34;&#34;&#34; user = users_db.get(user_id) if not user: return error_response( message=f&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) return success_response(user, &#34;获取用户成功&#34;) @app.route(&#39;/api/v1/users&#39;, methods=[&#39;POST&#39;]) def create_user(): &#34;&#34;&#34; 创建新用户 请求体： { &#34;name&#34;: &#34;用户名&#34;, &#34;email&#34;: &#34;邮箱&#34;, &#34;role&#34;: &#34;角色&#34; } &#34;&#34;&#34; data = request.get_json() # 验证必填字段 required_fields = [&#39;name&#39;, &#39;email&#39;] missing_fields = [f for f in required_fields if f not in data] if missing_fields: return error_response( message=&#34;缺少必填字段&#34;, code=&#34;VALIDATION_ERROR&#34;, details=[{&#34;field&#34;: f, &#34;message&#34;: &#34;此字段为必填项&#34;} for f in missing_fields], status_code=422 ) # 验证邮箱唯一性 email = data.get(&#39;email&#39;) if any(u[&#39;email&#39;] == email for u in users_db.values()): return error_response( message=&#34;邮箱已存在&#34;, code=&#34;EMAIL_EXISTS&#34;, status_code=409 ) # 创建用户 user_id = str(uuid.uuid4()) user = { &#34;id&#34;: user_id, &#34;name&#34;: data[&#39;name&#39;], &#34;email&#34;: data[&#39;email&#39;], &#34;role&#34;: data.get(&#39;role&#39;, &#39;user&#39;), &#34;created_at&#34;: datetime.now().isoformat(), &#34;updated_at&#34;: datetime.now().isoformat() } users_db[user_id] = user return success_response(user, &#34;创建用户成功&#34;, 201) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;PUT&#39;]) def update_user(user_id): &#34;&#34;&#34; 完整更新用户 路径参数： user_id: 用户ID 请求体： { &#34;name&#34;: &#34;用户名&#34;, &#34;email&#34;: &#34;邮箱&#34;, &#34;role&#34;: &#34;角色&#34; } &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) data = request.get_json() # 验证必填字段 required_fields = [&#39;name&#39;, &#39;email&#39;] missing_fields = [f for f in required_fields if f not in data] if missing_fields: return error_response( message=&#34;缺少必填字段&#34;, code=&#34;VALIDATION_ERROR&#34;, details=[{&#34;field&#34;: f, &#34;message&#34;: &#34;此字段为必填项&#34;} for f in missing_fields], status_code=422 ) # 更新用户 users_db[user_id].update({ &#34;name&#34;: data[&#39;name&#39;], &#34;email&#34;: data[&#39;email&#39;], &#34;role&#34;: data.get(&#39;role&#39;, &#39;user&#39;), &#34;updated_at&#34;: datetime.now().isoformat() }) return success_response(users_db[user_id], &#34;更新用户成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;PATCH&#39;]) def patch_user(user_id): &#34;&#34;&#34; 部分更新用户 路径参数： user_id: 用户ID 请求体：可以只包含要更新的字段 { &#34;name&#34;: &#34;新用户名&#34; } &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) data = request.get_json() # 只更新提供的字段 allowed_fields = [&#39;name&#39;, &#39;email&#39;, &#39;role&#39;] for field in allowed_fields: if field in data: users_db[user_id][field] = data[field] users_db[user_id][&#39;updated_at&#39;] = datetime.now().isoformat() return success_response(users_db[user_id], &#34;更新用户成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;DELETE&#39;]) def delete_user(user_id): &#34;&#34;&#34; 删除用户 路径参数： user_id: 用户ID &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) del users_db[user_id] # DELETE成功通常返回204 No Content return &#39;&#39;, 204 # ============================================================ # API文档和健康检查 # ============================================================ @app.route(&#39;/api/v1/health&#39;, methods=[&#39;GET&#39;]) def health_check(): &#34;&#34;&#34;健康检查&#34;&#34;&#34; return success_response({ &#34;status&#34;: &#34;healthy&#34;, &#34;timestamp&#34;: datetime.now().isoformat() }) @app.route(&#39;/api/v1/docs&#39;, methods=[&#39;GET&#39;]) def api_docs(): &#34;&#34;&#34;API文档&#34;&#34;&#34; docs = { &#34;version&#34;: &#34;1.0.0&#34;, &#34;title&#34;: &#34;用户管理API&#34;, &#34;endpoints&#34;: [ { &#34;path&#34;: &#34;/api/v1/users&#34;, &#34;method&#34;: &#34;GET&#34;, &#34;description&#34;: &#34;获取用户列表&#34;, &#34;parameters&#34;: { &#34;page&#34;: &#34;页码&#34;, &#34;limit&#34;: &#34;每页数量&#34;, &#34;role&#34;: &#34;角色过滤&#34;, &#34;search&#34;: &#34;搜索&#34;, &#34;sort&#34;: &#34;排序字段&#34;, &#34;order&#34;: &#34;排序顺序&#34; } }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;GET&#34;, &#34;description&#34;: &#34;获取指定用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users&#34;, &#34;method&#34;: &#34;POST&#34;, &#34;description&#34;: &#34;创建新用户&#34;, &#34;body&#34;: { &#34;name&#34;: &#34;用户名（必填）&#34;, &#34;email&#34;: &#34;邮箱（必填）&#34;, &#34;role&#34;: &#34;角色（可选）&#34; } }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;PUT&#34;, &#34;description&#34;: &#34;完整更新用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;PATCH&#34;, &#34;description&#34;: &#34;部分更新用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;DELETE&#34;, &#34;description&#34;: &#34;删除用户&#34; } ] } return success_response(docs) if __name__ == &#39;__main__&#39;: print(&#34;&#34;&#34; ╔══════════════════════════════════════════════════════════╗ ║ RESTful API 服务器 ║ ║ User Management API ║ ╚══════════════════════════════════════════════════════════╝ API地址: http://127.0.0.1:5000/api/v1 可用端点: - GET /api/v1/users 获取用户列表 - GET /api/v1/users/&lt;id&gt; 获取指定用户 - POST /api/v1/users 创建新用户 - PUT /api/v1/users/&lt;id&gt; 更新用户（完整） - PATCH /api/v1/users/&lt;id&gt; 更新用户（部分） - DELETE /api/v1/users/&lt;id&gt; 删除用户 - GET /api/v1/health 健康检查 - GET /api/v1/docs API文档 测试命令: # 获取所有用户 curl http://127.0.0.1:5000/api/v1/users # 创建用户 curl -X POST http://127.0.0.1:5000/api/v1/users \\\\ -H &#34;Content-Type: application/json&#34; \\\\ -d &#39;{&#34;name&#34;:&#34;测试用户&#34;,&#34;email&#34;:&#34;test@example.com&#34;}&#39; # 获取单个用户 curl http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 更新用户 curl -X PATCH http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\\\ -H &#34;Content-Type: application/json&#34; \\\\ -d &#39;{&#34;name&#34;:&#34;新名字&#34;}&#39; # 删除用户 curl -X DELETE http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; &#34;&#34;&#34;) app.run(debug=True, host=&#39;0.0.0.0&#39;, port=5000) 5. API测试 5.1 使用curl测试 # 1. 获取所有用户 curl http://127.0.0.1:5000/api/v1/users # 2. 分页和过滤 curl &#34;http://127.0.0.1:5000/api/v1/users?page=1&amp;limit=10&amp;role=admin&#34; # 3. 创建用户 curl -X POST http://127.0.0.1:5000/api/v1/users \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{ &#34;name&#34;: &#34;新用户&#34;, &#34;email&#34;: &#34;new@example.com&#34;, &#34;role&#34;: &#34;user&#34; }&#39; # 4. 获取单个用户 curl http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 5. 更新用户（PUT - 完整更新） curl -X PUT http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{ &#34;name&#34;: &#34;更新的用户&#34;, &#34;email&#34;: &#34;updated@example.com&#34;, &#34;role&#34;: &#34;admin&#34; }&#39; # 6. 更新用户（PATCH - 部分更新） curl -X PATCH http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{&#34;name&#34;: &#34;只更新名字&#34;}&#39; # 7. 删除用户 curl -X DELETE http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 8. 健康检查 curl http://127.0.0.1:5000/api/v1/health 6. 最佳实践总结 RESTful API设计最佳实践： 1. 使用名词表示资源，用HTTP方法表示操作 ✅ GET /users ❌ GET /getUsers 2. 使用复数形式 ✅ /users, /products ❌ /user, /product 3. 使用正确的HTTP状态码 200: 成功 201: 创建成功 204: 删除成功 400: 请求错误 401: 未认证 403: 无权限 404: 未找到 500: 服务器错误 4. 提供版本控制 /api/v1/users 5. 支持分页、过滤、排序 ?page=1&amp;limit=20&amp;sort=name 6. 使用统一的响应格式 { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: {...} } 7. 提供清晰的错误信息 { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: &#34;VALIDATION_ERROR&#34;, &#34;message&#34;: &#34;详细错误信息&#34; } } 8. 使用HTTPS保护API 9. 实现认证和授权（JWT推荐） 10. 提供完善的API文档 11. 实现请求限流（Rate Limiting） 12. 使用缓存提高性能 13. 记录完整的日志 14. 编写完善的测试 7. 今日练习 练习1：设计博客API 设计一个博客系统的RESTful API，包含：\n">
+<title>30天：RESTful API设计</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/30%E5%A4%A9restful-api%E8%AE%BE%E8%AE%A1/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="30天：RESTful API设计">
+<meta property='og:description' content="第30天：RESTful API设计 &ldquo;好的API设计就像好的用户界面，让使用者感到直观和愉悦！&rdquo;\n📚 今日目标 理解REST架构风格 掌握RESTful API设计原则 学习HTTP方法的正确使用 理解资源和URI设计 掌握API版本控制和错误处理 实现一个简单的RESTful API 1. REST基础概念 1.1 什么是REST？ REST (Representational State Transfer) 表述性状态转移 核心思想： - 资源（Resource）为中心 - 使用标准HTTP方法 - 无状态通信 - 统一接口 REST不是协议，而是一种架构风格 类比： REST API = 图书馆管理系统 - 资源 = 书籍 - URI = 书籍编号 - HTTP方法 = 操作（借、还、查、删） - 状态码 = 操作结果（成功、失败、未找到） 例如： GET /books/123 → 查询123号书 POST /books → 新增一本书 PUT /books/123 → 更新123号书 DELETE /books/123 → 删除123号书 1.2 REST的六大约束 1. 客户端-服务器分离 (Client-Server) - 客户端和服务器独立演化 - 前后端分离 2. 无状态 (Stateless) - 每个请求包含所有必要信息 - 服务器不保存客户端状态 - 易于扩展和负载均衡 3. 可缓存 (Cacheable) - 响应可以被缓存 - 提高性能 4. 分层系统 (Layered System) - 客户端不知道直接连接的是服务器还是中间层 - 可以加入负载均衡、缓存等 5. 统一接口 (Uniform Interface) - 资源标识（URI） - 通过表述操作资源 - 自描述消息 - 超媒体驱动（HATEOAS） 6. 按需代码（可选）(Code on Demand) - 服务器可以返回可执行代码 - 如JavaScript 2. RESTful API设计原则 2.1 资源和URI设计 资源设计原则： 1. 使用名词，不使用动词 ✅ 好的设计: GET /users # 获取用户列表 GET /users/123 # 获取ID为123的用户 POST /users # 创建新用户 ❌ 不好的设计: GET /getUsers POST /createUser GET /user/delete/123 2. 使用复数形式 ✅ 好: /users, /products, /orders ❌ 差: /user, /product, /order 3. 使用小写字母和连字符 ✅ 好: /user-profiles, /product-categories ❌ 差: /UserProfiles, /product_categories 4. 资源嵌套表示关系 ✅ 好: /users/123/orders # 用户123的订单 /orders/456/items # 订单456的商品 但不要嵌套太深（最多2-3层） ❌ 差: /users/123/orders/456/items/789/reviews 5. 使用查询参数进行过滤、排序、分页 /users?role=admin # 过滤 /users?sort=created_at&amp;order=desc # 排序 /users?page=2&amp;limit=20 # 分页 /users?fields=id,name,email # 字段选择 2.2 HTTP方法使用 标准HTTP方法及其用途： ┌────────┬──────────┬─────────┬─────────┬──────────┐ │ 方法 │ 用途 │ 安全性 │ 幂等性 │ 可缓存 │ ├────────┼──────────┼─────────┼─────────┼──────────┤ │ GET │ 获取资源 │ 是 │ 是 │ 是 │ │ POST │ 创建资源 │ 否 │ 否 │ 否 │ │ PUT │ 更新资源 │ 否 │ 是 │ 否 │ │ PATCH │ 部分更新 │ 否 │ 否 │ 否 │ │ DELETE │ 删除资源 │ 否 │ 是 │ 否 │ │ HEAD │ 获取头部 │ 是 │ 是 │ 是 │ │ OPTIONS│ 获取选项 │ 是 │ 是 │ 否 │ └────────┴──────────┴─────────┴─────────┴──────────┘ 详细说明： GET - 获取资源 GET /users → 获取所有用户 GET /users/123 → 获取ID为123的用户 特点：安全、幂等、可缓存 POST - 创建新资源 POST /users Body: {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;} 特点：不安全、不幂等 PUT - 完整更新资源 PUT /users/123 Body: {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;new@example.com&#34;, &#34;age&#34;: 30} 特点：幂等（多次执行结果相同） 要求：必须提供完整的资源数据 PATCH - 部分更新资源 PATCH /users/123 Body: {&#34;email&#34;: &#34;new@example.com&#34;} 特点：只更新提供的字段 更灵活，推荐使用 DELETE - 删除资源 DELETE /users/123 特点：幂等（删除多次结果相同） HEAD - 获取资源元数据 HEAD /users/123 返回：只返回响应头，不返回响应体 用途：检查资源是否存在、获取资源大小等 OPTIONS - 获取资源支持的方法 OPTIONS /users 返回：Allow: GET, POST, PUT, DELETE 用途：CORS预检请求 2.3 状态码使用 HTTP状态码分类： 1xx - 信息性 100 Continue # 继续请求 2xx - 成功 200 OK # 成功（GET, PUT, PATCH） 201 Created # 创建成功（POST） 202 Accepted # 已接受，处理中（异步操作） 204 No Content # 成功，无返回内容（DELETE） 3xx - 重定向 301 Moved Permanently # 永久重定向 302 Found # 临时重定向 304 Not Modified # 未修改（缓存有效） 4xx - 客户端错误 400 Bad Request # 请求参数错误 401 Unauthorized # 未认证 403 Forbidden # 无权限 404 Not Found # 资源不存在 405 Method Not Allowed # 方法不允许 409 Conflict # 资源冲突 422 Unprocessable Entity # 验证失败 429 Too Many Requests # 请求过多 5xx - 服务器错误 500 Internal Server Error # 服务器内部错误 502 Bad Gateway # 网关错误 503 Service Unavailable # 服务不可用 504 Gateway Timeout # 网关超时 最常用的状态码： ┌──────────────────┬─────────────────────────┐ │ 操作 │ 状态码 │ ├──────────────────┼─────────────────────────┤ │ GET成功 │ 200 OK │ │ POST创建成功 │ 201 Created │ │ PUT/PATCH成功 │ 200 OK │ │ DELETE成功 │ 204 No Content │ │ 参数错误 │ 400 Bad Request │ │ 未登录 │ 401 Unauthorized │ │ 无权限 │ 403 Forbidden │ │ 资源不存在 │ 404 Not Found │ │ 验证失败 │ 422 Unprocessable Entity│ │ 服务器错误 │ 500 Internal Server Error│ └──────────────────┴─────────────────────────┘ 2.4 响应数据格式 标准JSON响应格式： 成功响应： { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: { &#34;id&#34;: 123, &#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34; }, &#34;message&#34;: &#34;操作成功&#34; } 列表响应（带分页）： { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: [ {&#34;id&#34;: 1, &#34;name&#34;: &#34;张三&#34;}, {&#34;id&#34;: 2, &#34;name&#34;: &#34;李四&#34;} ], &#34;pagination&#34;: { &#34;total&#34;: 100, &#34;page&#34;: 1, &#34;limit&#34;: 20, &#34;pages&#34;: 5 }, &#34;message&#34;: &#34;获取成功&#34; } 错误响应： { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: &#34;VALIDATION_ERROR&#34;, &#34;message&#34;: &#34;验证失败&#34;, &#34;details&#34;: [ { &#34;field&#34;: &#34;email&#34;, &#34;message&#34;: &#34;邮箱格式不正确&#34; }, { &#34;field&#34;: &#34;password&#34;, &#34;message&#34;: &#34;密码长度至少8位&#34; } ] } } 统一字段说明： - status: 状态（success/error） - data: 数据内容 - message: 提示信息 - error: 错误详情 - pagination: 分页信息 3. 高级特性 3.1 版本控制 API版本控制的三种方式： 1. URI版本控制（推荐） https://api.example.com/v1/users https://api.example.com/v2/users 优点：清晰、直观 缺点：URI变化 2. 请求头版本控制 GET /users Headers: Accept: application/vnd.example.v1+json 优点：URI不变 缺点：不够直观 3. 参数版本控制 GET /users?version=1 优点：简单 缺点：容易忽略，不够规范 推荐做法： - 使用URI版本控制 - 主版本号（v1, v2） - 保持向后兼容 - 明确废弃策略 3.2 分页、过滤、排序 分页参数： GET /users?page=2&amp;limit=20 或使用offset和limit： GET /users?offset=20&amp;limit=20 响应包含分页信息： { &#34;data&#34;: [...], &#34;pagination&#34;: { &#34;total&#34;: 1000, # 总记录数 &#34;page&#34;: 2, # 当前页 &#34;limit&#34;: 20, # 每页数量 &#34;pages&#34;: 50, # 总页数 &#34;prev&#34;: 1, # 上一页 &#34;next&#34;: 3 # 下一页 } } --- 过滤参数： GET /users?role=admin&amp;status=active GET /products?category=electronics&amp;price_min=100&amp;price_max=1000 GET /orders?created_after=2024-01-01&amp;created_before=2024-12-31 --- 排序参数： GET /users?sort=created_at&amp;order=desc GET /products?sort=-price # 减号表示降序 GET /users?sort=name,created_at # 多字段排序 --- 字段选择（稀疏字段集）： GET /users?fields=id,name,email 只返回指定的字段，减少数据传输 --- 搜索： GET /users?search=张三 GET /products?q=手机 3.3 认证和授权 常见认证方式： 1. Basic Auth（基础认证） Authorization: Basic base64(username:password) 优点：简单 缺点：不够安全（需HTTPS） 2. API Key GET /users?api_key=your_api_key 或 Headers: X-API-Key: your_api_key 优点：简单、易于管理 缺点：密钥泄露风险 3. JWT (JSON Web Token)（推荐） Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... 优点：无状态、可扩展、信息丰富 缺点：令牌较大 4. OAuth 2.0 用于第三方授权 流程： 1. 客户端请求授权 2. 用户同意授权 3. 获取访问令牌 4. 使用令牌访问资源 JWT结构： Header.Payload.Signature { &#34;alg&#34;: &#34;HS256&#34;, # 算法 &#34;typ&#34;: &#34;JWT&#34; # 类型 } . { &#34;sub&#34;: &#34;123&#34;, # 用户ID &#34;name&#34;: &#34;张三&#34;, &#34;iat&#34;: 1516239022, # 签发时间 &#34;exp&#34;: 1516242622 # 过期时间 } . HMACSHA256( base64UrlEncode(header) + &#34;.&#34; + base64UrlEncode(payload), secret ) 3.4 HATEOAS HATEOAS (Hypermedia as the Engine of Application State) 超媒体驱动的应用状态 原则： API响应中包含相关操作的链接 示例： GET /users/123 响应： { &#34;id&#34;: 123, &#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;, &#34;links&#34;: [ { &#34;rel&#34;: &#34;self&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;GET&#34; }, { &#34;rel&#34;: &#34;update&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;PUT&#34; }, { &#34;rel&#34;: &#34;delete&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;DELETE&#34; }, { &#34;rel&#34;: &#34;orders&#34;, &#34;href&#34;: &#34;/users/123/orders&#34;, &#34;method&#34;: &#34;GET&#34; } ] } 优点： - API自解释 - 客户端不需要硬编码URL - 易于演化 缺点： - 增加响应大小 - 实现复杂 4. 实战项目：用户管理API 4.1 API设计 用户管理API设计： 资源：Users（用户） 端点设计： ┌────────┬─────────────────┬──────────────────┬─────────┐ │ 方法 │ URI │ 描述 │ 状态码 │ ├────────┼─────────────────┼──────────────────┼─────────┤ │ GET │ /api/v1/users │ 获取用户列表 │ 200 │ │ GET │ /api/v1/users/1 │ 获取指定用户 │ 200/404 │ │ POST │ /api/v1/users │ 创建新用户 │ 201 │ │ PUT │ /api/v1/users/1 │ 更新用户（完整） │ 200/404 │ │ PATCH │ /api/v1/users/1 │ 更新用户（部分） │ 200/404 │ │ DELETE │ /api/v1/users/1 │ 删除用户 │ 204/404 │ └────────┴─────────────────┴──────────────────┴─────────┘ 查询参数： - ?page=1&amp;limit=20 # 分页 - ?role=admin # 按角色过滤 - ?search=张 # 搜索 - ?sort=created_at # 排序 4.2 代码实现 # day30_restful_api.py # 功能：简单的RESTful API实现 from flask import Flask, request, jsonify from datetime import datetime import uuid app = Flask(__name__) # 模拟数据库 users_db = {} # 初始化一些测试数据 def init_data(): &#34;&#34;&#34;初始化测试数据&#34;&#34;&#34; users = [ {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;, &#34;role&#34;: &#34;admin&#34;}, {&#34;name&#34;: &#34;李四&#34;, &#34;email&#34;: &#34;li@example.com&#34;, &#34;role&#34;: &#34;user&#34;}, {&#34;name&#34;: &#34;王五&#34;, &#34;email&#34;: &#34;wang@example.com&#34;, &#34;role&#34;: &#34;user&#34;}, ] for user_data in users: user_id = str(uuid.uuid4()) users_db[user_id] = { &#34;id&#34;: user_id, **user_data, &#34;created_at&#34;: datetime.now().isoformat(), &#34;updated_at&#34;: datetime.now().isoformat() } init_data() def success_response(data=None, message=&#34;操作成功&#34;, status_code=200): &#34;&#34;&#34; 成功响应格式 参数： data: 返回的数据 message: 提示信息 status_code: HTTP状态码 &#34;&#34;&#34; response = { &#34;status&#34;: &#34;success&#34;, &#34;message&#34;: message } if data is not None: response[&#34;data&#34;] = data return jsonify(response), status_code def error_response(message=&#34;操作失败&#34;, code=&#34;ERROR&#34;, details=None, status_code=400): &#34;&#34;&#34; 错误响应格式 参数： message: 错误信息 code: 错误代码 details: 错误详情 status_code: HTTP状态码 &#34;&#34;&#34; response = { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: code, &#34;message&#34;: message } } if details: response[&#34;error&#34;][&#34;details&#34;] = details return jsonify(response), status_code # ============================================================ # 用户管理API # ============================================================ @app.route(&#39;/api/v1/users&#39;, methods=[&#39;GET&#39;]) def get_users(): &#34;&#34;&#34; 获取用户列表 查询参数： page: 页码（默认1） limit: 每页数量（默认20） role: 角色过滤 search: 搜索（姓名或邮箱） sort: 排序字段 order: 排序顺序（asc/desc） &#34;&#34;&#34; # 获取查询参数 page = int(request.args.get(&#39;page&#39;, 1)) limit = int(request.args.get(&#39;limit&#39;, 20)) role = request.args.get(&#39;role&#39;) search = request.args.get(&#39;search&#39;) sort_field = request.args.get(&#39;sort&#39;, &#39;created_at&#39;) sort_order = request.args.get(&#39;order&#39;, &#39;desc&#39;) # 获取所有用户 users_list = list(users_db.values()) # 过滤 if role: users_list = [u for u in users_list if u.get(&#39;role&#39;) == role] if search: users_list = [ u for u in users_list if search.lower() in u.get(&#39;name&#39;, &#39;&#39;).lower() or search.lower() in u.get(&#39;email&#39;, &#39;&#39;).lower() ] # 排序 reverse = (sort_order == &#39;desc&#39;) users_list.sort(key=lambda x: x.get(sort_field, &#39;&#39;), reverse=reverse) # 分页 total = len(users_list) start = (page - 1) * limit end = start + limit users_page = users_list[start:end] # 构造响应 response_data = { &#34;users&#34;: users_page, &#34;pagination&#34;: { &#34;total&#34;: total, &#34;page&#34;: page, &#34;limit&#34;: limit, &#34;pages&#34;: (total + limit - 1) // limit } } return success_response(response_data, &#34;获取用户列表成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;GET&#39;]) def get_user(user_id): &#34;&#34;&#34; 获取指定用户 路径参数： user_id: 用户ID &#34;&#34;&#34; user = users_db.get(user_id) if not user: return error_response( message=f&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) return success_response(user, &#34;获取用户成功&#34;) @app.route(&#39;/api/v1/users&#39;, methods=[&#39;POST&#39;]) def create_user(): &#34;&#34;&#34; 创建新用户 请求体： { &#34;name&#34;: &#34;用户名&#34;, &#34;email&#34;: &#34;邮箱&#34;, &#34;role&#34;: &#34;角色&#34; } &#34;&#34;&#34; data = request.get_json() # 验证必填字段 required_fields = [&#39;name&#39;, &#39;email&#39;] missing_fields = [f for f in required_fields if f not in data] if missing_fields: return error_response( message=&#34;缺少必填字段&#34;, code=&#34;VALIDATION_ERROR&#34;, details=[{&#34;field&#34;: f, &#34;message&#34;: &#34;此字段为必填项&#34;} for f in missing_fields], status_code=422 ) # 验证邮箱唯一性 email = data.get(&#39;email&#39;) if any(u[&#39;email&#39;] == email for u in users_db.values()): return error_response( message=&#34;邮箱已存在&#34;, code=&#34;EMAIL_EXISTS&#34;, status_code=409 ) # 创建用户 user_id = str(uuid.uuid4()) user = { &#34;id&#34;: user_id, &#34;name&#34;: data[&#39;name&#39;], &#34;email&#34;: data[&#39;email&#39;], &#34;role&#34;: data.get(&#39;role&#39;, &#39;user&#39;), &#34;created_at&#34;: datetime.now().isoformat(), &#34;updated_at&#34;: datetime.now().isoformat() } users_db[user_id] = user return success_response(user, &#34;创建用户成功&#34;, 201) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;PUT&#39;]) def update_user(user_id): &#34;&#34;&#34; 完整更新用户 路径参数： user_id: 用户ID 请求体： { &#34;name&#34;: &#34;用户名&#34;, &#34;email&#34;: &#34;邮箱&#34;, &#34;role&#34;: &#34;角色&#34; } &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) data = request.get_json() # 验证必填字段 required_fields = [&#39;name&#39;, &#39;email&#39;] missing_fields = [f for f in required_fields if f not in data] if missing_fields: return error_response( message=&#34;缺少必填字段&#34;, code=&#34;VALIDATION_ERROR&#34;, details=[{&#34;field&#34;: f, &#34;message&#34;: &#34;此字段为必填项&#34;} for f in missing_fields], status_code=422 ) # 更新用户 users_db[user_id].update({ &#34;name&#34;: data[&#39;name&#39;], &#34;email&#34;: data[&#39;email&#39;], &#34;role&#34;: data.get(&#39;role&#39;, &#39;user&#39;), &#34;updated_at&#34;: datetime.now().isoformat() }) return success_response(users_db[user_id], &#34;更新用户成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;PATCH&#39;]) def patch_user(user_id): &#34;&#34;&#34; 部分更新用户 路径参数： user_id: 用户ID 请求体：可以只包含要更新的字段 { &#34;name&#34;: &#34;新用户名&#34; } &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) data = request.get_json() # 只更新提供的字段 allowed_fields = [&#39;name&#39;, &#39;email&#39;, &#39;role&#39;] for field in allowed_fields: if field in data: users_db[user_id][field] = data[field] users_db[user_id][&#39;updated_at&#39;] = datetime.now().isoformat() return success_response(users_db[user_id], &#34;更新用户成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;DELETE&#39;]) def delete_user(user_id): &#34;&#34;&#34; 删除用户 路径参数： user_id: 用户ID &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) del users_db[user_id] # DELETE成功通常返回204 No Content return &#39;&#39;, 204 # ============================================================ # API文档和健康检查 # ============================================================ @app.route(&#39;/api/v1/health&#39;, methods=[&#39;GET&#39;]) def health_check(): &#34;&#34;&#34;健康检查&#34;&#34;&#34; return success_response({ &#34;status&#34;: &#34;healthy&#34;, &#34;timestamp&#34;: datetime.now().isoformat() }) @app.route(&#39;/api/v1/docs&#39;, methods=[&#39;GET&#39;]) def api_docs(): &#34;&#34;&#34;API文档&#34;&#34;&#34; docs = { &#34;version&#34;: &#34;1.0.0&#34;, &#34;title&#34;: &#34;用户管理API&#34;, &#34;endpoints&#34;: [ { &#34;path&#34;: &#34;/api/v1/users&#34;, &#34;method&#34;: &#34;GET&#34;, &#34;description&#34;: &#34;获取用户列表&#34;, &#34;parameters&#34;: { &#34;page&#34;: &#34;页码&#34;, &#34;limit&#34;: &#34;每页数量&#34;, &#34;role&#34;: &#34;角色过滤&#34;, &#34;search&#34;: &#34;搜索&#34;, &#34;sort&#34;: &#34;排序字段&#34;, &#34;order&#34;: &#34;排序顺序&#34; } }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;GET&#34;, &#34;description&#34;: &#34;获取指定用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users&#34;, &#34;method&#34;: &#34;POST&#34;, &#34;description&#34;: &#34;创建新用户&#34;, &#34;body&#34;: { &#34;name&#34;: &#34;用户名（必填）&#34;, &#34;email&#34;: &#34;邮箱（必填）&#34;, &#34;role&#34;: &#34;角色（可选）&#34; } }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;PUT&#34;, &#34;description&#34;: &#34;完整更新用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;PATCH&#34;, &#34;description&#34;: &#34;部分更新用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;DELETE&#34;, &#34;description&#34;: &#34;删除用户&#34; } ] } return success_response(docs) if __name__ == &#39;__main__&#39;: print(&#34;&#34;&#34; ╔══════════════════════════════════════════════════════════╗ ║ RESTful API 服务器 ║ ║ User Management API ║ ╚══════════════════════════════════════════════════════════╝ API地址: http://127.0.0.1:5000/api/v1 可用端点: - GET /api/v1/users 获取用户列表 - GET /api/v1/users/&lt;id&gt; 获取指定用户 - POST /api/v1/users 创建新用户 - PUT /api/v1/users/&lt;id&gt; 更新用户（完整） - PATCH /api/v1/users/&lt;id&gt; 更新用户（部分） - DELETE /api/v1/users/&lt;id&gt; 删除用户 - GET /api/v1/health 健康检查 - GET /api/v1/docs API文档 测试命令: # 获取所有用户 curl http://127.0.0.1:5000/api/v1/users # 创建用户 curl -X POST http://127.0.0.1:5000/api/v1/users \\\\ -H &#34;Content-Type: application/json&#34; \\\\ -d &#39;{&#34;name&#34;:&#34;测试用户&#34;,&#34;email&#34;:&#34;test@example.com&#34;}&#39; # 获取单个用户 curl http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 更新用户 curl -X PATCH http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\\\ -H &#34;Content-Type: application/json&#34; \\\\ -d &#39;{&#34;name&#34;:&#34;新名字&#34;}&#39; # 删除用户 curl -X DELETE http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; &#34;&#34;&#34;) app.run(debug=True, host=&#39;0.0.0.0&#39;, port=5000) 5. API测试 5.1 使用curl测试 # 1. 获取所有用户 curl http://127.0.0.1:5000/api/v1/users # 2. 分页和过滤 curl &#34;http://127.0.0.1:5000/api/v1/users?page=1&amp;limit=10&amp;role=admin&#34; # 3. 创建用户 curl -X POST http://127.0.0.1:5000/api/v1/users \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{ &#34;name&#34;: &#34;新用户&#34;, &#34;email&#34;: &#34;new@example.com&#34;, &#34;role&#34;: &#34;user&#34; }&#39; # 4. 获取单个用户 curl http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 5. 更新用户（PUT - 完整更新） curl -X PUT http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{ &#34;name&#34;: &#34;更新的用户&#34;, &#34;email&#34;: &#34;updated@example.com&#34;, &#34;role&#34;: &#34;admin&#34; }&#39; # 6. 更新用户（PATCH - 部分更新） curl -X PATCH http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{&#34;name&#34;: &#34;只更新名字&#34;}&#39; # 7. 删除用户 curl -X DELETE http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 8. 健康检查 curl http://127.0.0.1:5000/api/v1/health 6. 最佳实践总结 RESTful API设计最佳实践： 1. 使用名词表示资源，用HTTP方法表示操作 ✅ GET /users ❌ GET /getUsers 2. 使用复数形式 ✅ /users, /products ❌ /user, /product 3. 使用正确的HTTP状态码 200: 成功 201: 创建成功 204: 删除成功 400: 请求错误 401: 未认证 403: 无权限 404: 未找到 500: 服务器错误 4. 提供版本控制 /api/v1/users 5. 支持分页、过滤、排序 ?page=1&amp;limit=20&amp;sort=name 6. 使用统一的响应格式 { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: {...} } 7. 提供清晰的错误信息 { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: &#34;VALIDATION_ERROR&#34;, &#34;message&#34;: &#34;详细错误信息&#34; } } 8. 使用HTTPS保护API 9. 实现认证和授权（JWT推荐） 10. 提供完善的API文档 11. 实现请求限流（Rate Limiting） 12. 使用缓存提高性能 13. 记录完整的日志 14. 编写完善的测试 7. 今日练习 练习1：设计博客API 设计一个博客系统的RESTful API，包含：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/30%E5%A4%A9restful-api%E8%AE%BE%E8%AE%A1/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:25:45&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:25:45&#43;00:00'/>
+<meta name="twitter:title" content="30天：RESTful API设计">
+<meta name="twitter:description" content="第30天：RESTful API设计 &ldquo;好的API设计就像好的用户界面，让使用者感到直观和愉悦！&rdquo;\n📚 今日目标 理解REST架构风格 掌握RESTful API设计原则 学习HTTP方法的正确使用 理解资源和URI设计 掌握API版本控制和错误处理 实现一个简单的RESTful API 1. REST基础概念 1.1 什么是REST？ REST (Representational State Transfer) 表述性状态转移 核心思想： - 资源（Resource）为中心 - 使用标准HTTP方法 - 无状态通信 - 统一接口 REST不是协议，而是一种架构风格 类比： REST API = 图书馆管理系统 - 资源 = 书籍 - URI = 书籍编号 - HTTP方法 = 操作（借、还、查、删） - 状态码 = 操作结果（成功、失败、未找到） 例如： GET /books/123 → 查询123号书 POST /books → 新增一本书 PUT /books/123 → 更新123号书 DELETE /books/123 → 删除123号书 1.2 REST的六大约束 1. 客户端-服务器分离 (Client-Server) - 客户端和服务器独立演化 - 前后端分离 2. 无状态 (Stateless) - 每个请求包含所有必要信息 - 服务器不保存客户端状态 - 易于扩展和负载均衡 3. 可缓存 (Cacheable) - 响应可以被缓存 - 提高性能 4. 分层系统 (Layered System) - 客户端不知道直接连接的是服务器还是中间层 - 可以加入负载均衡、缓存等 5. 统一接口 (Uniform Interface) - 资源标识（URI） - 通过表述操作资源 - 自描述消息 - 超媒体驱动（HATEOAS） 6. 按需代码（可选）(Code on Demand) - 服务器可以返回可执行代码 - 如JavaScript 2. RESTful API设计原则 2.1 资源和URI设计 资源设计原则： 1. 使用名词，不使用动词 ✅ 好的设计: GET /users # 获取用户列表 GET /users/123 # 获取ID为123的用户 POST /users # 创建新用户 ❌ 不好的设计: GET /getUsers POST /createUser GET /user/delete/123 2. 使用复数形式 ✅ 好: /users, /products, /orders ❌ 差: /user, /product, /order 3. 使用小写字母和连字符 ✅ 好: /user-profiles, /product-categories ❌ 差: /UserProfiles, /product_categories 4. 资源嵌套表示关系 ✅ 好: /users/123/orders # 用户123的订单 /orders/456/items # 订单456的商品 但不要嵌套太深（最多2-3层） ❌ 差: /users/123/orders/456/items/789/reviews 5. 使用查询参数进行过滤、排序、分页 /users?role=admin # 过滤 /users?sort=created_at&amp;order=desc # 排序 /users?page=2&amp;limit=20 # 分页 /users?fields=id,name,email # 字段选择 2.2 HTTP方法使用 标准HTTP方法及其用途： ┌────────┬──────────┬─────────┬─────────┬──────────┐ │ 方法 │ 用途 │ 安全性 │ 幂等性 │ 可缓存 │ ├────────┼──────────┼─────────┼─────────┼──────────┤ │ GET │ 获取资源 │ 是 │ 是 │ 是 │ │ POST │ 创建资源 │ 否 │ 否 │ 否 │ │ PUT │ 更新资源 │ 否 │ 是 │ 否 │ │ PATCH │ 部分更新 │ 否 │ 否 │ 否 │ │ DELETE │ 删除资源 │ 否 │ 是 │ 否 │ │ HEAD │ 获取头部 │ 是 │ 是 │ 是 │ │ OPTIONS│ 获取选项 │ 是 │ 是 │ 否 │ └────────┴──────────┴─────────┴─────────┴──────────┘ 详细说明： GET - 获取资源 GET /users → 获取所有用户 GET /users/123 → 获取ID为123的用户 特点：安全、幂等、可缓存 POST - 创建新资源 POST /users Body: {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;} 特点：不安全、不幂等 PUT - 完整更新资源 PUT /users/123 Body: {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;new@example.com&#34;, &#34;age&#34;: 30} 特点：幂等（多次执行结果相同） 要求：必须提供完整的资源数据 PATCH - 部分更新资源 PATCH /users/123 Body: {&#34;email&#34;: &#34;new@example.com&#34;} 特点：只更新提供的字段 更灵活，推荐使用 DELETE - 删除资源 DELETE /users/123 特点：幂等（删除多次结果相同） HEAD - 获取资源元数据 HEAD /users/123 返回：只返回响应头，不返回响应体 用途：检查资源是否存在、获取资源大小等 OPTIONS - 获取资源支持的方法 OPTIONS /users 返回：Allow: GET, POST, PUT, DELETE 用途：CORS预检请求 2.3 状态码使用 HTTP状态码分类： 1xx - 信息性 100 Continue # 继续请求 2xx - 成功 200 OK # 成功（GET, PUT, PATCH） 201 Created # 创建成功（POST） 202 Accepted # 已接受，处理中（异步操作） 204 No Content # 成功，无返回内容（DELETE） 3xx - 重定向 301 Moved Permanently # 永久重定向 302 Found # 临时重定向 304 Not Modified # 未修改（缓存有效） 4xx - 客户端错误 400 Bad Request # 请求参数错误 401 Unauthorized # 未认证 403 Forbidden # 无权限 404 Not Found # 资源不存在 405 Method Not Allowed # 方法不允许 409 Conflict # 资源冲突 422 Unprocessable Entity # 验证失败 429 Too Many Requests # 请求过多 5xx - 服务器错误 500 Internal Server Error # 服务器内部错误 502 Bad Gateway # 网关错误 503 Service Unavailable # 服务不可用 504 Gateway Timeout # 网关超时 最常用的状态码： ┌──────────────────┬─────────────────────────┐ │ 操作 │ 状态码 │ ├──────────────────┼─────────────────────────┤ │ GET成功 │ 200 OK │ │ POST创建成功 │ 201 Created │ │ PUT/PATCH成功 │ 200 OK │ │ DELETE成功 │ 204 No Content │ │ 参数错误 │ 400 Bad Request │ │ 未登录 │ 401 Unauthorized │ │ 无权限 │ 403 Forbidden │ │ 资源不存在 │ 404 Not Found │ │ 验证失败 │ 422 Unprocessable Entity│ │ 服务器错误 │ 500 Internal Server Error│ └──────────────────┴─────────────────────────┘ 2.4 响应数据格式 标准JSON响应格式： 成功响应： { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: { &#34;id&#34;: 123, &#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34; }, &#34;message&#34;: &#34;操作成功&#34; } 列表响应（带分页）： { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: [ {&#34;id&#34;: 1, &#34;name&#34;: &#34;张三&#34;}, {&#34;id&#34;: 2, &#34;name&#34;: &#34;李四&#34;} ], &#34;pagination&#34;: { &#34;total&#34;: 100, &#34;page&#34;: 1, &#34;limit&#34;: 20, &#34;pages&#34;: 5 }, &#34;message&#34;: &#34;获取成功&#34; } 错误响应： { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: &#34;VALIDATION_ERROR&#34;, &#34;message&#34;: &#34;验证失败&#34;, &#34;details&#34;: [ { &#34;field&#34;: &#34;email&#34;, &#34;message&#34;: &#34;邮箱格式不正确&#34; }, { &#34;field&#34;: &#34;password&#34;, &#34;message&#34;: &#34;密码长度至少8位&#34; } ] } } 统一字段说明： - status: 状态（success/error） - data: 数据内容 - message: 提示信息 - error: 错误详情 - pagination: 分页信息 3. 高级特性 3.1 版本控制 API版本控制的三种方式： 1. URI版本控制（推荐） https://api.example.com/v1/users https://api.example.com/v2/users 优点：清晰、直观 缺点：URI变化 2. 请求头版本控制 GET /users Headers: Accept: application/vnd.example.v1+json 优点：URI不变 缺点：不够直观 3. 参数版本控制 GET /users?version=1 优点：简单 缺点：容易忽略，不够规范 推荐做法： - 使用URI版本控制 - 主版本号（v1, v2） - 保持向后兼容 - 明确废弃策略 3.2 分页、过滤、排序 分页参数： GET /users?page=2&amp;limit=20 或使用offset和limit： GET /users?offset=20&amp;limit=20 响应包含分页信息： { &#34;data&#34;: [...], &#34;pagination&#34;: { &#34;total&#34;: 1000, # 总记录数 &#34;page&#34;: 2, # 当前页 &#34;limit&#34;: 20, # 每页数量 &#34;pages&#34;: 50, # 总页数 &#34;prev&#34;: 1, # 上一页 &#34;next&#34;: 3 # 下一页 } } --- 过滤参数： GET /users?role=admin&amp;status=active GET /products?category=electronics&amp;price_min=100&amp;price_max=1000 GET /orders?created_after=2024-01-01&amp;created_before=2024-12-31 --- 排序参数： GET /users?sort=created_at&amp;order=desc GET /products?sort=-price # 减号表示降序 GET /users?sort=name,created_at # 多字段排序 --- 字段选择（稀疏字段集）： GET /users?fields=id,name,email 只返回指定的字段，减少数据传输 --- 搜索： GET /users?search=张三 GET /products?q=手机 3.3 认证和授权 常见认证方式： 1. Basic Auth（基础认证） Authorization: Basic base64(username:password) 优点：简单 缺点：不够安全（需HTTPS） 2. API Key GET /users?api_key=your_api_key 或 Headers: X-API-Key: your_api_key 优点：简单、易于管理 缺点：密钥泄露风险 3. JWT (JSON Web Token)（推荐） Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... 优点：无状态、可扩展、信息丰富 缺点：令牌较大 4. OAuth 2.0 用于第三方授权 流程： 1. 客户端请求授权 2. 用户同意授权 3. 获取访问令牌 4. 使用令牌访问资源 JWT结构： Header.Payload.Signature { &#34;alg&#34;: &#34;HS256&#34;, # 算法 &#34;typ&#34;: &#34;JWT&#34; # 类型 } . { &#34;sub&#34;: &#34;123&#34;, # 用户ID &#34;name&#34;: &#34;张三&#34;, &#34;iat&#34;: 1516239022, # 签发时间 &#34;exp&#34;: 1516242622 # 过期时间 } . HMACSHA256( base64UrlEncode(header) + &#34;.&#34; + base64UrlEncode(payload), secret ) 3.4 HATEOAS HATEOAS (Hypermedia as the Engine of Application State) 超媒体驱动的应用状态 原则： API响应中包含相关操作的链接 示例： GET /users/123 响应： { &#34;id&#34;: 123, &#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;, &#34;links&#34;: [ { &#34;rel&#34;: &#34;self&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;GET&#34; }, { &#34;rel&#34;: &#34;update&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;PUT&#34; }, { &#34;rel&#34;: &#34;delete&#34;, &#34;href&#34;: &#34;/users/123&#34;, &#34;method&#34;: &#34;DELETE&#34; }, { &#34;rel&#34;: &#34;orders&#34;, &#34;href&#34;: &#34;/users/123/orders&#34;, &#34;method&#34;: &#34;GET&#34; } ] } 优点： - API自解释 - 客户端不需要硬编码URL - 易于演化 缺点： - 增加响应大小 - 实现复杂 4. 实战项目：用户管理API 4.1 API设计 用户管理API设计： 资源：Users（用户） 端点设计： ┌────────┬─────────────────┬──────────────────┬─────────┐ │ 方法 │ URI │ 描述 │ 状态码 │ ├────────┼─────────────────┼──────────────────┼─────────┤ │ GET │ /api/v1/users │ 获取用户列表 │ 200 │ │ GET │ /api/v1/users/1 │ 获取指定用户 │ 200/404 │ │ POST │ /api/v1/users │ 创建新用户 │ 201 │ │ PUT │ /api/v1/users/1 │ 更新用户（完整） │ 200/404 │ │ PATCH │ /api/v1/users/1 │ 更新用户（部分） │ 200/404 │ │ DELETE │ /api/v1/users/1 │ 删除用户 │ 204/404 │ └────────┴─────────────────┴──────────────────┴─────────┘ 查询参数： - ?page=1&amp;limit=20 # 分页 - ?role=admin # 按角色过滤 - ?search=张 # 搜索 - ?sort=created_at # 排序 4.2 代码实现 # day30_restful_api.py # 功能：简单的RESTful API实现 from flask import Flask, request, jsonify from datetime import datetime import uuid app = Flask(__name__) # 模拟数据库 users_db = {} # 初始化一些测试数据 def init_data(): &#34;&#34;&#34;初始化测试数据&#34;&#34;&#34; users = [ {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;, &#34;role&#34;: &#34;admin&#34;}, {&#34;name&#34;: &#34;李四&#34;, &#34;email&#34;: &#34;li@example.com&#34;, &#34;role&#34;: &#34;user&#34;}, {&#34;name&#34;: &#34;王五&#34;, &#34;email&#34;: &#34;wang@example.com&#34;, &#34;role&#34;: &#34;user&#34;}, ] for user_data in users: user_id = str(uuid.uuid4()) users_db[user_id] = { &#34;id&#34;: user_id, **user_data, &#34;created_at&#34;: datetime.now().isoformat(), &#34;updated_at&#34;: datetime.now().isoformat() } init_data() def success_response(data=None, message=&#34;操作成功&#34;, status_code=200): &#34;&#34;&#34; 成功响应格式 参数： data: 返回的数据 message: 提示信息 status_code: HTTP状态码 &#34;&#34;&#34; response = { &#34;status&#34;: &#34;success&#34;, &#34;message&#34;: message } if data is not None: response[&#34;data&#34;] = data return jsonify(response), status_code def error_response(message=&#34;操作失败&#34;, code=&#34;ERROR&#34;, details=None, status_code=400): &#34;&#34;&#34; 错误响应格式 参数： message: 错误信息 code: 错误代码 details: 错误详情 status_code: HTTP状态码 &#34;&#34;&#34; response = { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: code, &#34;message&#34;: message } } if details: response[&#34;error&#34;][&#34;details&#34;] = details return jsonify(response), status_code # ============================================================ # 用户管理API # ============================================================ @app.route(&#39;/api/v1/users&#39;, methods=[&#39;GET&#39;]) def get_users(): &#34;&#34;&#34; 获取用户列表 查询参数： page: 页码（默认1） limit: 每页数量（默认20） role: 角色过滤 search: 搜索（姓名或邮箱） sort: 排序字段 order: 排序顺序（asc/desc） &#34;&#34;&#34; # 获取查询参数 page = int(request.args.get(&#39;page&#39;, 1)) limit = int(request.args.get(&#39;limit&#39;, 20)) role = request.args.get(&#39;role&#39;) search = request.args.get(&#39;search&#39;) sort_field = request.args.get(&#39;sort&#39;, &#39;created_at&#39;) sort_order = request.args.get(&#39;order&#39;, &#39;desc&#39;) # 获取所有用户 users_list = list(users_db.values()) # 过滤 if role: users_list = [u for u in users_list if u.get(&#39;role&#39;) == role] if search: users_list = [ u for u in users_list if search.lower() in u.get(&#39;name&#39;, &#39;&#39;).lower() or search.lower() in u.get(&#39;email&#39;, &#39;&#39;).lower() ] # 排序 reverse = (sort_order == &#39;desc&#39;) users_list.sort(key=lambda x: x.get(sort_field, &#39;&#39;), reverse=reverse) # 分页 total = len(users_list) start = (page - 1) * limit end = start + limit users_page = users_list[start:end] # 构造响应 response_data = { &#34;users&#34;: users_page, &#34;pagination&#34;: { &#34;total&#34;: total, &#34;page&#34;: page, &#34;limit&#34;: limit, &#34;pages&#34;: (total + limit - 1) // limit } } return success_response(response_data, &#34;获取用户列表成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;GET&#39;]) def get_user(user_id): &#34;&#34;&#34; 获取指定用户 路径参数： user_id: 用户ID &#34;&#34;&#34; user = users_db.get(user_id) if not user: return error_response( message=f&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) return success_response(user, &#34;获取用户成功&#34;) @app.route(&#39;/api/v1/users&#39;, methods=[&#39;POST&#39;]) def create_user(): &#34;&#34;&#34; 创建新用户 请求体： { &#34;name&#34;: &#34;用户名&#34;, &#34;email&#34;: &#34;邮箱&#34;, &#34;role&#34;: &#34;角色&#34; } &#34;&#34;&#34; data = request.get_json() # 验证必填字段 required_fields = [&#39;name&#39;, &#39;email&#39;] missing_fields = [f for f in required_fields if f not in data] if missing_fields: return error_response( message=&#34;缺少必填字段&#34;, code=&#34;VALIDATION_ERROR&#34;, details=[{&#34;field&#34;: f, &#34;message&#34;: &#34;此字段为必填项&#34;} for f in missing_fields], status_code=422 ) # 验证邮箱唯一性 email = data.get(&#39;email&#39;) if any(u[&#39;email&#39;] == email for u in users_db.values()): return error_response( message=&#34;邮箱已存在&#34;, code=&#34;EMAIL_EXISTS&#34;, status_code=409 ) # 创建用户 user_id = str(uuid.uuid4()) user = { &#34;id&#34;: user_id, &#34;name&#34;: data[&#39;name&#39;], &#34;email&#34;: data[&#39;email&#39;], &#34;role&#34;: data.get(&#39;role&#39;, &#39;user&#39;), &#34;created_at&#34;: datetime.now().isoformat(), &#34;updated_at&#34;: datetime.now().isoformat() } users_db[user_id] = user return success_response(user, &#34;创建用户成功&#34;, 201) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;PUT&#39;]) def update_user(user_id): &#34;&#34;&#34; 完整更新用户 路径参数： user_id: 用户ID 请求体： { &#34;name&#34;: &#34;用户名&#34;, &#34;email&#34;: &#34;邮箱&#34;, &#34;role&#34;: &#34;角色&#34; } &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) data = request.get_json() # 验证必填字段 required_fields = [&#39;name&#39;, &#39;email&#39;] missing_fields = [f for f in required_fields if f not in data] if missing_fields: return error_response( message=&#34;缺少必填字段&#34;, code=&#34;VALIDATION_ERROR&#34;, details=[{&#34;field&#34;: f, &#34;message&#34;: &#34;此字段为必填项&#34;} for f in missing_fields], status_code=422 ) # 更新用户 users_db[user_id].update({ &#34;name&#34;: data[&#39;name&#39;], &#34;email&#34;: data[&#39;email&#39;], &#34;role&#34;: data.get(&#39;role&#39;, &#39;user&#39;), &#34;updated_at&#34;: datetime.now().isoformat() }) return success_response(users_db[user_id], &#34;更新用户成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;PATCH&#39;]) def patch_user(user_id): &#34;&#34;&#34; 部分更新用户 路径参数： user_id: 用户ID 请求体：可以只包含要更新的字段 { &#34;name&#34;: &#34;新用户名&#34; } &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) data = request.get_json() # 只更新提供的字段 allowed_fields = [&#39;name&#39;, &#39;email&#39;, &#39;role&#39;] for field in allowed_fields: if field in data: users_db[user_id][field] = data[field] users_db[user_id][&#39;updated_at&#39;] = datetime.now().isoformat() return success_response(users_db[user_id], &#34;更新用户成功&#34;) @app.route(&#39;/api/v1/users/&lt;user_id&gt;&#39;, methods=[&#39;DELETE&#39;]) def delete_user(user_id): &#34;&#34;&#34; 删除用户 路径参数： user_id: 用户ID &#34;&#34;&#34; if user_id not in users_db: return error_response( message=&#34;用户不存在&#34;, code=&#34;USER_NOT_FOUND&#34;, status_code=404 ) del users_db[user_id] # DELETE成功通常返回204 No Content return &#39;&#39;, 204 # ============================================================ # API文档和健康检查 # ============================================================ @app.route(&#39;/api/v1/health&#39;, methods=[&#39;GET&#39;]) def health_check(): &#34;&#34;&#34;健康检查&#34;&#34;&#34; return success_response({ &#34;status&#34;: &#34;healthy&#34;, &#34;timestamp&#34;: datetime.now().isoformat() }) @app.route(&#39;/api/v1/docs&#39;, methods=[&#39;GET&#39;]) def api_docs(): &#34;&#34;&#34;API文档&#34;&#34;&#34; docs = { &#34;version&#34;: &#34;1.0.0&#34;, &#34;title&#34;: &#34;用户管理API&#34;, &#34;endpoints&#34;: [ { &#34;path&#34;: &#34;/api/v1/users&#34;, &#34;method&#34;: &#34;GET&#34;, &#34;description&#34;: &#34;获取用户列表&#34;, &#34;parameters&#34;: { &#34;page&#34;: &#34;页码&#34;, &#34;limit&#34;: &#34;每页数量&#34;, &#34;role&#34;: &#34;角色过滤&#34;, &#34;search&#34;: &#34;搜索&#34;, &#34;sort&#34;: &#34;排序字段&#34;, &#34;order&#34;: &#34;排序顺序&#34; } }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;GET&#34;, &#34;description&#34;: &#34;获取指定用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users&#34;, &#34;method&#34;: &#34;POST&#34;, &#34;description&#34;: &#34;创建新用户&#34;, &#34;body&#34;: { &#34;name&#34;: &#34;用户名（必填）&#34;, &#34;email&#34;: &#34;邮箱（必填）&#34;, &#34;role&#34;: &#34;角色（可选）&#34; } }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;PUT&#34;, &#34;description&#34;: &#34;完整更新用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;PATCH&#34;, &#34;description&#34;: &#34;部分更新用户&#34; }, { &#34;path&#34;: &#34;/api/v1/users/&lt;id&gt;&#34;, &#34;method&#34;: &#34;DELETE&#34;, &#34;description&#34;: &#34;删除用户&#34; } ] } return success_response(docs) if __name__ == &#39;__main__&#39;: print(&#34;&#34;&#34; ╔══════════════════════════════════════════════════════════╗ ║ RESTful API 服务器 ║ ║ User Management API ║ ╚══════════════════════════════════════════════════════════╝ API地址: http://127.0.0.1:5000/api/v1 可用端点: - GET /api/v1/users 获取用户列表 - GET /api/v1/users/&lt;id&gt; 获取指定用户 - POST /api/v1/users 创建新用户 - PUT /api/v1/users/&lt;id&gt; 更新用户（完整） - PATCH /api/v1/users/&lt;id&gt; 更新用户（部分） - DELETE /api/v1/users/&lt;id&gt; 删除用户 - GET /api/v1/health 健康检查 - GET /api/v1/docs API文档 测试命令: # 获取所有用户 curl http://127.0.0.1:5000/api/v1/users # 创建用户 curl -X POST http://127.0.0.1:5000/api/v1/users \\\\ -H &#34;Content-Type: application/json&#34; \\\\ -d &#39;{&#34;name&#34;:&#34;测试用户&#34;,&#34;email&#34;:&#34;test@example.com&#34;}&#39; # 获取单个用户 curl http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 更新用户 curl -X PATCH http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\\\ -H &#34;Content-Type: application/json&#34; \\\\ -d &#39;{&#34;name&#34;:&#34;新名字&#34;}&#39; # 删除用户 curl -X DELETE http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; &#34;&#34;&#34;) app.run(debug=True, host=&#39;0.0.0.0&#39;, port=5000) 5. API测试 5.1 使用curl测试 # 1. 获取所有用户 curl http://127.0.0.1:5000/api/v1/users # 2. 分页和过滤 curl &#34;http://127.0.0.1:5000/api/v1/users?page=1&amp;limit=10&amp;role=admin&#34; # 3. 创建用户 curl -X POST http://127.0.0.1:5000/api/v1/users \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{ &#34;name&#34;: &#34;新用户&#34;, &#34;email&#34;: &#34;new@example.com&#34;, &#34;role&#34;: &#34;user&#34; }&#39; # 4. 获取单个用户 curl http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 5. 更新用户（PUT - 完整更新） curl -X PUT http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{ &#34;name&#34;: &#34;更新的用户&#34;, &#34;email&#34;: &#34;updated@example.com&#34;, &#34;role&#34;: &#34;admin&#34; }&#39; # 6. 更新用户（PATCH - 部分更新） curl -X PATCH http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; \\ -H &#34;Content-Type: application/json&#34; \\ -d &#39;{&#34;name&#34;: &#34;只更新名字&#34;}&#39; # 7. 删除用户 curl -X DELETE http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; # 8. 健康检查 curl http://127.0.0.1:5000/api/v1/health 6. 最佳实践总结 RESTful API设计最佳实践： 1. 使用名词表示资源，用HTTP方法表示操作 ✅ GET /users ❌ GET /getUsers 2. 使用复数形式 ✅ /users, /products ❌ /user, /product 3. 使用正确的HTTP状态码 200: 成功 201: 创建成功 204: 删除成功 400: 请求错误 401: 未认证 403: 无权限 404: 未找到 500: 服务器错误 4. 提供版本控制 /api/v1/users 5. 支持分页、过滤、排序 ?page=1&amp;limit=20&amp;sort=name 6. 使用统一的响应格式 { &#34;status&#34;: &#34;success&#34;, &#34;data&#34;: {...} } 7. 提供清晰的错误信息 { &#34;status&#34;: &#34;error&#34;, &#34;error&#34;: { &#34;code&#34;: &#34;VALIDATION_ERROR&#34;, &#34;message&#34;: &#34;详细错误信息&#34; } } 8. 使用HTTPS保护API 9. 实现认证和授权（JWT推荐） 10. 提供完善的API文档 11. 实现请求限流（Rate Limiting） 12. 使用缓存提高性能 13. 记录完整的日志 14. 编写完善的测试 7. 今日练习 练习1：设计博客API 设计一个博客系统的RESTful API，包含：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#1-rest基础概念">1. REST基础概念</a>
+      <ul>
+        <li><a href="#11-什么是rest">1.1 什么是REST？</a></li>
+        <li><a href="#12-rest的六大约束">1.2 REST的六大约束</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-restful-api设计原则">2. RESTful API设计原则</a>
+      <ul>
+        <li><a href="#21-资源和uri设计">2.1 资源和URI设计</a></li>
+        <li><a href="#22-http方法使用">2.2 HTTP方法使用</a></li>
+        <li><a href="#23-状态码使用">2.3 状态码使用</a></li>
+        <li><a href="#24-响应数据格式">2.4 响应数据格式</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-高级特性">3. 高级特性</a>
+      <ul>
+        <li><a href="#31-版本控制">3.1 版本控制</a></li>
+        <li><a href="#32-分页过滤排序">3.2 分页、过滤、排序</a></li>
+        <li><a href="#33-认证和授权">3.3 认证和授权</a></li>
+        <li><a href="#34-hateoas">3.4 HATEOAS</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-实战项目用户管理api">4. 实战项目：用户管理API</a>
+      <ul>
+        <li><a href="#41-api设计">4.1 API设计</a></li>
+        <li><a href="#42-代码实现">4.2 代码实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-api测试">5. API测试</a>
+      <ul>
+        <li><a href="#51-使用curl测试">5.1 使用curl测试</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-最佳实践总结">6. 最佳实践总结</a></li>
+    <li><a href="#7-今日练习">7. 今日练习</a>
+      <ul>
+        <li><a href="#练习1设计博客api">练习1：设计博客API</a></li>
+        <li><a href="#练习2实现产品api">练习2：实现产品API</a></li>
+        <li><a href="#练习3api测试">练习3：API测试</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-扩展阅读">8. 扩展阅读</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/30%E5%A4%A9restful-api%E8%AE%BE%E8%AE%A1/">30天：RESTful API设计</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:25:45Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#-今日目标">📚 今日目标</a></li>
+    <li><a href="#1-rest基础概念">1. REST基础概念</a>
+      <ul>
+        <li><a href="#11-什么是rest">1.1 什么是REST？</a></li>
+        <li><a href="#12-rest的六大约束">1.2 REST的六大约束</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-restful-api设计原则">2. RESTful API设计原则</a>
+      <ul>
+        <li><a href="#21-资源和uri设计">2.1 资源和URI设计</a></li>
+        <li><a href="#22-http方法使用">2.2 HTTP方法使用</a></li>
+        <li><a href="#23-状态码使用">2.3 状态码使用</a></li>
+        <li><a href="#24-响应数据格式">2.4 响应数据格式</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-高级特性">3. 高级特性</a>
+      <ul>
+        <li><a href="#31-版本控制">3.1 版本控制</a></li>
+        <li><a href="#32-分页过滤排序">3.2 分页、过滤、排序</a></li>
+        <li><a href="#33-认证和授权">3.3 认证和授权</a></li>
+        <li><a href="#34-hateoas">3.4 HATEOAS</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-实战项目用户管理api">4. 实战项目：用户管理API</a>
+      <ul>
+        <li><a href="#41-api设计">4.1 API设计</a></li>
+        <li><a href="#42-代码实现">4.2 代码实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-api测试">5. API测试</a>
+      <ul>
+        <li><a href="#51-使用curl测试">5.1 使用curl测试</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-最佳实践总结">6. 最佳实践总结</a></li>
+    <li><a href="#7-今日练习">7. 今日练习</a>
+      <ul>
+        <li><a href="#练习1设计博客api">练习1：设计博客API</a></li>
+        <li><a href="#练习2实现产品api">练习2：实现产品API</a></li>
+        <li><a href="#练习3api测试">练习3：API测试</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-扩展阅读">8. 扩展阅读</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第30天restful-api设计">第30天：RESTful API设计
+</h1>
+    <blockquote>
+        <p>&ldquo;好的API设计就像好的用户界面，让使用者感到直观和愉悦！&rdquo;</p>
+
+    </blockquote>
+<h2 id="-今日目标">📚 今日目标
+</h2><ul>
+<li>理解REST架构风格</li>
+<li>掌握RESTful API设计原则</li>
+<li>学习HTTP方法的正确使用</li>
+<li>理解资源和URI设计</li>
+<li>掌握API版本控制和错误处理</li>
+<li>实现一个简单的RESTful API</li>
+</ul>
+<hr>
+<h2 id="1-rest基础概念">1. REST基础概念
+</h2><h3 id="11-什么是rest">1.1 什么是REST？
+</h3><pre tabindex="0"><code>REST (Representational State Transfer)
+表述性状态转移
+
+核心思想：
+- 资源（Resource）为中心
+- 使用标准HTTP方法
+- 无状态通信
+- 统一接口
+
+REST不是协议，而是一种架构风格
+
+类比：
+REST API = 图书馆管理系统
+- 资源 = 书籍
+- URI = 书籍编号
+- HTTP方法 = 操作（借、还、查、删）
+- 状态码 = 操作结果（成功、失败、未找到）
+
+例如：
+GET /books/123        → 查询123号书
+POST /books           → 新增一本书
+PUT /books/123        → 更新123号书
+DELETE /books/123     → 删除123号书
+</code></pre><h3 id="12-rest的六大约束">1.2 REST的六大约束
+</h3><pre tabindex="0"><code>1. 客户端-服务器分离 (Client-Server)
+   - 客户端和服务器独立演化
+   - 前后端分离
+
+2. 无状态 (Stateless)
+   - 每个请求包含所有必要信息
+   - 服务器不保存客户端状态
+   - 易于扩展和负载均衡
+
+3. 可缓存 (Cacheable)
+   - 响应可以被缓存
+   - 提高性能
+
+4. 分层系统 (Layered System)
+   - 客户端不知道直接连接的是服务器还是中间层
+   - 可以加入负载均衡、缓存等
+
+5. 统一接口 (Uniform Interface)
+   - 资源标识（URI）
+   - 通过表述操作资源
+   - 自描述消息
+   - 超媒体驱动（HATEOAS）
+
+6. 按需代码（可选）(Code on Demand)
+   - 服务器可以返回可执行代码
+   - 如JavaScript
+</code></pre><hr>
+<h2 id="2-restful-api设计原则">2. RESTful API设计原则
+</h2><h3 id="21-资源和uri设计">2.1 资源和URI设计
+</h3><pre tabindex="0"><code>资源设计原则：
+
+1. 使用名词，不使用动词
+   ✅ 好的设计:
+   GET  /users          # 获取用户列表
+   GET  /users/123      # 获取ID为123的用户
+   POST /users          # 创建新用户
+
+   ❌ 不好的设计:
+   GET  /getUsers
+   POST /createUser
+   GET  /user/delete/123
+
+2. 使用复数形式
+   ✅ 好: /users, /products, /orders
+   ❌ 差: /user, /product, /order
+
+3. 使用小写字母和连字符
+   ✅ 好: /user-profiles, /product-categories
+   ❌ 差: /UserProfiles, /product_categories
+
+4. 资源嵌套表示关系
+   ✅ 好: /users/123/orders        # 用户123的订单
+        /orders/456/items        # 订单456的商品
+
+   但不要嵌套太深（最多2-3层）
+   ❌ 差: /users/123/orders/456/items/789/reviews
+
+5. 使用查询参数进行过滤、排序、分页
+   /users?role=admin              # 过滤
+   /users?sort=created_at&amp;order=desc  # 排序
+   /users?page=2&amp;limit=20         # 分页
+   /users?fields=id,name,email    # 字段选择
+</code></pre><h3 id="22-http方法使用">2.2 HTTP方法使用
+</h3><pre tabindex="0"><code>标准HTTP方法及其用途：
+
+┌────────┬──────────┬─────────┬─────────┬──────────┐
+│ 方法   │ 用途     │ 安全性  │ 幂等性  │ 可缓存   │
+├────────┼──────────┼─────────┼─────────┼──────────┤
+│ GET    │ 获取资源 │ 是      │ 是      │ 是       │
+│ POST   │ 创建资源 │ 否      │ 否      │ 否       │
+│ PUT    │ 更新资源 │ 否      │ 是      │ 否       │
+│ PATCH  │ 部分更新 │ 否      │ 否      │ 否       │
+│ DELETE │ 删除资源 │ 否      │ 是      │ 否       │
+│ HEAD   │ 获取头部 │ 是      │ 是      │ 是       │
+│ OPTIONS│ 获取选项 │ 是      │ 是      │ 否       │
+└────────┴──────────┴─────────┴─────────┴──────────┘
+
+详细说明：
+
+GET - 获取资源
+  GET /users           → 获取所有用户
+  GET /users/123       → 获取ID为123的用户
+  特点：安全、幂等、可缓存
+
+POST - 创建新资源
+  POST /users
+  Body: {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;zhang@example.com&#34;}
+  特点：不安全、不幂等
+
+PUT - 完整更新资源
+  PUT /users/123
+  Body: {&#34;name&#34;: &#34;张三&#34;, &#34;email&#34;: &#34;new@example.com&#34;, &#34;age&#34;: 30}
+  特点：幂等（多次执行结果相同）
+  要求：必须提供完整的资源数据
+
+PATCH - 部分更新资源
+  PATCH /users/123
+  Body: {&#34;email&#34;: &#34;new@example.com&#34;}
+  特点：只更新提供的字段
+  更灵活，推荐使用
+
+DELETE - 删除资源
+  DELETE /users/123
+  特点：幂等（删除多次结果相同）
+
+HEAD - 获取资源元数据
+  HEAD /users/123
+  返回：只返回响应头，不返回响应体
+  用途：检查资源是否存在、获取资源大小等
+
+OPTIONS - 获取资源支持的方法
+  OPTIONS /users
+  返回：Allow: GET, POST, PUT, DELETE
+  用途：CORS预检请求
+</code></pre><h3 id="23-状态码使用">2.3 状态码使用
+</h3><pre tabindex="0"><code>HTTP状态码分类：
+
+1xx - 信息性
+  100 Continue              # 继续请求
+
+2xx - 成功
+  200 OK                    # 成功（GET, PUT, PATCH）
+  201 Created               # 创建成功（POST）
+  202 Accepted              # 已接受，处理中（异步操作）
+  204 No Content            # 成功，无返回内容（DELETE）
+
+3xx - 重定向
+  301 Moved Permanently     # 永久重定向
+  302 Found                 # 临时重定向
+  304 Not Modified          # 未修改（缓存有效）
+
+4xx - 客户端错误
+  400 Bad Request           # 请求参数错误
+  401 Unauthorized          # 未认证
+  403 Forbidden             # 无权限
+  404 Not Found             # 资源不存在
+  405 Method Not Allowed    # 方法不允许
+  409 Conflict              # 资源冲突
+  422 Unprocessable Entity  # 验证失败
+  429 Too Many Requests     # 请求过多
+
+5xx - 服务器错误
+  500 Internal Server Error # 服务器内部错误
+  502 Bad Gateway           # 网关错误
+  503 Service Unavailable   # 服务不可用
+  504 Gateway Timeout       # 网关超时
+
+最常用的状态码：
+┌──────────────────┬─────────────────────────┐
+│ 操作             │ 状态码                   │
+├──────────────────┼─────────────────────────┤
+│ GET成功          │ 200 OK                  │
+│ POST创建成功     │ 201 Created             │
+│ PUT/PATCH成功    │ 200 OK                  │
+│ DELETE成功       │ 204 No Content          │
+│ 参数错误         │ 400 Bad Request         │
+│ 未登录           │ 401 Unauthorized        │
+│ 无权限           │ 403 Forbidden           │
+│ 资源不存在       │ 404 Not Found           │
+│ 验证失败         │ 422 Unprocessable Entity│
+│ 服务器错误       │ 500 Internal Server Error│
+└──────────────────┴─────────────────────────┘
+</code></pre><h3 id="24-响应数据格式">2.4 响应数据格式
+</h3><pre tabindex="0"><code>标准JSON响应格式：
+
+成功响应：
+{
+  &#34;status&#34;: &#34;success&#34;,
+  &#34;data&#34;: {
+    &#34;id&#34;: 123,
+    &#34;name&#34;: &#34;张三&#34;,
+    &#34;email&#34;: &#34;zhang@example.com&#34;
+  },
+  &#34;message&#34;: &#34;操作成功&#34;
+}
+
+列表响应（带分页）：
+{
+  &#34;status&#34;: &#34;success&#34;,
+  &#34;data&#34;: [
+    {&#34;id&#34;: 1, &#34;name&#34;: &#34;张三&#34;},
+    {&#34;id&#34;: 2, &#34;name&#34;: &#34;李四&#34;}
+  ],
+  &#34;pagination&#34;: {
+    &#34;total&#34;: 100,
+    &#34;page&#34;: 1,
+    &#34;limit&#34;: 20,
+    &#34;pages&#34;: 5
+  },
+  &#34;message&#34;: &#34;获取成功&#34;
+}
+
+错误响应：
+{
+  &#34;status&#34;: &#34;error&#34;,
+  &#34;error&#34;: {
+    &#34;code&#34;: &#34;VALIDATION_ERROR&#34;,
+    &#34;message&#34;: &#34;验证失败&#34;,
+    &#34;details&#34;: [
+      {
+        &#34;field&#34;: &#34;email&#34;,
+        &#34;message&#34;: &#34;邮箱格式不正确&#34;
+      },
+      {
+        &#34;field&#34;: &#34;password&#34;,
+        &#34;message&#34;: &#34;密码长度至少8位&#34;
+      }
+    ]
+  }
+}
+
+统一字段说明：
+- status: 状态（success/error）
+- data: 数据内容
+- message: 提示信息
+- error: 错误详情
+- pagination: 分页信息
+</code></pre><hr>
+<h2 id="3-高级特性">3. 高级特性
+</h2><h3 id="31-版本控制">3.1 版本控制
+</h3><pre tabindex="0"><code>API版本控制的三种方式：
+
+1. URI版本控制（推荐）
+   https://api.example.com/v1/users
+   https://api.example.com/v2/users
+
+   优点：清晰、直观
+   缺点：URI变化
+
+2. 请求头版本控制
+   GET /users
+   Headers:
+     Accept: application/vnd.example.v1+json
+
+   优点：URI不变
+   缺点：不够直观
+
+3. 参数版本控制
+   GET /users?version=1
+
+   优点：简单
+   缺点：容易忽略，不够规范
+
+推荐做法：
+- 使用URI版本控制
+- 主版本号（v1, v2）
+- 保持向后兼容
+- 明确废弃策略
+</code></pre><h3 id="32-分页过滤排序">3.2 分页、过滤、排序
+</h3><pre tabindex="0"><code>分页参数：
+GET /users?page=2&amp;limit=20
+
+或使用offset和limit：
+GET /users?offset=20&amp;limit=20
+
+响应包含分页信息：
+{
+  &#34;data&#34;: [...],
+  &#34;pagination&#34;: {
+    &#34;total&#34;: 1000,      # 总记录数
+    &#34;page&#34;: 2,          # 当前页
+    &#34;limit&#34;: 20,        # 每页数量
+    &#34;pages&#34;: 50,        # 总页数
+    &#34;prev&#34;: 1,          # 上一页
+    &#34;next&#34;: 3           # 下一页
+  }
+}
+
+---
+
+过滤参数：
+GET /users?role=admin&amp;status=active
+GET /products?category=electronics&amp;price_min=100&amp;price_max=1000
+GET /orders?created_after=2024-01-01&amp;created_before=2024-12-31
+
+---
+
+排序参数：
+GET /users?sort=created_at&amp;order=desc
+GET /products?sort=-price  # 减号表示降序
+GET /users?sort=name,created_at  # 多字段排序
+
+---
+
+字段选择（稀疏字段集）：
+GET /users?fields=id,name,email
+只返回指定的字段，减少数据传输
+
+---
+
+搜索：
+GET /users?search=张三
+GET /products?q=手机
+</code></pre><h3 id="33-认证和授权">3.3 认证和授权
+</h3><pre tabindex="0"><code>常见认证方式：
+
+1. Basic Auth（基础认证）
+   Authorization: Basic base64(username:password)
+
+   优点：简单
+   缺点：不够安全（需HTTPS）
+
+2. API Key
+   GET /users?api_key=your_api_key
+   或
+   Headers: X-API-Key: your_api_key
+
+   优点：简单、易于管理
+   缺点：密钥泄露风险
+
+3. JWT (JSON Web Token)（推荐）
+   Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+   优点：无状态、可扩展、信息丰富
+   缺点：令牌较大
+
+4. OAuth 2.0
+   用于第三方授权
+
+   流程：
+   1. 客户端请求授权
+   2. 用户同意授权
+   3. 获取访问令牌
+   4. 使用令牌访问资源
+
+JWT结构：
+Header.Payload.Signature
+
+{
+  &#34;alg&#34;: &#34;HS256&#34;,        # 算法
+  &#34;typ&#34;: &#34;JWT&#34;           # 类型
+}
+.
+{
+  &#34;sub&#34;: &#34;123&#34;,          # 用户ID
+  &#34;name&#34;: &#34;张三&#34;,
+  &#34;iat&#34;: 1516239022,     # 签发时间
+  &#34;exp&#34;: 1516242622      # 过期时间
+}
+.
+HMACSHA256(
+  base64UrlEncode(header) + &#34;.&#34; +
+  base64UrlEncode(payload),
+  secret
+)
+</code></pre><h3 id="34-hateoas">3.4 HATEOAS
+</h3><pre tabindex="0"><code>HATEOAS (Hypermedia as the Engine of Application State)
+超媒体驱动的应用状态
+
+原则：
+API响应中包含相关操作的链接
+
+示例：
+GET /users/123
+
+响应：
+{
+  &#34;id&#34;: 123,
+  &#34;name&#34;: &#34;张三&#34;,
+  &#34;email&#34;: &#34;zhang@example.com&#34;,
+  &#34;links&#34;: [
+    {
+      &#34;rel&#34;: &#34;self&#34;,
+      &#34;href&#34;: &#34;/users/123&#34;,
+      &#34;method&#34;: &#34;GET&#34;
+    },
+    {
+      &#34;rel&#34;: &#34;update&#34;,
+      &#34;href&#34;: &#34;/users/123&#34;,
+      &#34;method&#34;: &#34;PUT&#34;
+    },
+    {
+      &#34;rel&#34;: &#34;delete&#34;,
+      &#34;href&#34;: &#34;/users/123&#34;,
+      &#34;method&#34;: &#34;DELETE&#34;
+    },
+    {
+      &#34;rel&#34;: &#34;orders&#34;,
+      &#34;href&#34;: &#34;/users/123/orders&#34;,
+      &#34;method&#34;: &#34;GET&#34;
+    }
+  ]
+}
+
+优点：
+- API自解释
+- 客户端不需要硬编码URL
+- 易于演化
+
+缺点：
+- 增加响应大小
+- 实现复杂
+</code></pre><hr>
+<h2 id="4-实战项目用户管理api">4. 实战项目：用户管理API
+</h2><h3 id="41-api设计">4.1 API设计
+</h3><pre tabindex="0"><code>用户管理API设计：
+
+资源：Users（用户）
+
+端点设计：
+┌────────┬─────────────────┬──────────────────┬─────────┐
+│ 方法   │ URI             │ 描述             │ 状态码  │
+├────────┼─────────────────┼──────────────────┼─────────┤
+│ GET    │ /api/v1/users   │ 获取用户列表     │ 200     │
+│ GET    │ /api/v1/users/1 │ 获取指定用户     │ 200/404 │
+│ POST   │ /api/v1/users   │ 创建新用户       │ 201     │
+│ PUT    │ /api/v1/users/1 │ 更新用户（完整） │ 200/404 │
+│ PATCH  │ /api/v1/users/1 │ 更新用户（部分） │ 200/404 │
+│ DELETE │ /api/v1/users/1 │ 删除用户         │ 204/404 │
+└────────┴─────────────────┴──────────────────┴─────────┘
+
+查询参数：
+- ?page=1&amp;limit=20    # 分页
+- ?role=admin         # 按角色过滤
+- ?search=张          # 搜索
+- ?sort=created_at    # 排序
+</code></pre><h3 id="42-代码实现">4.2 代码实现
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># day30_restful_api.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 功能：简单的RESTful API实现</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask, request, jsonify
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> datetime <span style="color:#f92672">import</span> datetime
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> uuid
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 模拟数据库</span>
+</span></span><span style="display:flex;"><span>users_db <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 初始化一些测试数据</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">init_data</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;初始化测试数据&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    users <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;张三&#34;</span>, <span style="color:#e6db74">&#34;email&#34;</span>: <span style="color:#e6db74">&#34;zhang@example.com&#34;</span>, <span style="color:#e6db74">&#34;role&#34;</span>: <span style="color:#e6db74">&#34;admin&#34;</span>},
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;李四&#34;</span>, <span style="color:#e6db74">&#34;email&#34;</span>: <span style="color:#e6db74">&#34;li@example.com&#34;</span>, <span style="color:#e6db74">&#34;role&#34;</span>: <span style="color:#e6db74">&#34;user&#34;</span>},
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;王五&#34;</span>, <span style="color:#e6db74">&#34;email&#34;</span>: <span style="color:#e6db74">&#34;wang@example.com&#34;</span>, <span style="color:#e6db74">&#34;role&#34;</span>: <span style="color:#e6db74">&#34;user&#34;</span>},
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> user_data <span style="color:#f92672">in</span> users:
+</span></span><span style="display:flex;"><span>        user_id <span style="color:#f92672">=</span> str(uuid<span style="color:#f92672">.</span>uuid4())
+</span></span><span style="display:flex;"><span>        users_db[user_id] <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;id&#34;</span>: user_id,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">**</span>user_data,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;created_at&#34;</span>: datetime<span style="color:#f92672">.</span>now()<span style="color:#f92672">.</span>isoformat(),
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;updated_at&#34;</span>: datetime<span style="color:#f92672">.</span>now()<span style="color:#f92672">.</span>isoformat()
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>init_data()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">success_response</span>(data<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>, message<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;操作成功&#34;</span>, status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">200</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    成功响应格式
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        data: 返回的数据
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        message: 提示信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        status_code: HTTP状态码
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;status&#34;</span>: <span style="color:#e6db74">&#34;success&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;message&#34;</span>: message
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> data <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>        response[<span style="color:#e6db74">&#34;data&#34;</span>] <span style="color:#f92672">=</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> jsonify(response), status_code
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">error_response</span>(message<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;操作失败&#34;</span>, code<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;ERROR&#34;</span>, details<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>, status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">400</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    错误响应格式
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        message: 错误信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        code: 错误代码
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        details: 错误详情
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        status_code: HTTP状态码
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;status&#34;</span>: <span style="color:#e6db74">&#34;error&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;error&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;code&#34;</span>: code,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;message&#34;</span>: message
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> details:
+</span></span><span style="display:flex;"><span>        response[<span style="color:#e6db74">&#34;error&#34;</span>][<span style="color:#e6db74">&#34;details&#34;</span>] <span style="color:#f92672">=</span> details
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> jsonify(response), status_code
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ============================================================</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 用户管理API</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ============================================================</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/api/v1/users&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_users</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    获取用户列表
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    查询参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        page: 页码（默认1）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        limit: 每页数量（默认20）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        role: 角色过滤
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        search: 搜索（姓名或邮箱）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        sort: 排序字段
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        order: 排序顺序（asc/desc）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 获取查询参数</span>
+</span></span><span style="display:flex;"><span>    page <span style="color:#f92672">=</span> int(request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;page&#39;</span>, <span style="color:#ae81ff">1</span>))
+</span></span><span style="display:flex;"><span>    limit <span style="color:#f92672">=</span> int(request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;limit&#39;</span>, <span style="color:#ae81ff">20</span>))
+</span></span><span style="display:flex;"><span>    role <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;role&#39;</span>)
+</span></span><span style="display:flex;"><span>    search <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;search&#39;</span>)
+</span></span><span style="display:flex;"><span>    sort_field <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;sort&#39;</span>, <span style="color:#e6db74">&#39;created_at&#39;</span>)
+</span></span><span style="display:flex;"><span>    sort_order <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>args<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;order&#39;</span>, <span style="color:#e6db74">&#39;desc&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 获取所有用户</span>
+</span></span><span style="display:flex;"><span>    users_list <span style="color:#f92672">=</span> list(users_db<span style="color:#f92672">.</span>values())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 过滤</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> role:
+</span></span><span style="display:flex;"><span>        users_list <span style="color:#f92672">=</span> [u <span style="color:#66d9ef">for</span> u <span style="color:#f92672">in</span> users_list <span style="color:#66d9ef">if</span> u<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;role&#39;</span>) <span style="color:#f92672">==</span> role]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> search:
+</span></span><span style="display:flex;"><span>        users_list <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>            u <span style="color:#66d9ef">for</span> u <span style="color:#f92672">in</span> users_list
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> search<span style="color:#f92672">.</span>lower() <span style="color:#f92672">in</span> u<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)<span style="color:#f92672">.</span>lower()
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">or</span> search<span style="color:#f92672">.</span>lower() <span style="color:#f92672">in</span> u<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;email&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)<span style="color:#f92672">.</span>lower()
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 排序</span>
+</span></span><span style="display:flex;"><span>    reverse <span style="color:#f92672">=</span> (sort_order <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;desc&#39;</span>)
+</span></span><span style="display:flex;"><span>    users_list<span style="color:#f92672">.</span>sort(key<span style="color:#f92672">=</span><span style="color:#66d9ef">lambda</span> x: x<span style="color:#f92672">.</span>get(sort_field, <span style="color:#e6db74">&#39;&#39;</span>), reverse<span style="color:#f92672">=</span>reverse)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 分页</span>
+</span></span><span style="display:flex;"><span>    total <span style="color:#f92672">=</span> len(users_list)
+</span></span><span style="display:flex;"><span>    start <span style="color:#f92672">=</span> (page <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> limit
+</span></span><span style="display:flex;"><span>    end <span style="color:#f92672">=</span> start <span style="color:#f92672">+</span> limit
+</span></span><span style="display:flex;"><span>    users_page <span style="color:#f92672">=</span> users_list[start:end]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 构造响应</span>
+</span></span><span style="display:flex;"><span>    response_data <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;users&#34;</span>: users_page,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;pagination&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;total&#34;</span>: total,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;page&#34;</span>: page,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;limit&#34;</span>: limit,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;pages&#34;</span>: (total <span style="color:#f92672">+</span> limit <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">//</span> limit
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> success_response(response_data, <span style="color:#e6db74">&#34;获取用户列表成功&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/api/v1/users/&lt;user_id&gt;&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_user</span>(user_id):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    获取指定用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    路径参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        user_id: 用户ID
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    user <span style="color:#f92672">=</span> users_db<span style="color:#f92672">.</span>get(user_id)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> user:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> error_response(
+</span></span><span style="display:flex;"><span>            message<span style="color:#f92672">=</span><span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;用户不存在&#34;</span>,
+</span></span><span style="display:flex;"><span>            code<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;USER_NOT_FOUND&#34;</span>,
+</span></span><span style="display:flex;"><span>            status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">404</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> success_response(user, <span style="color:#e6db74">&#34;获取用户成功&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/api/v1/users&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;POST&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create_user</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    创建新用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    请求体：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        {
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &#34;name&#34;: &#34;用户名&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &#34;email&#34;: &#34;邮箱&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &#34;role&#34;: &#34;角色&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        }
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>get_json()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 验证必填字段</span>
+</span></span><span style="display:flex;"><span>    required_fields <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;email&#39;</span>]
+</span></span><span style="display:flex;"><span>    missing_fields <span style="color:#f92672">=</span> [f <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> required_fields <span style="color:#66d9ef">if</span> f <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> data]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> missing_fields:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> error_response(
+</span></span><span style="display:flex;"><span>            message<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;缺少必填字段&#34;</span>,
+</span></span><span style="display:flex;"><span>            code<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;VALIDATION_ERROR&#34;</span>,
+</span></span><span style="display:flex;"><span>            details<span style="color:#f92672">=</span>[{<span style="color:#e6db74">&#34;field&#34;</span>: f, <span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;此字段为必填项&#34;</span>} <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> missing_fields],
+</span></span><span style="display:flex;"><span>            status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">422</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 验证邮箱唯一性</span>
+</span></span><span style="display:flex;"><span>    email <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;email&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> any(u[<span style="color:#e6db74">&#39;email&#39;</span>] <span style="color:#f92672">==</span> email <span style="color:#66d9ef">for</span> u <span style="color:#f92672">in</span> users_db<span style="color:#f92672">.</span>values()):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> error_response(
+</span></span><span style="display:flex;"><span>            message<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;邮箱已存在&#34;</span>,
+</span></span><span style="display:flex;"><span>            code<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;EMAIL_EXISTS&#34;</span>,
+</span></span><span style="display:flex;"><span>            status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">409</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 创建用户</span>
+</span></span><span style="display:flex;"><span>    user_id <span style="color:#f92672">=</span> str(uuid<span style="color:#f92672">.</span>uuid4())
+</span></span><span style="display:flex;"><span>    user <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;id&#34;</span>: user_id,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;name&#34;</span>: data[<span style="color:#e6db74">&#39;name&#39;</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;email&#34;</span>: data[<span style="color:#e6db74">&#39;email&#39;</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;role&#34;</span>: data<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;role&#39;</span>, <span style="color:#e6db74">&#39;user&#39;</span>),
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;created_at&#34;</span>: datetime<span style="color:#f92672">.</span>now()<span style="color:#f92672">.</span>isoformat(),
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;updated_at&#34;</span>: datetime<span style="color:#f92672">.</span>now()<span style="color:#f92672">.</span>isoformat()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    users_db[user_id] <span style="color:#f92672">=</span> user
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> success_response(user, <span style="color:#e6db74">&#34;创建用户成功&#34;</span>, <span style="color:#ae81ff">201</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/api/v1/users/&lt;user_id&gt;&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;PUT&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update_user</span>(user_id):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    完整更新用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    路径参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        user_id: 用户ID
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    请求体：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        {
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &#34;name&#34;: &#34;用户名&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &#34;email&#34;: &#34;邮箱&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &#34;role&#34;: &#34;角色&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        }
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> user_id <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> users_db:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> error_response(
+</span></span><span style="display:flex;"><span>            message<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;用户不存在&#34;</span>,
+</span></span><span style="display:flex;"><span>            code<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;USER_NOT_FOUND&#34;</span>,
+</span></span><span style="display:flex;"><span>            status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">404</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>get_json()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 验证必填字段</span>
+</span></span><span style="display:flex;"><span>    required_fields <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;email&#39;</span>]
+</span></span><span style="display:flex;"><span>    missing_fields <span style="color:#f92672">=</span> [f <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> required_fields <span style="color:#66d9ef">if</span> f <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> data]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> missing_fields:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> error_response(
+</span></span><span style="display:flex;"><span>            message<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;缺少必填字段&#34;</span>,
+</span></span><span style="display:flex;"><span>            code<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;VALIDATION_ERROR&#34;</span>,
+</span></span><span style="display:flex;"><span>            details<span style="color:#f92672">=</span>[{<span style="color:#e6db74">&#34;field&#34;</span>: f, <span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;此字段为必填项&#34;</span>} <span style="color:#66d9ef">for</span> f <span style="color:#f92672">in</span> missing_fields],
+</span></span><span style="display:flex;"><span>            status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">422</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 更新用户</span>
+</span></span><span style="display:flex;"><span>    users_db[user_id]<span style="color:#f92672">.</span>update({
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;name&#34;</span>: data[<span style="color:#e6db74">&#39;name&#39;</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;email&#34;</span>: data[<span style="color:#e6db74">&#39;email&#39;</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;role&#34;</span>: data<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;role&#39;</span>, <span style="color:#e6db74">&#39;user&#39;</span>),
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;updated_at&#34;</span>: datetime<span style="color:#f92672">.</span>now()<span style="color:#f92672">.</span>isoformat()
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> success_response(users_db[user_id], <span style="color:#e6db74">&#34;更新用户成功&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/api/v1/users/&lt;user_id&gt;&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;PATCH&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">patch_user</span>(user_id):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    部分更新用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    路径参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        user_id: 用户ID
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    请求体：可以只包含要更新的字段
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        {
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &#34;name&#34;: &#34;新用户名&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        }
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> user_id <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> users_db:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> error_response(
+</span></span><span style="display:flex;"><span>            message<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;用户不存在&#34;</span>,
+</span></span><span style="display:flex;"><span>            code<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;USER_NOT_FOUND&#34;</span>,
+</span></span><span style="display:flex;"><span>            status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">404</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>get_json()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 只更新提供的字段</span>
+</span></span><span style="display:flex;"><span>    allowed_fields <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;email&#39;</span>, <span style="color:#e6db74">&#39;role&#39;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> field <span style="color:#f92672">in</span> allowed_fields:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> field <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>            users_db[user_id][field] <span style="color:#f92672">=</span> data[field]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    users_db[user_id][<span style="color:#e6db74">&#39;updated_at&#39;</span>] <span style="color:#f92672">=</span> datetime<span style="color:#f92672">.</span>now()<span style="color:#f92672">.</span>isoformat()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> success_response(users_db[user_id], <span style="color:#e6db74">&#34;更新用户成功&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/api/v1/users/&lt;user_id&gt;&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;DELETE&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">delete_user</span>(user_id):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    删除用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    路径参数：
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        user_id: 用户ID
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> user_id <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> users_db:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> error_response(
+</span></span><span style="display:flex;"><span>            message<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;用户不存在&#34;</span>,
+</span></span><span style="display:flex;"><span>            code<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;USER_NOT_FOUND&#34;</span>,
+</span></span><span style="display:flex;"><span>            status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">404</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">del</span> users_db[user_id]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># DELETE成功通常返回204 No Content</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;&#39;</span>, <span style="color:#ae81ff">204</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ============================================================</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># API文档和健康检查</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ============================================================</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/api/v1/health&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">health_check</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;健康检查&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> success_response({
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;status&#34;</span>: <span style="color:#e6db74">&#34;healthy&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;timestamp&#34;</span>: datetime<span style="color:#f92672">.</span>now()<span style="color:#f92672">.</span>isoformat()
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/api/v1/docs&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">api_docs</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;API文档&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    docs <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;1.0.0&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;title&#34;</span>: <span style="color:#e6db74">&#34;用户管理API&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;endpoints&#34;</span>: [
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;/api/v1/users&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;method&#34;</span>: <span style="color:#e6db74">&#34;GET&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;获取用户列表&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;parameters&#34;</span>: {
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;page&#34;</span>: <span style="color:#e6db74">&#34;页码&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;limit&#34;</span>: <span style="color:#e6db74">&#34;每页数量&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;role&#34;</span>: <span style="color:#e6db74">&#34;角色过滤&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;search&#34;</span>: <span style="color:#e6db74">&#34;搜索&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;sort&#34;</span>: <span style="color:#e6db74">&#34;排序字段&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;order&#34;</span>: <span style="color:#e6db74">&#34;排序顺序&#34;</span>
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;/api/v1/users/&lt;id&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;method&#34;</span>: <span style="color:#e6db74">&#34;GET&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;获取指定用户&#34;</span>
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;/api/v1/users&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;method&#34;</span>: <span style="color:#e6db74">&#34;POST&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;创建新用户&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;body&#34;</span>: {
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;用户名（必填）&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;email&#34;</span>: <span style="color:#e6db74">&#34;邮箱（必填）&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#34;role&#34;</span>: <span style="color:#e6db74">&#34;角色（可选）&#34;</span>
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;/api/v1/users/&lt;id&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;method&#34;</span>: <span style="color:#e6db74">&#34;PUT&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;完整更新用户&#34;</span>
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;/api/v1/users/&lt;id&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;method&#34;</span>: <span style="color:#e6db74">&#34;PATCH&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;部分更新用户&#34;</span>
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;/api/v1/users/&lt;id&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;method&#34;</span>: <span style="color:#e6db74">&#34;DELETE&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;删除用户&#34;</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> success_response(docs)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ╔══════════════════════════════════════════════════════════╗
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ║       RESTful API 服务器                                  ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ║       User Management API                                ║
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ╚══════════════════════════════════════════════════════════╝
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    API地址: http://127.0.0.1:5000/api/v1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    可用端点:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - GET    /api/v1/users          获取用户列表
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - GET    /api/v1/users/&lt;id&gt;     获取指定用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - POST   /api/v1/users          创建新用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - PUT    /api/v1/users/&lt;id&gt;     更新用户（完整）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - PATCH  /api/v1/users/&lt;id&gt;     更新用户（部分）
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - DELETE /api/v1/users/&lt;id&gt;     删除用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - GET    /api/v1/health         健康检查
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - GET    /api/v1/docs           API文档
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    测试命令:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    # 获取所有用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    curl http://127.0.0.1:5000/api/v1/users
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    # 创建用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    curl -X POST http://127.0.0.1:5000/api/v1/users </span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      -H &#34;Content-Type: application/json&#34; </span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      -d &#39;{&#34;name&#34;:&#34;测试用户&#34;,&#34;email&#34;:&#34;test@example.com&#34;}&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    # 获取单个用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    curl http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    # 更新用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    curl -X PATCH http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; </span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      -H &#34;Content-Type: application/json&#34; </span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      -d &#39;{&#34;name&#34;:&#34;新名字&#34;}&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    # 删除用户
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    curl -X DELETE http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    app<span style="color:#f92672">.</span>run(debug<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, host<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;0.0.0.0&#39;</span>, port<span style="color:#f92672">=</span><span style="color:#ae81ff">5000</span>)
+</span></span></code></pre></div><hr>
+<h2 id="5-api测试">5. API测试
+</h2><h3 id="51-使用curl测试">5.1 使用curl测试
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. 获取所有用户</span>
+</span></span><span style="display:flex;"><span>curl http://127.0.0.1:5000/api/v1/users
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 分页和过滤</span>
+</span></span><span style="display:flex;"><span>curl <span style="color:#e6db74">&#34;http://127.0.0.1:5000/api/v1/users?page=1&amp;limit=10&amp;role=admin&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 创建用户</span>
+</span></span><span style="display:flex;"><span>curl -X POST http://127.0.0.1:5000/api/v1/users <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -H <span style="color:#e6db74">&#34;Content-Type: application/json&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -d <span style="color:#e6db74">&#39;{
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;name&#34;: &#34;新用户&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;email&#34;: &#34;new@example.com&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;role&#34;: &#34;user&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  }&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 获取单个用户</span>
+</span></span><span style="display:flex;"><span>curl http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 5. 更新用户（PUT - 完整更新）</span>
+</span></span><span style="display:flex;"><span>curl -X PUT http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -H <span style="color:#e6db74">&#34;Content-Type: application/json&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -d <span style="color:#e6db74">&#39;{
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;name&#34;: &#34;更新的用户&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;email&#34;: &#34;updated@example.com&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;role&#34;: &#34;admin&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  }&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 6. 更新用户（PATCH - 部分更新）</span>
+</span></span><span style="display:flex;"><span>curl -X PATCH http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt; <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -H <span style="color:#e6db74">&#34;Content-Type: application/json&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -d <span style="color:#e6db74">&#39;{&#34;name&#34;: &#34;只更新名字&#34;}&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 7. 删除用户</span>
+</span></span><span style="display:flex;"><span>curl -X DELETE http://127.0.0.1:5000/api/v1/users/&lt;user_id&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 8. 健康检查</span>
+</span></span><span style="display:flex;"><span>curl http://127.0.0.1:5000/api/v1/health
+</span></span></code></pre></div><hr>
+<h2 id="6-最佳实践总结">6. 最佳实践总结
+</h2><pre tabindex="0"><code>RESTful API设计最佳实践：
+
+1. 使用名词表示资源，用HTTP方法表示操作
+   ✅ GET /users
+   ❌ GET /getUsers
+
+2. 使用复数形式
+   ✅ /users, /products
+   ❌ /user, /product
+
+3. 使用正确的HTTP状态码
+   200: 成功
+   201: 创建成功
+   204: 删除成功
+   400: 请求错误
+   401: 未认证
+   403: 无权限
+   404: 未找到
+   500: 服务器错误
+
+4. 提供版本控制
+   /api/v1/users
+
+5. 支持分页、过滤、排序
+   ?page=1&amp;limit=20&amp;sort=name
+
+6. 使用统一的响应格式
+   {
+     &#34;status&#34;: &#34;success&#34;,
+     &#34;data&#34;: {...}
+   }
+
+7. 提供清晰的错误信息
+   {
+     &#34;status&#34;: &#34;error&#34;,
+     &#34;error&#34;: {
+       &#34;code&#34;: &#34;VALIDATION_ERROR&#34;,
+       &#34;message&#34;: &#34;详细错误信息&#34;
+     }
+   }
+
+8. 使用HTTPS保护API
+9. 实现认证和授权（JWT推荐）
+10. 提供完善的API文档
+11. 实现请求限流（Rate Limiting）
+12. 使用缓存提高性能
+13. 记录完整的日志
+14. 编写完善的测试
+</code></pre><hr>
+<h2 id="7-今日练习">7. 今日练习
+</h2><h3 id="练习1设计博客api">练习1：设计博客API
+</h3><p>设计一个博客系统的RESTful API，包含：</p>
+<ul>
+<li>文章（articles）</li>
+<li>评论（comments）</li>
+<li>标签（tags）</li>
+</ul>
+<p>要求：</p>
+<ol>
+<li>设计合理的URI</li>
+<li>选择正确的HTTP方法</li>
+<li>考虑资源之间的关系</li>
+</ol>
+<h3 id="练习2实现产品api">练习2：实现产品API
+</h3><p>扩展示例代码，实现产品管理API：</p>
+<ul>
+<li>产品CRUD操作</li>
+<li>分类过滤</li>
+<li>价格区间查询</li>
+<li>库存管理</li>
+</ul>
+<h3 id="练习3api测试">练习3：API测试
+</h3><p>使用Postman或curl测试今天的用户管理API：</p>
+<ol>
+<li>测试所有端点</li>
+<li>测试边界情况</li>
+<li>测试错误处理</li>
+</ol>
+<hr>
+<h2 id="8-扩展阅读">8. 扩展阅读
+</h2><ul>
+<li>REST架构论文（Roy Fielding）</li>
+<li>HTTP/1.1规范（RFC 7231-7235）</li>
+<li>JSON API规范</li>
+<li>OpenAPI/Swagger文档规范</li>
+</ul>
+<hr>
+<p><strong>进度：30/120天（25.0%）</strong></p>
+<p>恭喜完成第30天学习！你已经掌握了RESTful API设计的核心原则。明天我们将学习WebSocket实时通信！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/29%E5%A4%A9http/3%E5%92%8Cquic%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">29天：HTTP/3和QUIC协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/28%E5%A4%A9http/2%E5%8D%8F%E8%AE%AE%E7%89%B9%E6%80%A7/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">28天：HTTP/2协议特性</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/27%E5%A4%A9%E7%AC%AC%E5%9B%9B%E5%91%A8%E7%BB%BC%E5%90%88%E5%AE%9E%E6%88%98/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">27天：第四周综合实战</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/26%E5%A4%A9%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">26天：路由协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/25%E5%A4%A9arp%E5%8D%8F%E8%AE%AE%E5%92%8C%E9%93%BE%E8%B7%AF%E5%B1%82/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">25天：ARP协议和链路层</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

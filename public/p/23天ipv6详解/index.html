@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第23天：IPv6详解 今日目标 理解IPv6产生的背景和必要性 掌握IPv6地址格式和表示方法 学习IPv6特性和优势 了解IPv6报文格式 理解IPv6地址类型 学习IPv6过渡技术 实现IPv6地址解析工具 1. IPv6概述 1.1 为什么需要IPv6？ IPv4地址耗尽：\n">
+<title>23天：IPv6详解</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/23%E5%A4%A9ipv6%E8%AF%A6%E8%A7%A3/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="23天：IPv6详解">
+<meta property='og:description' content="第23天：IPv6详解 今日目标 理解IPv6产生的背景和必要性 掌握IPv6地址格式和表示方法 学习IPv6特性和优势 了解IPv6报文格式 理解IPv6地址类型 学习IPv6过渡技术 实现IPv6地址解析工具 1. IPv6概述 1.1 为什么需要IPv6？ IPv4地址耗尽：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/23%E5%A4%A9ipv6%E8%AF%A6%E8%A7%A3/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:25:38&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:25:38&#43;00:00'/>
+<meta name="twitter:title" content="23天：IPv6详解">
+<meta name="twitter:description" content="第23天：IPv6详解 今日目标 理解IPv6产生的背景和必要性 掌握IPv6地址格式和表示方法 学习IPv6特性和优势 了解IPv6报文格式 理解IPv6地址类型 学习IPv6过渡技术 实现IPv6地址解析工具 1. IPv6概述 1.1 为什么需要IPv6？ IPv4地址耗尽：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-ipv6概述">1. IPv6概述</a>
+      <ul>
+        <li><a href="#11-为什么需要ipv6">1.1 为什么需要IPv6？</a></li>
+        <li><a href="#12-ipv6的优势">1.2 IPv6的优势</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-ipv6地址格式">2. IPv6地址格式</a>
+      <ul>
+        <li><a href="#21-地址表示">2.1 地址表示</a></li>
+        <li><a href="#22-ipv6地址结构">2.2 IPv6地址结构</a></li>
+        <li><a href="#23-ipv6地址类型">2.3 IPv6地址类型</a></li>
+        <li><a href="#24-特殊地址">2.4 特殊地址</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-ipv6报文格式">3. IPv6报文格式</a>
+      <ul>
+        <li><a href="#31-ipv6基本头部">3.1 IPv6基本头部</a></li>
+        <li><a href="#32-ipv6扩展头部">3.2 IPv6扩展头部</a></li>
+        <li><a href="#33-ipv6-vs-ipv4报文对比">3.3 IPv6 vs IPv4报文对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-ipv6地址配置">4. IPv6地址配置</a>
+      <ul>
+        <li><a href="#41-无状态地址自动配置slaac">4.1 无状态地址自动配置（SLAAC）</a></li>
+        <li><a href="#42-dhcpv6">4.2 DHCPv6</a></li>
+        <li><a href="#43-配置方式对比">4.3 配置方式对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-ipv6过渡技术">5. IPv6过渡技术</a>
+      <ul>
+        <li><a href="#51-双栈dual-stack">5.1 双栈（Dual Stack）</a></li>
+        <li><a href="#52-隧道技术tunneling">5.2 隧道技术（Tunneling）</a></li>
+        <li><a href="#53-转换技术translation">5.3 转换技术（Translation）</a></li>
+        <li><a href="#54-过渡策略">5.4 过渡策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-ipv6实践">6. IPv6实践</a>
+      <ul>
+        <li><a href="#61-查看ipv6地址">6.1 查看IPv6地址</a></li>
+        <li><a href="#62-配置ipv6">6.2 配置IPv6</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-实战项目ipv6地址工具">7. 实战项目：IPv6地址工具</a>
+      <ul>
+        <li><a href="#71-项目需求">7.1 项目需求</a></li>
+        <li><a href="#72-工具演示">7.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1地址压缩">练习1：地址压缩</a></li>
+        <li><a href="#练习2地址识别">练习2：地址识别</a></li>
+        <li><a href="#练习3子网划分">练习3：子网划分</a></li>
+        <li><a href="#练习4配置实践">练习4：配置实践</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-常见问题">9. 常见问题</a></li>
+    <li><a href="#10-总结">10. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/23%E5%A4%A9ipv6%E8%AF%A6%E8%A7%A3/">23天：IPv6详解</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:25:38Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-ipv6概述">1. IPv6概述</a>
+      <ul>
+        <li><a href="#11-为什么需要ipv6">1.1 为什么需要IPv6？</a></li>
+        <li><a href="#12-ipv6的优势">1.2 IPv6的优势</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-ipv6地址格式">2. IPv6地址格式</a>
+      <ul>
+        <li><a href="#21-地址表示">2.1 地址表示</a></li>
+        <li><a href="#22-ipv6地址结构">2.2 IPv6地址结构</a></li>
+        <li><a href="#23-ipv6地址类型">2.3 IPv6地址类型</a></li>
+        <li><a href="#24-特殊地址">2.4 特殊地址</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-ipv6报文格式">3. IPv6报文格式</a>
+      <ul>
+        <li><a href="#31-ipv6基本头部">3.1 IPv6基本头部</a></li>
+        <li><a href="#32-ipv6扩展头部">3.2 IPv6扩展头部</a></li>
+        <li><a href="#33-ipv6-vs-ipv4报文对比">3.3 IPv6 vs IPv4报文对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-ipv6地址配置">4. IPv6地址配置</a>
+      <ul>
+        <li><a href="#41-无状态地址自动配置slaac">4.1 无状态地址自动配置（SLAAC）</a></li>
+        <li><a href="#42-dhcpv6">4.2 DHCPv6</a></li>
+        <li><a href="#43-配置方式对比">4.3 配置方式对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-ipv6过渡技术">5. IPv6过渡技术</a>
+      <ul>
+        <li><a href="#51-双栈dual-stack">5.1 双栈（Dual Stack）</a></li>
+        <li><a href="#52-隧道技术tunneling">5.2 隧道技术（Tunneling）</a></li>
+        <li><a href="#53-转换技术translation">5.3 转换技术（Translation）</a></li>
+        <li><a href="#54-过渡策略">5.4 过渡策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-ipv6实践">6. IPv6实践</a>
+      <ul>
+        <li><a href="#61-查看ipv6地址">6.1 查看IPv6地址</a></li>
+        <li><a href="#62-配置ipv6">6.2 配置IPv6</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-实战项目ipv6地址工具">7. 实战项目：IPv6地址工具</a>
+      <ul>
+        <li><a href="#71-项目需求">7.1 项目需求</a></li>
+        <li><a href="#72-工具演示">7.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1地址压缩">练习1：地址压缩</a></li>
+        <li><a href="#练习2地址识别">练习2：地址识别</a></li>
+        <li><a href="#练习3子网划分">练习3：子网划分</a></li>
+        <li><a href="#练习4配置实践">练习4：配置实践</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-常见问题">9. 常见问题</a></li>
+    <li><a href="#10-总结">10. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第23天ipv6详解">第23天：IPv6详解
+</h1><h2 id="今日目标">今日目标
+</h2><ul>
+<li>理解IPv6产生的背景和必要性</li>
+<li>掌握IPv6地址格式和表示方法</li>
+<li>学习IPv6特性和优势</li>
+<li>了解IPv6报文格式</li>
+<li>理解IPv6地址类型</li>
+<li>学习IPv6过渡技术</li>
+<li>实现IPv6地址解析工具</li>
+</ul>
+<hr>
+<h2 id="1-ipv6概述">1. IPv6概述
+</h2><h3 id="11-为什么需要ipv6">1.1 为什么需要IPv6？
+</h3><p><strong>IPv4地址耗尽</strong>：</p>
+<pre tabindex="0"><code>IPv4地址空间：
+- 32位地址
+- 总数：2^32 = 4,294,967,296 ≈ 43亿个
+- 实际可用：更少（保留地址、私有地址等）
+
+全球需求：
+- 全球人口：约80亿
+- 每人多设备：手机、电脑、平板、手表...
+- 物联网设备：数百亿
+- 明显不够用！
+
+地址耗尽时间线：
+- 2011年：IANA分配完最后的IPv4地址块
+- 2012-2019：各地区陆续耗尽
+- 现状：依赖NAT等技术缓解
+</code></pre><p><strong>NAT的局限性</strong>：</p>
+<pre tabindex="0"><code>NAT虽然缓解了地址短缺，但带来问题：
+
+❌ 破坏端到端连接性
+❌ 增加复杂度和延迟
+❌ P2P应用困难
+❌ 需要维护状态表
+❌ 违反分层原则
+❌ 某些协议不支持
+
+IPv6是根本解决方案
+</code></pre><h3 id="12-ipv6的优势">1.2 IPv6的优势
+</h3><p><strong>核心优势</strong>：</p>
+<pre tabindex="0"><code>1. 巨大的地址空间
+   ✅ 128位地址
+   ✅ 2^128 ≈ 340万亿亿亿亿个
+   ✅ 足够用几百年
+
+2. 简化的报文头部
+   ✅ 固定40字节（IPv4为20-60字节）
+   ✅ 提高路由效率
+   ✅ 扩展头部机制
+
+3. 更好的移动性
+   ✅ 移动IPv6
+   ✅ 无需NAT
+   ✅ 更快的切换
+
+4. 内置安全性
+   ✅ IPSec是强制的
+   ✅ 端到端加密
+
+5. 更好的QoS支持
+   ✅ 流标签
+   ✅ 优先级
+
+6. 无需NAT
+   ✅ 端到端连接
+   ✅ 简化网络
+   ✅ 更好的性能
+
+7. 自动配置
+   ✅ 无状态地址自动配置（SLAAC）
+   ✅ 即插即用
+   ✅ 简化管理
+
+8. 更好的多播
+   ✅ 改进的多播路由
+   ✅ 任播支持
+</code></pre><hr>
+<h2 id="2-ipv6地址格式">2. IPv6地址格式
+</h2><h3 id="21-地址表示">2.1 地址表示
+</h3><p><strong>基本格式</strong>：</p>
+<pre tabindex="0"><code>IPv6地址：128位 = 16字节
+
+表示方法：
+- 8个16位字段
+- 每个字段用4个十六进制数表示
+- 用冒号分隔
+
+完整格式：
+2001:0db8:0000:0000:0000:ff00:0042:8329
+
+说明：
+2001 : 0db8 : 0000 : 0000 : 0000 : ff00 : 0042 : 8329
+  ↓      ↓      ↓      ↓      ↓      ↓      ↓      ↓
+ 16位   16位   16位   16位   16位   16位   16位   16位
+</code></pre><p><strong>地址压缩规则</strong>：</p>
+<pre tabindex="0"><code>规则1：前导零压缩
+可以省略每个字段的前导零
+
+示例：
+2001:0db8:0000:0000:0000:ff00:0042:8329
+↓
+2001:db8:0:0:0:ff00:42:8329
+
+规则2：零压缩
+连续的零字段可以用 :: 表示
+但一个地址中只能使用一次 ::
+
+示例：
+2001:db8:0:0:0:ff00:42:8329
+↓
+2001:db8::ff00:42:8329
+
+错误示例：
+2001:0:0:0:0:0:0:1
+不能写成：2001::0::1  ❌（两个::）
+应该写成：2001::1     ✅
+</code></pre><p><strong>特殊地址表示</strong>：</p>
+<pre tabindex="0"><code>未指定地址：
+0:0:0:0:0:0:0:0
+或 ::
+
+环回地址：
+0:0:0:0:0:0:0:1
+或 ::1
+
+IPv4映射地址：
+::ffff:192.168.1.1
+前96位为0，后32位为IPv4地址
+</code></pre><h3 id="22-ipv6地址结构">2.2 IPv6地址结构
+</h3><p><strong>地址组成</strong>：</p>
+<pre tabindex="0"><code>IPv6地址 = 前缀 + 接口标识符
+
+常见结构（64位前缀）：
+┌─────────────────────────┬─────────────────────────┐
+│    前缀（64位）          │   接口标识符（64位）     │
+│   网络部分               │    主机部分             │
+└─────────────────────────┴─────────────────────────┘
+
+前缀分配：
+┌──────┬──────────┬────────────┬─────────────────────┐
+│ /48  │   /56    │    /64     │      接口ID         │
+│ 站点 │  子网    │  链路      │     主机            │
+└──────┴──────────┴────────────┴─────────────────────┘
+</code></pre><p><strong>前缀表示</strong>：</p>
+<pre tabindex="0"><code>IPv6前缀表示：
+地址/前缀长度
+
+示例：
+2001:db8::/32
+- 网络地址：2001:db8::
+- 前缀长度：32位
+
+常见前缀长度：
+/32 - ISP分配
+/48 - 组织/站点
+/56 - 小型组织
+/64 - 单个链路（最常用）
+/128 - 单个主机
+</code></pre><h3 id="23-ipv6地址类型">2.3 IPv6地址类型
+</h3><p><strong>单播地址（Unicast）</strong>：</p>
+<pre tabindex="0"><code>单播 = 一对一通信
+
+类型：
+
+1. 全局单播地址（Global Unicast Address）
+   - 前缀：2000::/3（2开头或3开头）
+   - 相当于IPv4的公网地址
+   - 全球唯一，可路由
+   - 示例：2001:db8::1
+
+2. 链路本地地址（Link-Local Address）
+   - 前缀：fe80::/10
+   - 只在本地链路有效
+   - 不能路由
+   - 自动配置
+   - 相当于IPv4的169.254.0.0/16
+   - 示例：fe80::1
+
+3. 唯一本地地址（Unique Local Address，ULA）
+   - 前缀：fc00::/7（实际使用fd00::/8）
+   - 相当于IPv4的私有地址
+   - 本地路由，不在互联网路由
+   - 示例：fd12:3456:789a::1
+
+4. 环回地址（Loopback）
+   - 地址：::1
+   - 相当于IPv4的127.0.0.1
+
+5. 未指定地址
+   - 地址：::
+   - 相当于IPv4的0.0.0.0
+   - 表示&#34;无地址&#34;
+</code></pre><p><strong>任播地址（Anycast）</strong>：</p>
+<pre tabindex="0"><code>任播 = 发送给多个接口中最近的一个
+
+特点：
+- 多个节点共享相同地址
+- 数据包发送给最近的节点
+- 用于负载均衡
+
+使用：
+- 相同格式的单播地址
+- 通过路由配置实现
+
+应用场景：
+- DNS根服务器
+- CDN
+- 负载均衡
+</code></pre><p><strong>多播地址（Multicast）</strong>：</p>
+<pre tabindex="0"><code>多播 = 一对多通信
+
+前缀：ff00::/8
+
+格式：
+ff&lt;flags&gt;&lt;scope&gt;:....
+
+Flags：
+- 0：永久分配
+- 1：临时分配
+
+Scope（范围）：
+- 1：接口本地
+- 2：链路本地
+- 5：站点本地
+- 8：组织本地
+- e：全球
+
+常用多播地址：
+ff02::1  - 所有节点（链路本地）
+ff02::2  - 所有路由器（链路本地）
+ff02::1:ff00:0/104 - 请求节点多播地址
+</code></pre><p><strong>IPv6没有广播</strong>：</p>
+<pre tabindex="0"><code>IPv6取消了广播
+
+原因：
+- 广播效率低
+- 占用带宽
+- 影响所有节点
+
+替代方案：
+使用多播
+更精确，更高效
+</code></pre><h3 id="24-特殊地址">2.4 特殊地址
+</h3><pre tabindex="0"><code>::1/128
+- 环回地址
+- 本地主机
+
+::/128
+- 未指定地址
+- 没有地址时使用
+
+fe80::/10
+- 链路本地地址
+- 自动配置
+
+ff00::/8
+- 多播地址
+
+2001:db8::/32
+- 文档地址
+- 仅用于文档和示例
+- 不能在互联网路由
+
+::ffff:0:0/96
+- IPv4映射地址
+- 表示IPv4地址
+
+64:ff9b::/96
+- IPv4/IPv6转换
+- NAT64使用
+</code></pre><hr>
+<h2 id="3-ipv6报文格式">3. IPv6报文格式
+</h2><h3 id="31-ipv6基本头部">3.1 IPv6基本头部
+</h3><p><strong>固定40字节头部</strong>：</p>
+<pre tabindex="0"><code> 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Version| Traffic Class |           Flow Label                  |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Payload Length        |  Next Header  |   Hop Limit   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
++                                                               +
+|                                                               |
++                         Source Address                        +
+|                                                               |
++                                                               +
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
++                                                               +
+|                                                               |
++                      Destination Address                      +
+|                                                               |
++                                                               +
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</code></pre><p><strong>字段说明</strong>：</p>
+<pre tabindex="0"><code>Version（版本，4位）：
+- 值为6
+
+Traffic Class（流量类别，8位）：
+- 相当于IPv4的ToS
+- 用于QoS
+
+Flow Label（流标签，20位）：
+- 标识一个流
+- 用于QoS保证
+- 同一流的包有相同标签
+
+Payload Length（有效载荷长度，16位）：
+- 载荷（数据+扩展头部）的长度
+- 单位：字节
+- 不包括基本头部的40字节
+
+Next Header（下一个头部，8位）：
+- 指示下一个头部的类型
+- 相当于IPv4的Protocol字段
+- 值：
+  - 6：TCP
+  - 17：UDP
+  - 58：ICMPv6
+  - 43：路由扩展头部
+  - 44：分片扩展头部
+  - 等等
+
+Hop Limit（跳数限制，8位）：
+- 相当于IPv4的TTL
+- 每经过一个路由器减1
+- 为0时丢弃
+
+Source Address（源地址，128位）：
+- 发送方IPv6地址
+
+Destination Address（目的地址，128位）：
+- 接收方IPv6地址
+</code></pre><h3 id="32-ipv6扩展头部">3.2 IPv6扩展头部
+</h3><p><strong>扩展头部链</strong>：</p>
+<pre tabindex="0"><code>IPv6的灵活性：扩展头部
+
+IPv6基本头部（40字节）
+    ↓ Next Header
+扩展头部1（可选）
+    ↓ Next Header
+扩展头部2（可选）
+    ↓ Next Header
+...
+    ↓ Next Header
+上层协议（TCP/UDP等）
+
+优点：
+✅ 只在需要时添加
+✅ 提高路由效率（基本头部固定）
+✅ 灵活扩展
+</code></pre><p><strong>常见扩展头部</strong>：</p>
+<pre tabindex="0"><code>1. 逐跳选项头部（Hop-by-Hop Options）
+   - Next Header = 0
+   - 每个路由器都要处理
+
+2. 路由头部（Routing Header）
+   - Next Header = 43
+   - 指定路由路径
+
+3. 分片头部（Fragment Header）
+   - Next Header = 44
+   - 用于分片和重组
+
+4. 目的选项头部（Destination Options）
+   - Next Header = 60
+   - 只有目的节点处理
+
+5. 认证头部（Authentication Header，AH）
+   - Next Header = 51
+   - IPSec认证
+
+6. 封装安全载荷（ESP）
+   - Next Header = 50
+   - IPSec加密
+
+推荐顺序：
+基本头部 → 逐跳 → 目的 → 路由 → 分片 → 认证 → ESP → 目的 → 上层协议
+</code></pre><h3 id="33-ipv6-vs-ipv4报文对比">3.3 IPv6 vs IPv4报文对比
+</h3><pre tabindex="0"><code>┌────────────────────┬──────────────┬──────────────┐
+│      特性          │    IPv4      │    IPv6      │
+├────────────────────┼──────────────┼──────────────┤
+│ 地址长度           │   32位       │   128位      │
+│ 头部长度           │  20-60字节   │   40字节     │
+│ 头部格式           │   可变       │   固定       │
+│ 校验和             │    有        │    无        │
+│ 分片               │ 路由器可分片 │ 只有源节点   │
+│ 选项               │ 头部内       │  扩展头部    │
+│ 广播               │    支持      │   不支持     │
+│ 多播               │    可选      │   内置       │
+│ 任播               │   不支持     │   支持       │
+│ IPSec              │    可选      │   强制       │
+│ 配置               │ 手动/DHCP    │ 自动/DHCPv6  │
+└────────────────────┴──────────────┴──────────────┘
+
+简化：
+IPv6去掉了：
+❌ 头部校验和（让上层协议处理）
+❌ 选项字段（改用扩展头部）
+❌ 分片字段（只有源节点分片）
+
+IPv6添加了：
+✅ 流标签
+✅ 扩展头部机制
+✅ 更大的地址空间
+</code></pre><hr>
+<h2 id="4-ipv6地址配置">4. IPv6地址配置
+</h2><h3 id="41-无状态地址自动配置slaac">4.1 无状态地址自动配置（SLAAC）
+</h3><p><strong>工作原理</strong>：</p>
+<pre tabindex="0"><code>SLAAC = Stateless Address Autoconfiguration
+无状态地址自动配置
+
+过程：
+
+1. 生成链路本地地址
+   - 前缀：fe80::/64
+   - 接口ID：从MAC地址生成（EUI-64）
+   - 示例：fe80::xxxx:xxxx:xxxx:xxxx
+
+2. 重复地址检测（DAD）
+   - 发送邻居请求（Neighbor Solicitation）
+   - 如果无响应，地址可用
+
+3. 路由器发现
+   - 发送路由器请求（Router Solicitation）
+   - 或等待路由器通告（Router Advertisement）
+
+4. 生成全局地址
+   - 从RA获取前缀（如2001:db8::/64）
+   - 加上接口ID
+   - 得到全局地址：2001:db8::xxxx:xxxx:xxxx:xxxx
+
+5. 再次DAD
+   - 确保全局地址唯一
+
+完成！即插即用，无需DHCP
+</code></pre><p><strong>EUI-64接口标识符</strong>：</p>
+<pre tabindex="0"><code>从MAC地址生成接口ID：
+
+MAC地址（48位）：
+00:1A:2B:3C:4D:5E
+
+步骤：
+1. 插入FF:FE
+   00:1A:2B:FF:FE:3C:4D:5E
+
+2. 反转第7位（本地/全球位）
+   00 = 00000000
+   反转第7位 = 00000010 = 02
+
+结果：
+02:1A:2B:FF:FE:3C:4D:5E
+
+接口ID：
+021a:2bff:fe3c:4d5e
+
+完整地址：
+2001:db8::021a:2bff:fe3c:4d5e
+
+简化：
+2001:db8::21a:2bff:fe3c:4d5e
+</code></pre><p><strong>隐私扩展</strong>：</p>
+<pre tabindex="0"><code>问题：
+EUI-64使用MAC地址
+→ 地址包含硬件信息
+→ 可以跟踪设备
+→ 隐私问题
+
+解决方案：
+隐私扩展（Privacy Extensions，RFC 4941）
+
+特点：
+- 随机生成接口ID
+- 定期更换
+- 临时地址
+
+结果：
+主机有多个IPv6地址：
+- 链路本地地址（fe80::）
+- 永久全局地址（基于EUI-64）
+- 临时地址（隐私扩展）
+</code></pre><h3 id="42-dhcpv6">4.2 DHCPv6
+</h3><p><strong>有状态配置</strong>：</p>
+<pre tabindex="0"><code>DHCPv6 = 类似IPv4的DHCP
+
+使用场景：
+- 需要DNS服务器地址
+- 需要中央管理
+- 需要特定地址分配
+
+工作模式：
+
+1. 有状态DHCPv6（Stateful）
+   - 分配完整地址
+   - 类似IPv4 DHCP
+
+2. 无状态DHCPv6（Stateless）
+   - 地址通过SLAAC获取
+   - DHCPv6只提供其他信息（DNS等）
+
+消息类型：
+- SOLICIT：客户端请求
+- ADVERTISE：服务器通告
+- REQUEST：客户端请求地址
+- REPLY：服务器响应
+</code></pre><h3 id="43-配置方式对比">4.3 配置方式对比
+</h3><pre tabindex="0"><code>┌─────────────┬──────────┬──────────┬──────────┐
+│   特性      │  SLAAC   │无状态DHCPv6│有状态DHCPv6│
+├─────────────┼──────────┼──────────┼──────────┤
+│ 地址获取    │   RA     │    RA    │  DHCPv6  │
+│ DNS获取     │   ❌     │    ✅    │    ✅    │
+│ 中央管理    │   ❌     │    ❌    │    ✅    │
+│ 部署复杂度  │   低     │    中    │    高    │
+│ 即插即用    │   ✅     │    ✅    │    ❌    │
+└─────────────┴──────────┴──────────┴──────────┘
+
+推荐：
+- 家庭网络：SLAAC
+- 企业网络：有状态DHCPv6
+- 混合环境：无状态DHCPv6
+</code></pre><hr>
+<h2 id="5-ipv6过渡技术">5. IPv6过渡技术
+</h2><h3 id="51-双栈dual-stack">5.1 双栈（Dual Stack）
+</h3><pre tabindex="0"><code>双栈 = IPv4 + IPv6同时运行
+
+原理：
+主机同时配置IPv4和IPv6地址
+
+┌──────────────────┐
+│   应用程序       │
+├──────────────────┤
+│  IPv4   │  IPv6  │
+├──────────────────┤
+│   传输层（TCP）  │
+├──────────────────┤
+│  物理层          │
+└──────────────────┘
+
+优点：
+✅ 兼容性好
+✅ 平滑过渡
+✅ 应用无需修改
+
+缺点：
+❌ 需要IPv4和IPv6双份资源
+❌ 管理复杂
+
+使用场景：
+- 过渡初期
+- 长期共存
+</code></pre><h3 id="52-隧道技术tunneling">5.2 隧道技术（Tunneling）
+</h3><p><strong>6to4隧道</strong>：</p>
+<pre tabindex="0"><code>IPv6数据包封装在IPv4中
+
+原理：
+[IPv6数据包]
+    ↓ 封装
+[IPv4头部 | IPv6数据包]
+    ↓ 传输（IPv4网络）
+[IPv4头部 | IPv6数据包]
+    ↓ 解封装
+[IPv6数据包]
+
+类型：
+
+1. 6to4
+   - 自动隧道
+   - 地址前缀：2002::/16
+   - 包含IPv4地址
+
+2. 6in4（手动隧道）
+   - 手动配置
+   - 点对点
+
+3. Teredo
+   - 穿越NAT
+   - 地址前缀：2001:0::/32
+   - Windows内置
+
+4. ISATAP
+   - 企业内部
+   - 站点内自动隧道
+</code></pre><h3 id="53-转换技术translation">5.3 转换技术（Translation）
+</h3><p><strong>NAT64</strong>：</p>
+<pre tabindex="0"><code>NAT64 = IPv6 ↔ IPv4转换
+
+场景：
+IPv6客户端访问IPv4服务器
+
+原理：
+IPv6客户端
+    ↓ IPv6
+NAT64网关
+    ↓ IPv4
+IPv4服务器
+
+地址映射：
+IPv6: 64:ff9b::192.0.2.1
+IPv4: 192.0.2.1
+
+工作过程：
+1. IPv6客户端访问 64:ff9b::192.0.2.1
+2. NAT64提取IPv4地址：192.0.2.1
+3. 转换为IPv4包，发送到服务器
+4. 响应返回，转换为IPv6包
+5. 发送给客户端
+
+配合DNS64：
+自动将IPv4地址映射为IPv6
+</code></pre><h3 id="54-过渡策略">5.4 过渡策略
+</h3><pre tabindex="0"><code>推荐过渡路径：
+
+阶段1：准备（现在）
+- 学习IPv6
+- 测试设备兼容性
+- 规划地址
+
+阶段2：部署双栈（1-3年）
+- 启用IPv6
+- 保留IPv4
+- 双栈运行
+
+阶段3：优先IPv6（3-5年）
+- IPv6优先
+- IPv4备用
+- 逐步减少IPv4
+
+阶段4：纯IPv6（5-10年）
+- 完全IPv6
+- 必要时使用转换
+- IPv4淘汰
+
+现实：
+- 双栈会长期存在
+- 完全过渡需要时间
+- 应用和设备逐步支持
+</code></pre><hr>
+<h2 id="6-ipv6实践">6. IPv6实践
+</h2><h3 id="61-查看ipv6地址">6.1 查看IPv6地址
+</h3><p><strong>Linux/macOS</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看所有IPv6地址</span>
+</span></span><span style="display:flex;"><span>ip -6 addr show
+</span></span><span style="display:flex;"><span>ifconfig
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看IPv6路由表</span>
+</span></span><span style="display:flex;"><span>ip -6 route show
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 测试IPv6连接</span>
+</span></span><span style="display:flex;"><span>ping6 ::1
+</span></span><span style="display:flex;"><span>ping6 google.com
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 追踪IPv6路由</span>
+</span></span><span style="display:flex;"><span>traceroute6 google.com
+</span></span></code></pre></div><p><strong>Windows</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-cmd" data-lang="cmd"><span style="display:flex;"><span># 查看IPv6地址
+</span></span><span style="display:flex;"><span>ipconfig
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 测试IPv6连接
+</span></span><span style="display:flex;"><span>ping ::1
+</span></span><span style="display:flex;"><span>ping ipv6.google.com
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 追踪路由
+</span></span><span style="display:flex;"><span>tracert -6 google.com
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 查看IPv6路由表
+</span></span><span style="display:flex;"><span>netsh interface ipv6 show route
+</span></span></code></pre></div><h3 id="62-配置ipv6">6.2 配置IPv6
+</h3><p><strong>Linux</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 启用IPv6</span>
+</span></span><span style="display:flex;"><span>sysctl -w net.ipv6.conf.all.disable_ipv6<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 配置静态IPv6地址</span>
+</span></span><span style="display:flex;"><span>ip -6 addr add 2001:db8::1/64 dev eth0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 配置IPv6网关</span>
+</span></span><span style="display:flex;"><span>ip -6 route add default via 2001:db8::ff
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 配置文件（/etc/network/interfaces）</span>
+</span></span><span style="display:flex;"><span>iface eth0 inet6 static
+</span></span><span style="display:flex;"><span>    address 2001:db8::1
+</span></span><span style="display:flex;"><span>    netmask <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>    gateway 2001:db8::ff
+</span></span></code></pre></div><p><strong>macOS</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 配置IPv6地址（网络偏好设置）</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 或使用networksetup命令</span>
+</span></span><span style="display:flex;"><span>networksetup -setv6manual Ethernet 2001:db8::1 <span style="color:#ae81ff">64</span> 2001:db8::ff
+</span></span></code></pre></div><hr>
+<h2 id="7-实战项目ipv6地址工具">7. 实战项目：IPv6地址工具
+</h2><h3 id="71-项目需求">7.1 项目需求
+</h3><pre tabindex="0"><code>功能需求：
+1. IPv6地址解析和验证
+2. 地址压缩和扩展
+3. 地址类型识别
+4. EUI-64计算
+5. IPv4/IPv6地址转换
+6. 地址范围计算
+
+技术要求：
+- Python实现
+- 命令行界面
+- 支持各种IPv6格式
+- 友好的输出
+</code></pre><h3 id="72-工具演示">7.2 工具演示
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># IPv6地址解析</span>
+</span></span><span style="display:flex;"><span>python day23_ipv6_tool.py --parse 2001:db8::1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 地址压缩</span>
+</span></span><span style="display:flex;"><span>python day23_ipv6_tool.py --compress 2001:0db8:0000:0000:0000:0000:0000:0001
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># EUI-64计算</span>
+</span></span><span style="display:flex;"><span>python day23_ipv6_tool.py --eui64 00:1a:2b:3c:4d:5e --prefix 2001:db8::/64
+</span></span></code></pre></div><hr>
+<h2 id="8-今日练习">8. 今日练习
+</h2><h3 id="练习1地址压缩">练习1：地址压缩
+</h3><pre tabindex="0"><code>压缩以下IPv6地址：
+1. 2001:0db8:0000:0000:0000:ff00:0042:8329
+2. fe80:0000:0000:0000:0000:0000:0000:0001
+3. 2001:0db8:0001:0000:0000:0000:0000:0001
+</code></pre><h3 id="练习2地址识别">练习2：地址识别
+</h3><pre tabindex="0"><code>识别以下地址类型：
+1. ::1
+2. fe80::1
+3. ff02::1
+4. 2001:db8::1
+5. fd00::1
+</code></pre><h3 id="练习3子网划分">练习3：子网划分
+</h3><pre tabindex="0"><code>将2001:db8::/32分配给：
+1. 256个/40子网
+2. 每个子网的/64链路
+</code></pre><h3 id="练习4配置实践">练习4：配置实践
+</h3><pre tabindex="0"><code>1. 在本机启用IPv6
+2. 配置链路本地地址
+3. 测试连接
+4. 查看路由表
+</code></pre><hr>
+<h2 id="9-常见问题">9. 常见问题
+</h2><p><strong>Q1：IPv6真的必要吗？</strong></p>
+<p>A：</p>
+<ul>
+<li>是的，IPv4地址已经耗尽</li>
+<li>NAT只是临时方案</li>
+<li>物联网需要大量地址</li>
+<li>IPv6是长远解决方案</li>
+</ul>
+<p><strong>Q2：何时全面部署IPv6？</strong></p>
+<p>A：</p>
+<ul>
+<li>已经在逐步部署</li>
+<li>主要网站已支持</li>
+<li>ISP逐步提供</li>
+<li>预计10-20年完全过渡</li>
+</ul>
+<p><strong>Q3：IPv6比IPv4快吗？</strong></p>
+<p>A：</p>
+<ul>
+<li>理论上更快（简化头部）</li>
+<li>实际差异不大</li>
+<li>主要优势在地址空间和功能</li>
+</ul>
+<p><strong>Q4：IPv6安全吗？</strong></p>
+<p>A：</p>
+<ul>
+<li>IPSec是强制的</li>
+<li>但仍需要防火墙</li>
+<li>地址空间大，扫描困难</li>
+<li>新协议，可能有未知漏洞</li>
+</ul>
+<p><strong>Q5：如何测试IPv6连接？</strong></p>
+<p>A：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 访问IPv6测试网站</span>
+</span></span><span style="display:flex;"><span>http://test-ipv6.com
+</span></span><span style="display:flex;"><span>http://ipv6-test.com
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 命令行测试</span>
+</span></span><span style="display:flex;"><span>ping6 google.com
+</span></span><span style="display:flex;"><span>curl -6 http://ipv6.google.com
+</span></span></code></pre></div><hr>
+<h2 id="10-总结">10. 总结
+</h2><p>今天我们学习了：</p>
+<h3 id="核心知识点">核心知识点
+</h3><ol>
+<li>
+<p><strong>IPv6基础</strong>：</p>
+<ul>
+<li>128位地址</li>
+<li>解决IPv4地址短缺</li>
+<li>简化头部，提高效率</li>
+</ul>
+</li>
+<li>
+<p><strong>地址格式</strong>：</p>
+<ul>
+<li>冒号十六进制表示</li>
+<li>压缩规则</li>
+<li>前缀表示</li>
+</ul>
+</li>
+<li>
+<p><strong>地址类型</strong>：</p>
+<ul>
+<li>单播（全局、链路本地、ULA）</li>
+<li>任播</li>
+<li>多播（无广播）</li>
+</ul>
+</li>
+<li>
+<p><strong>报文格式</strong>：</p>
+<ul>
+<li>固定40字节头部</li>
+<li>扩展头部机制</li>
+<li>简化的字段</li>
+</ul>
+</li>
+<li>
+<p><strong>地址配置</strong>：</p>
+<ul>
+<li>SLAAC（自动配置）</li>
+<li>DHCPv6</li>
+<li>隐私扩展</li>
+</ul>
+</li>
+<li>
+<p><strong>过渡技术</strong>：</p>
+<ul>
+<li>双栈</li>
+<li>隧道（6to4、Teredo）</li>
+<li>转换（NAT64）</li>
+</ul>
+</li>
+</ol>
+<h3 id="重点回顾">重点回顾
+</h3><pre tabindex="0"><code>IPv6地址：
+- 128位 = 8个16位字段
+- 十六进制表示
+- 可以压缩零
+
+地址类型：
+- 2000::/3 - 全局单播
+- fe80::/10 - 链路本地
+- fc00::/7 - 唯一本地（私有）
+- ff00::/8 - 多播
+
+配置方式：
+- SLAAC：自动，即插即用
+- DHCPv6：中央管理
+- 手动：特殊需求
+
+过渡策略：
+现在：双栈
+未来：纯IPv6
+</code></pre><h3 id="明天预告">明天预告
+</h3><p><strong>第24天：ICMP和诊断工具</strong></p>
+<p>内容预览：</p>
+<ul>
+<li>ICMP协议详解</li>
+<li>ICMPv6</li>
+<li>ping原理和实现</li>
+<li>traceroute原理</li>
+<li>网络诊断工具</li>
+</ul>
+<hr>
+<p><strong>继续加油！</strong> 🚀</p>
+<p>今天我们学习了下一代互联网协议IPv6，理解了它的设计优势和过渡策略。虽然IPv6部署需要时间，但这是网络发展的必然趋势。明天我们将学习ICMP协议，了解网络诊断工具的原理！</p>
+<p><strong>进度：23/180天（12.8%）</strong></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/22%E5%A4%A9ip%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">22天：IP协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/21%E5%A4%A9%E7%AC%AC%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AE%9E%E6%88%98/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">21天：第三周总结与实战</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/20%E5%A4%A9https%E5%92%8C%E5%AE%89%E5%85%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">20天：HTTPS和安全</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E5%9B%9B%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">四周总结：网络层协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/19%E5%A4%A9http%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">19天：HTTP协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

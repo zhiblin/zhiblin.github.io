@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第16天：TCP可靠传输机制 今日目标 深入理解TCP序列号和确认号机制 掌握TCP滑动窗口原理 理解超时重传机制 掌握快速重传和快速恢复算法 理解TCP流量控制 理解TCP拥塞控制算法 实现TCP可靠性分析工具 1. TCP可靠传输概述 1.1 什么是可靠传输？ 可靠传输的保证：\n">
+<title>16天：TCP可靠传输机制</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/16%E5%A4%A9tcp%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E6%9C%BA%E5%88%B6/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="16天：TCP可靠传输机制">
+<meta property='og:description' content="第16天：TCP可靠传输机制 今日目标 深入理解TCP序列号和确认号机制 掌握TCP滑动窗口原理 理解超时重传机制 掌握快速重传和快速恢复算法 理解TCP流量控制 理解TCP拥塞控制算法 实现TCP可靠性分析工具 1. TCP可靠传输概述 1.1 什么是可靠传输？ 可靠传输的保证：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/16%E5%A4%A9tcp%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E6%9C%BA%E5%88%B6/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:24:36&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:24:36&#43;00:00'/>
+<meta name="twitter:title" content="16天：TCP可靠传输机制">
+<meta name="twitter:description" content="第16天：TCP可靠传输机制 今日目标 深入理解TCP序列号和确认号机制 掌握TCP滑动窗口原理 理解超时重传机制 掌握快速重传和快速恢复算法 理解TCP流量控制 理解TCP拥塞控制算法 实现TCP可靠性分析工具 1. TCP可靠传输概述 1.1 什么是可靠传输？ 可靠传输的保证：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-tcp可靠传输概述">1. TCP可靠传输概述</a>
+      <ul>
+        <li><a href="#11-什么是可靠传输">1.1 什么是可靠传输？</a></li>
+        <li><a href="#12-可靠传输的核心机制">1.2 可靠传输的核心机制</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-序列号和确认号">2. 序列号和确认号</a>
+      <ul>
+        <li><a href="#21-序列号机制">2.1 序列号机制</a></li>
+        <li><a href="#22-确认号机制">2.2 确认号机制</a></li>
+        <li><a href="#23-序列号回绕问题">2.3 序列号回绕问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-滑动窗口机制">3. 滑动窗口机制</a>
+      <ul>
+        <li><a href="#31-为什么需要滑动窗口">3.1 为什么需要滑动窗口？</a></li>
+        <li><a href="#32-发送窗口">3.2 发送窗口</a></li>
+        <li><a href="#33-接收窗口">3.3 接收窗口</a></li>
+        <li><a href="#34-窗口大小的影响">3.4 窗口大小的影响</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-超时重传机制">4. 超时重传机制</a>
+      <ul>
+        <li><a href="#41-超时重传原理">4.1 超时重传原理</a></li>
+        <li><a href="#42-重传超时时间rto的计算">4.2 重传超时时间（RTO）的计算</a></li>
+        <li><a href="#43-重传歧义问题">4.3 重传歧义问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-快速重传与快速恢复">5. 快速重传与快速恢复</a>
+      <ul>
+        <li><a href="#51-快速重传fast-retransmit">5.1 快速重传（Fast Retransmit）</a></li>
+        <li><a href="#52-sack选择性确认">5.2 SACK（选择性确认）</a></li>
+        <li><a href="#53-快速恢复fast-recovery">5.3 快速恢复（Fast Recovery）</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-流量控制">6. 流量控制</a>
+      <ul>
+        <li><a href="#61-流量控制的目的">6.1 流量控制的目的</a></li>
+        <li><a href="#62-流量控制机制">6.2 流量控制机制</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-拥塞控制">7. 拥塞控制</a>
+      <ul>
+        <li><a href="#71-拥塞控制-vs-流量控制">7.1 拥塞控制 vs 流量控制</a></li>
+        <li><a href="#72-拥塞控制算法">7.2 拥塞控制算法</a></li>
+        <li><a href="#73-拥塞控制状态图">7.3 拥塞控制状态图</a></li>
+        <li><a href="#74-拥塞控制变体">7.4 拥塞控制变体</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-实战项目tcp可靠性分析工具">8. 实战项目：TCP可靠性分析工具</a>
+      <ul>
+        <li><a href="#81-项目功能">8.1 项目功能</a></li>
+        <li><a href="#82-工具演示">8.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-今日练习">9. 今日练习</a>
+      <ul>
+        <li><a href="#练习1观察重传">练习1：观察重传</a></li>
+        <li><a href="#练习2计算rto">练习2：计算RTO</a></li>
+        <li><a href="#练习3模拟拥塞控制">练习3：模拟拥塞控制</a></li>
+        <li><a href="#练习4查看tcp统计">练习4：查看TCP统计</a></li>
+      </ul>
+    </li>
+    <li><a href="#10-常见问题">10. 常见问题</a></li>
+    <li><a href="#11-总结">11. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/16%E5%A4%A9tcp%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E6%9C%BA%E5%88%B6/">16天：TCP可靠传输机制</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:24:36Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-tcp可靠传输概述">1. TCP可靠传输概述</a>
+      <ul>
+        <li><a href="#11-什么是可靠传输">1.1 什么是可靠传输？</a></li>
+        <li><a href="#12-可靠传输的核心机制">1.2 可靠传输的核心机制</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-序列号和确认号">2. 序列号和确认号</a>
+      <ul>
+        <li><a href="#21-序列号机制">2.1 序列号机制</a></li>
+        <li><a href="#22-确认号机制">2.2 确认号机制</a></li>
+        <li><a href="#23-序列号回绕问题">2.3 序列号回绕问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-滑动窗口机制">3. 滑动窗口机制</a>
+      <ul>
+        <li><a href="#31-为什么需要滑动窗口">3.1 为什么需要滑动窗口？</a></li>
+        <li><a href="#32-发送窗口">3.2 发送窗口</a></li>
+        <li><a href="#33-接收窗口">3.3 接收窗口</a></li>
+        <li><a href="#34-窗口大小的影响">3.4 窗口大小的影响</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-超时重传机制">4. 超时重传机制</a>
+      <ul>
+        <li><a href="#41-超时重传原理">4.1 超时重传原理</a></li>
+        <li><a href="#42-重传超时时间rto的计算">4.2 重传超时时间（RTO）的计算</a></li>
+        <li><a href="#43-重传歧义问题">4.3 重传歧义问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-快速重传与快速恢复">5. 快速重传与快速恢复</a>
+      <ul>
+        <li><a href="#51-快速重传fast-retransmit">5.1 快速重传（Fast Retransmit）</a></li>
+        <li><a href="#52-sack选择性确认">5.2 SACK（选择性确认）</a></li>
+        <li><a href="#53-快速恢复fast-recovery">5.3 快速恢复（Fast Recovery）</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-流量控制">6. 流量控制</a>
+      <ul>
+        <li><a href="#61-流量控制的目的">6.1 流量控制的目的</a></li>
+        <li><a href="#62-流量控制机制">6.2 流量控制机制</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-拥塞控制">7. 拥塞控制</a>
+      <ul>
+        <li><a href="#71-拥塞控制-vs-流量控制">7.1 拥塞控制 vs 流量控制</a></li>
+        <li><a href="#72-拥塞控制算法">7.2 拥塞控制算法</a></li>
+        <li><a href="#73-拥塞控制状态图">7.3 拥塞控制状态图</a></li>
+        <li><a href="#74-拥塞控制变体">7.4 拥塞控制变体</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-实战项目tcp可靠性分析工具">8. 实战项目：TCP可靠性分析工具</a>
+      <ul>
+        <li><a href="#81-项目功能">8.1 项目功能</a></li>
+        <li><a href="#82-工具演示">8.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-今日练习">9. 今日练习</a>
+      <ul>
+        <li><a href="#练习1观察重传">练习1：观察重传</a></li>
+        <li><a href="#练习2计算rto">练习2：计算RTO</a></li>
+        <li><a href="#练习3模拟拥塞控制">练习3：模拟拥塞控制</a></li>
+        <li><a href="#练习4查看tcp统计">练习4：查看TCP统计</a></li>
+      </ul>
+    </li>
+    <li><a href="#10-常见问题">10. 常见问题</a></li>
+    <li><a href="#11-总结">11. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第16天tcp可靠传输机制">第16天：TCP可靠传输机制
+</h1><h2 id="今日目标">今日目标
+</h2><ul>
+<li>深入理解TCP序列号和确认号机制</li>
+<li>掌握TCP滑动窗口原理</li>
+<li>理解超时重传机制</li>
+<li>掌握快速重传和快速恢复算法</li>
+<li>理解TCP流量控制</li>
+<li>理解TCP拥塞控制算法</li>
+<li>实现TCP可靠性分析工具</li>
+</ul>
+<hr>
+<h2 id="1-tcp可靠传输概述">1. TCP可靠传输概述
+</h2><h3 id="11-什么是可靠传输">1.1 什么是可靠传输？
+</h3><p><strong>可靠传输的保证</strong>：</p>
+<pre tabindex="0"><code>1. 数据无差错
+   └─ 通过校验和检测
+
+2. 数据不丢失
+   └─ 通过确认和重传
+
+3. 数据不重复
+   └─ 通过序列号去重
+
+4. 数据按序到达
+   └─ 通过序列号排序
+
+5. 流量控制
+   └─ 防止发送方发送过快
+
+6. 拥塞控制
+   └─ 防止网络过载
+</code></pre><h3 id="12-可靠传输的核心机制">1.2 可靠传输的核心机制
+</h3><pre tabindex="0"><code>┌─────────────────────────────────────────┐
+│         TCP可靠传输机制                   │
+├─────────────────────────────────────────┤
+│ 1. 序列号 (Sequence Number)             │
+│    └─ 标识每个字节                       │
+│                                          │
+│ 2. 确认应答 (ACK)                       │
+│    └─ 确认收到的数据                     │
+│                                          │
+│ 3. 超时重传 (Retransmission)            │
+│    └─ 超时未收到ACK则重传                │
+│                                          │
+│ 4. 滑动窗口 (Sliding Window)            │
+│    └─ 流量控制和效率提升                 │
+│                                          │
+│ 5. 快速重传 (Fast Retransmit)           │
+│    └─ 收到3个重复ACK立即重传             │
+│                                          │
+│ 6. 拥塞控制 (Congestion Control)        │
+│    └─ 慢启动、拥塞避免、快速恢复         │
+└─────────────────────────────────────────┘
+</code></pre><hr>
+<h2 id="2-序列号和确认号">2. 序列号和确认号
+</h2><h3 id="21-序列号机制">2.1 序列号机制
+</h3><p><strong>序列号（Sequence Number）</strong>：</p>
+<pre tabindex="0"><code>作用：标识发送的每个字节在字节流中的位置
+
+特点：
+- 32位，范围：0 ~ 4,294,967,295 (约4GB)
+- 超过最大值会回绕（wraparound）
+- 初始序列号（ISN）在连接时随机选择
+
+示例：
+┌─────────────────────────────────────────┐
+│   字节流：HELLO WORLD                    │
+├─────────────────────────────────────────┤
+│   位置：  0 1 2 3 4 5 6 7 8 9 10        │
+│   字符：  H E L L O   W O R L D         │
+└─────────────────────────────────────────┘
+
+如果ISN = 1000：
+- &#39;H&#39; 的序列号：1000
+- &#39;E&#39; 的序列号：1001
+- &#39;L&#39; 的序列号：1002
+- ...
+- &#39;D&#39; 的序列号：1010
+</code></pre><p><strong>TCP段的序列号</strong>：</p>
+<pre tabindex="0"><code>TCP段的序列号 = 该段第一个字节的序列号
+
+示例：
+发送 &#34;HELLO WORLD&#34; (11字节)
+
+方案1：一次发送
+┌──────────────────────────────┐
+│ SEQ=1000, Data=&#34;HELLO WORLD&#34; │
+│ 长度：11字节                  │
+└──────────────────────────────┘
+
+方案2：分两次发送
+┌──────────────────────────────┐
+│ SEQ=1000, Data=&#34;HELLO &#34;      │  (6字节)
+│ SEQ=1006, Data=&#34;WORLD&#34;       │  (5字节)
+└──────────────────────────────┘
+
+下一个段的SEQ：
+= 当前SEQ + 当前段数据长度
+= 1000 + 11 = 1011
+</code></pre><h3 id="22-确认号机制">2.2 确认号机制
+</h3><p><strong>确认号（Acknowledgment Number）</strong>：</p>
+<pre tabindex="0"><code>作用：告诉对方期望接收的下一个字节的序列号
+
+含义：
+ACK = n 表示 &#34;我已经收到了序列号 &lt; n 的所有数据&#34;
+
+特点：
+- 累积确认（Cumulative ACK）
+- 确认号之前的所有数据都已收到
+</code></pre><p><strong>确认示例</strong>：</p>
+<pre tabindex="0"><code>发送方                                     接收方
+  |                                          |
+  | SEQ=1000, Len=100 (&#34;数据1&#34;)             |
+  |─────────────────────────────────────────&gt;|
+  |                                          |
+  |                  ACK=1100                |
+  |&lt;─────────────────────────────────────────|
+  |    (已收到1000-1099，期望1100)           |
+  |                                          |
+  | SEQ=1100, Len=50 (&#34;数据2&#34;)              |
+  |─────────────────────────────────────────&gt;|
+  |                                          |
+  |                  ACK=1150                |
+  |&lt;─────────────────────────────────────────|
+  |    (已收到1100-1149，期望1150)           |
+</code></pre><p><strong>累积确认的问题</strong>：</p>
+<pre tabindex="0"><code>发送方发送了3个段：
+  段1: SEQ=1000, Len=100
+  段2: SEQ=1100, Len=100
+  段3: SEQ=1200, Len=100
+
+情况1：全部收到
+  接收方回复：ACK=1300 ✅
+
+情况2：段2丢失
+  段1到达 → 回复 ACK=1100
+  段3到达 → 还是回复 ACK=1100（期望1100）
+
+  问题：发送方不知道段3是否收到
+  解决：SACK（选择性确认）扩展
+</code></pre><h3 id="23-序列号回绕问题">2.3 序列号回绕问题
+</h3><pre tabindex="0"><code>序列号是32位：0 ~ 4,294,967,295 (约4GB)
+
+高速网络问题：
+- 10 Gbps 网络
+- 发送速度：1.25 GB/s
+- 序列号耗尽时间：4GB ÷ 1.25GB/s ≈ 3.2秒
+
+解决方案：
+1. PAWS (Protection Against Wrapped Sequence numbers)
+   └─ 使用时间戳选项
+2. TCP窗口扩大选项
+   └─ 减少数据段数量
+</code></pre><hr>
+<h2 id="3-滑动窗口机制">3. 滑动窗口机制
+</h2><h3 id="31-为什么需要滑动窗口">3.1 为什么需要滑动窗口？
+</h3><p><strong>停止等待协议的问题</strong>：</p>
+<pre tabindex="0"><code>停止等待 (Stop-and-Wait)：
+1. 发送一个段
+2. 等待ACK
+3. 收到ACK后发送下一个段
+
+效率：非常低
+
+示例：
+RTT = 100ms
+数据段大小 = 1KB
+
+时间线：
+t=0ms:    发送段1
+t=100ms:  收到ACK1
+t=100ms:  发送段2
+t=200ms:  收到ACK2
+...
+
+吞吐量 = 1KB / 100ms = 10KB/s = 80Kbps
+
+即使带宽是1Gbps，也只能用到80Kbps！❌
+</code></pre><p><strong>滑动窗口解决方案</strong>：</p>
+<pre tabindex="0"><code>连续发送多个段，不用等待ACK
+
+示例（窗口大小=4）：
+t=0ms:    发送段1、段2、段3、段4
+t=100ms:  收到ACK1，窗口滑动，发送段5
+t=105ms:  收到ACK2，窗口滑动，发送段6
+...
+
+吞吐量大幅提升！✅
+</code></pre><h3 id="32-发送窗口">3.2 发送窗口
+</h3><p><strong>发送窗口结构</strong>：</p>
+<pre tabindex="0"><code>字节流：
+┌────────────────────────────────────────────────────┐
+│ 已发送  │  已发送   │   可以发送    │    不能发送   │
+│ 已确认  │  未确认   │   (窗口内)    │   (窗口外)    │
+└────────────────────────────────────────────────────┘
+    ↑          ↑             ↑              ↑
+   P1         P2            P3             P4
+
+P1: 已发送并已确认的最后一个字节
+P2: 已发送但未确认的最后一个字节
+P3: 允许发送的最后一个字节
+P4: 未来的数据
+
+发送窗口 = P3 - P1
+可用窗口 = P3 - P2
+已发送未确认 = P2 - P1
+</code></pre><p><strong>窗口滑动过程</strong>：</p>
+<pre tabindex="0"><code>初始状态（窗口大小=6）：
+┌────┬────┬────┬────┬────┬────┬────┬────┬────┐
+│ 1  │ 2  │ 3  │ 4  │ 5  │ 6  │ 7  │ 8  │ 9  │
+└────┴────┴────┴────┴────┴────┴────┴────┴────┘
+       └────────窗口────────┘
+       可发送：1,2,3,4,5,6
+
+步骤1：发送1,2,3
+┌────┬────┬────┬────┬────┬────┬────┬────┬────┐
+│ 1* │ 2* │ 3* │ 4  │ 5  │ 6  │ 7  │ 8  │ 9  │
+└────┴────┴────┴────┴────┴────┴────┴────┴────┘
+       └────────窗口────────┘
+       *=已发送
+
+步骤2：收到ACK for 1,2
+┌────┬────┬────┬────┬────┬────┬────┬────┬────┐
+│ 1✓ │ 2✓ │ 3* │ 4  │ 5  │ 6  │ 7  │ 8  │ 9  │
+└────┴────┴────┴────┴────┴────┴────┴────┴────┘
+             └────────窗口────────┘
+             窗口向右滑动2格
+
+步骤3：可以发送7,8
+┌────┬────┬────┬────┬────┬────┬────┬────┬────┐
+│ 1✓ │ 2✓ │ 3* │ 4  │ 5  │ 6  │ 7  │ 8  │ 9  │
+└────┴────┴────┴────┴────┴────┴────┴────┴────┘
+             └────────窗口────────┘
+             发送7,8
+</code></pre><h3 id="33-接收窗口">3.3 接收窗口
+</h3><p><strong>接收窗口结构</strong>：</p>
+<pre tabindex="0"><code>字节流：
+┌────────────────────────────────────────────────────┐
+│   已接收    │    可以接收      │      不能接收      │
+│   已确认    │   (窗口内)       │     (窗口外)       │
+└────────────────────────────────────────────────────┘
+       ↑             ↑                  ↑
+      Q1            Q2                 Q3
+
+Q1: 已接收并已确认的最后一个字节
+Q2: 期望接收的最后一个字节
+Q3: 不能接收的第一个字节
+
+接收窗口 = Q3 - Q1
+</code></pre><p><strong>乱序到达的处理</strong>：</p>
+<pre tabindex="0"><code>期望接收顺序：1, 2, 3, 4, 5
+
+实际到达顺序：1, 3, 2, 5, 4
+
+处理：
+1. 收到1 → 交付应用层，ACK=2
+2. 收到3 → 缓存（等待2），ACK=2
+3. 收到2 → 交付1,2,3，ACK=4
+4. 收到5 → 缓存（等待4），ACK=4
+5. 收到4 → 交付4,5，ACK=6
+
+策略：
+- 按序交付给应用层
+- 乱序数据暂存在缓冲区
+- 累积确认
+</code></pre><h3 id="34-窗口大小的影响">3.4 窗口大小的影响
+</h3><p><strong>带宽延迟积（BDP）</strong>：</p>
+<pre tabindex="0"><code>BDP = 带宽 × RTT
+
+示例：
+带宽 = 100 Mbps = 12.5 MB/s
+RTT = 100 ms = 0.1 s
+
+BDP = 12.5 MB/s × 0.1s = 1.25 MB
+
+含义：
+- 在收到ACK前，可以发送1.25MB数据
+- 窗口大小应该 ≥ BDP
+- 否则无法充分利用带宽
+</code></pre><p><strong>窗口大小限制</strong>：</p>
+<pre tabindex="0"><code>TCP头部窗口字段：16位
+最大窗口大小：2^16 = 65536 字节 = 64 KB
+
+问题：
+高速长延迟网络（如卫星链路）需要更大窗口
+
+解决：
+窗口扩大选项 (Window Scale Option)
+实际窗口 = 窗口字段值 × 2^Scale
+最大Scale = 14
+最大窗口 = 65536 × 2^14 = 1 GB
+</code></pre><hr>
+<h2 id="4-超时重传机制">4. 超时重传机制
+</h2><h3 id="41-超时重传原理">4.1 超时重传原理
+</h3><pre tabindex="0"><code>发送方行为：
+1. 发送数据段
+2. 启动重传计时器
+3. 如果超时仍未收到ACK
+   └─ 重传该数据段
+4. 收到ACK
+   └─ 取消计时器
+</code></pre><p><strong>超时重传示例</strong>：</p>
+<pre tabindex="0"><code>发送方                                     接收方
+  |                                          |
+  | SEQ=1000, Len=100                       |
+  |─────────────────────────────────────────&gt;|
+  | [启动计时器]                              |
+  |                                          |
+  |                                       ❌ 数据丢失
+  |                                          |
+  | [超时！]                                 |
+  | SEQ=1000, Len=100 (重传)                |
+  |─────────────────────────────────────────&gt;|
+  |                                          |
+  |                  ACK=1100                |
+  |&lt;─────────────────────────────────────────|
+  | ✅ 收到ACK，取消计时器                    |
+</code></pre><h3 id="42-重传超时时间rto的计算">4.2 重传超时时间（RTO）的计算
+</h3><p><strong>问题：RTO设置多少合适？</strong></p>
+<pre tabindex="0"><code>RTO太小：
+- 不必要的重传
+- 浪费带宽
+- 加重网络负担
+
+RTO太大：
+- 重传延迟大
+- 影响性能
+- 用户体验差
+
+理想：RTO 略大于 RTT
+</code></pre><p><strong>RTO计算算法（Jacobson算法）</strong>：</p>
+<pre tabindex="0"><code>1. 测量RTT样本（每次收到ACK时）
+   RTT_sample = ACK到达时间 - 发送时间
+
+2. 计算平滑RTT（SRTT）
+   SRTT = (1 - α) × SRTT + α × RTT_sample
+   α = 0.125 (1/8)
+
+3. 计算RTT变化（RTTVAR）
+   RTTVAR = (1 - β) × RTTVAR + β × |SRTT - RTT_sample|
+   β = 0.25 (1/4)
+
+4. 计算RTO
+   RTO = SRTT + 4 × RTTVAR
+   最小值：200ms（Linux默认）
+   最大值：120秒
+
+示例：
+假设：
+RTT样本序列：100ms, 110ms, 90ms, 105ms
+
+初始：SRTT=100ms, RTTVAR=0
+
+第1次：RTT=110ms
+SRTT = 0.875×100 + 0.125×110 = 101.25ms
+RTTVAR = 0.75×0 + 0.25×|100-110| = 2.5ms
+RTO = 101.25 + 4×2.5 = 111.25ms
+
+第2次：RTT=90ms
+SRTT = 0.875×101.25 + 0.125×90 = 99.84ms
+RTTVAR = 0.75×2.5 + 0.25×|101.25-90| = 4.69ms
+RTO = 99.84 + 4×4.69 = 118.6ms
+</code></pre><h3 id="43-重传歧义问题">4.3 重传歧义问题
+</h3><p><strong>问题：重传后收到ACK，这个ACK是对原始段还是重传段的确认？</strong></p>
+<pre tabindex="0"><code>场景1：ACK是对原始段的确认
+发送方                                     接收方
+  | SEQ=1000                                |
+  |─────────────────────────────────────────&gt;|
+  | [启动计时器]                              |
+  |                                          |
+  |                         ACK=1100 (延迟)  |
+  | [超时！重传]                 ↓            |
+  | SEQ=1000 (重传)           ↓              |
+  |──────────────&gt;            ↓              |
+  |                           ↓              |
+  |&lt;──────────────────────────┘              |
+  | 收到ACK                                  |
+
+  RTT计算：如果用重传时间，会高估RTT ❌
+
+场景2：ACK是对重传段的确认
+发送方                                     接收方
+  | SEQ=1000                                |
+  |─────────────&gt; ❌ 丢失                    |
+  | [启动计时器]                              |
+  | [超时！重传]                              |
+  | SEQ=1000 (重传)                         |
+  |─────────────────────────────────────────&gt;|
+  |                                          |
+  |                  ACK=1100                |
+  |&lt;─────────────────────────────────────────|
+
+  RTT计算：如果用原始发送时间，会高估RTT ❌
+</code></pre><p><strong>Karn算法解决方案</strong>：</p>
+<pre tabindex="0"><code>规则：
+1. 重传的段不用于RTT计算
+2. 只用成功传输（未重传）的段计算RTT
+
+缺点：
+如果连续丢包，无法更新RTO
+
+解决：
+结合指数退避（Exponential Backoff）
+每次重传，RTO翻倍
+RTO_new = RTO_old × 2
+</code></pre><hr>
+<h2 id="5-快速重传与快速恢复">5. 快速重传与快速恢复
+</h2><h3 id="51-快速重传fast-retransmit">5.1 快速重传（Fast Retransmit）
+</h3><p><strong>问题：超时重传太慢</strong></p>
+<pre tabindex="0"><code>传统超时重传：
+- 等待RTO超时（可能几百毫秒）
+- 影响传输效率
+</code></pre><p><strong>快速重传原理</strong>：</p>
+<pre tabindex="0"><code>规则：
+收到3个重复ACK，立即重传，不等超时
+
+为什么是3个？
+- 1个重复ACK：可能是乱序到达
+- 2个重复ACK：可能还是乱序
+- 3个重复ACK：很可能是丢包
+</code></pre><p><strong>快速重传示例</strong>：</p>
+<pre tabindex="0"><code>发送方                                     接收方
+  |                                          |
+  | SEQ=1000, Len=100                       |
+  |─────────────────────────────────────────&gt;|
+  |                  ACK=1100                |
+  |&lt;─────────────────────────────────────────|
+  |                                          |
+  | SEQ=1100, Len=100                       |
+  |─────────&gt;  ❌ 丢失                       |
+  |                                          |
+  | SEQ=1200, Len=100                       |
+  |─────────────────────────────────────────&gt;|
+  |                  ACK=1100 (重复1)        |
+  |&lt;─────────────────────────────────────────|
+  |                                          |
+  | SEQ=1300, Len=100                       |
+  |─────────────────────────────────────────&gt;|
+  |                  ACK=1100 (重复2)        |
+  |&lt;─────────────────────────────────────────|
+  |                                          |
+  | SEQ=1400, Len=100                       |
+  |─────────────────────────────────────────&gt;|
+  |                  ACK=1100 (重复3)        |
+  |&lt;─────────────────────────────────────────|
+  |                                          |
+  | 🚀 收到3个重复ACK，立即重传！             |
+  | SEQ=1100, Len=100 (快速重传)            |
+  |─────────────────────────────────────────&gt;|
+  |                  ACK=1500                |
+  |&lt;─────────────────────────────────────────|
+  | ✅ 成功恢复                               |
+</code></pre><h3 id="52-sack选择性确认">5.2 SACK（选择性确认）
+</h3><p><strong>累积ACK的局限</strong>：</p>
+<pre tabindex="0"><code>发送：段1(1000), 段2(1100), 段3(1200), 段4(1300)
+接收：段1✓, 段2✗, 段3✓, 段4✓
+
+累积ACK只能发送：ACK=1100
+发送方不知道段3和段4是否收到
+
+问题：
+- 发送方可能重传段2、3、4（浪费）
+- 只需要重传段2即可
+</code></pre><p><strong>SACK解决方案</strong>：</p>
+<pre tabindex="0"><code>SACK选项格式：
+┌─────────────────────────────────────────┐
+│ Kind=5 │ Length │ Left Edge │Right Edge │
+└─────────────────────────────────────────┘
+
+示例：
+接收到：1000-1099, 1200-1299, 1300-1399
+
+SACK选项：
+ACK=1100
+SACK: 1200-1300, 1300-1400
+
+含义：
+- 期望收到1100
+- 但已经收到1200-1399的数据
+
+发送方行为：
+- 只重传1100-1199
+- 不重传1200-1399 ✅
+</code></pre><h3 id="53-快速恢复fast-recovery">5.3 快速恢复（Fast Recovery）
+</h3><p><strong>快速恢复算法</strong>：</p>
+<pre tabindex="0"><code>触发：收到3个重复ACK时
+
+步骤：
+1. 拥塞窗口减半
+   cwnd = cwnd / 2
+   ssthresh = cwnd
+
+2. 快速重传丢失的段
+
+3. 每收到一个重复ACK
+   cwnd = cwnd + 1 (临时膨胀)
+
+4. 收到新的ACK
+   cwnd = ssthresh (恢复正常)
+   进入拥塞避免阶段
+
+目的：
+- 快速恢复，不回到慢启动
+- 保持较高的发送速率
+</code></pre><hr>
+<h2 id="6-流量控制">6. 流量控制
+</h2><h3 id="61-流量控制的目的">6.1 流量控制的目的
+</h3><pre tabindex="0"><code>问题：
+发送方发送速度 &gt; 接收方处理速度
+接收方缓冲区溢出，数据丢失
+
+解决：
+接收方通过窗口大小告诉发送方还能接收多少数据
+</code></pre><h3 id="62-流量控制机制">6.2 流量控制机制
+</h3><p><strong>接收窗口通告</strong>：</p>
+<pre tabindex="0"><code>接收方在每个ACK中通告窗口大小
+
+示例：
+接收缓冲区大小：8KB
+已接收未读：2KB
+可用空间：6KB
+
+发送ACK：
+ACK=1000, Window=6144 (6KB)
+
+发送方：
+- 最多再发送6KB数据
+- 发送后等待ACK和新的窗口通告
+</code></pre><p><strong>零窗口问题</strong>：</p>
+<pre tabindex="0"><code>场景：
+1. 接收方缓冲区满，发送Window=0
+2. 发送方停止发送
+3. 接收方处理数据，缓冲区有空间
+4. 但如果ACK丢失，发送方不知道可以继续发送
+
+解决：零窗口探测
+发送方定期发送零窗口探测段（1字节数据）
+询问接收方是否有可用窗口
+</code></pre><p><strong>糊涂窗口综合症（Silly Window Syndrome）</strong>：</p>
+<pre tabindex="0"><code>问题：
+接收方每次只读取很少数据
+导致频繁发送小窗口通告
+发送方发送大量小数据段
+效率低下
+
+示例：
+缓冲区8KB，应用每次读1字节
+Window序列：0, 1, 0, 1, 0, 1...
+效率：极低 ❌
+
+解决方案：
+1. 接收方（Clark算法）
+   - 缓冲区空间 &lt; MSS时，通告Window=0
+   - 直到有足够空间（MSS或缓冲区一半）
+
+2. 发送方（Nagle算法）
+   - 等待数据累积到MSS大小再发送
+   - 或收到之前数据的ACK再发送
+</code></pre><hr>
+<h2 id="7-拥塞控制">7. 拥塞控制
+</h2><h3 id="71-拥塞控制-vs-流量控制">7.1 拥塞控制 vs 流量控制
+</h3><pre tabindex="0"><code>流量控制（Flow Control）：
+- 目标：防止接收方过载
+- 机制：接收窗口（rwnd）
+- 控制：接收方控制发送方
+
+拥塞控制（Congestion Control）：
+- 目标：防止网络过载
+- 机制：拥塞窗口（cwnd）
+- 控制：发送方自己判断
+
+发送窗口 = min(rwnd, cwnd)
+</code></pre><h3 id="72-拥塞控制算法">7.2 拥塞控制算法
+</h3><p><strong>1. 慢启动（Slow Start）</strong></p>
+<pre tabindex="0"><code>目的：
+连接初期探测网络容量
+
+算法：
+1. 初始cwnd = 1 MSS (或更大，如10 MSS)
+2. 每收到一个ACK，cwnd += 1
+3. 效果：cwnd指数增长（每个RTT翻倍）
+
+示例：
+RTT 0: cwnd=1,  发送1个段
+RTT 1: cwnd=2,  发送2个段
+RTT 2: cwnd=4,  发送4个段
+RTT 3: cwnd=8,  发送8个段
+...
+
+终止条件：
+- cwnd &gt;= ssthresh（慢启动阈值）
+  → 进入拥塞避免
+- 发生丢包
+  → 进入拥塞避免或快速恢复
+</code></pre><p><strong>2. 拥塞避免（Congestion Avoidance）</strong></p>
+<pre tabindex="0"><code>目的：
+小心翼翼地增加窗口，避免拥塞
+
+算法：
+每收到一个ACK：
+cwnd = cwnd + 1/cwnd
+
+效果：每个RTT，cwnd增加1
+
+示例：
+RTT 0: cwnd=16
+RTT 1: cwnd=17
+RTT 2: cwnd=18
+RTT 3: cwnd=19
+...
+
+特点：线性增长（比慢启动慢得多）
+</code></pre><p><strong>3. 拥塞发生</strong></p>
+<pre tabindex="0"><code>情况1：超时（丢包严重）
+行为：
+- ssthresh = cwnd / 2
+- cwnd = 1 MSS
+- 重新慢启动
+
+情况2：3个重复ACK（丢包较轻）
+行为：
+- ssthresh = cwnd / 2
+- cwnd = ssthresh + 3
+- 快速重传 + 快速恢复
+</code></pre><p><strong>4. 快速恢复（Fast Recovery）</strong></p>
+<pre tabindex="0"><code>算法：
+1. ssthresh = cwnd / 2
+2. cwnd = ssthresh + 3
+3. 重传丢失的段
+4. 每收到重复ACK，cwnd += 1（临时膨胀）
+5. 收到新ACK时，cwnd = ssthresh
+6. 进入拥塞避免
+
+目的：
+- 快速恢复，不回到慢启动
+- 维持较高吞吐量
+</code></pre><h3 id="73-拥塞控制状态图">7.3 拥塞控制状态图
+</h3><pre tabindex="0"><code>                 [连接建立]
+                      ↓
+                ┌──────────┐
+                │ 慢启动    │ cwnd指数增长
+                │          │ 每ACK: cwnd += 1
+                └──────────┘
+                      ↓
+              cwnd &gt;= ssthresh
+                      ↓
+                ┌──────────┐
+                │拥塞避免   │ cwnd线性增长
+                │          │ 每RTT: cwnd += 1
+                └──────────┘
+                      ↓
+                  发生丢包
+                   ↙    ↘
+            超时         3个重复ACK
+              ↓               ↓
+        ┌──────────┐    ┌──────────┐
+        │ 慢启动    │    │快速恢复   │
+        │cwnd=1    │    │cwnd=ssthresh/2+3│
+        └──────────┘    └──────────┘
+              ↓               ↓
+              └───────┬───────┘
+                      ↓
+                ┌──────────┐
+                │拥塞避免   │
+                └──────────┘
+</code></pre><h3 id="74-拥塞控制变体">7.4 拥塞控制变体
+</h3><p><strong>TCP Reno（经典算法）</strong>：</p>
+<pre tabindex="0"><code>特点：
+- 慢启动 + 拥塞避免 + 快速重传 + 快速恢复
+- 最经典的TCP实现
+
+问题：
+- 对多个丢包处理不好
+- 每个RTT只能恢复一个丢包
+</code></pre><p><strong>TCP NewReno</strong>：</p>
+<pre tabindex="0"><code>改进：
+- 改进的快速恢复
+- 可以在一个RTT内恢复多个丢包
+
+特点：
+- 部分ACK触发重传
+- 直到所有丢失数据恢复才退出快速恢复
+</code></pre><p><strong>TCP CUBIC（Linux默认）</strong>：</p>
+<pre tabindex="0"><code>特点：
+- 窗口增长函数：cwnd = C(t - K)^3 + W_max
+- 更适合高带宽长延迟网络
+
+优点：
+- 快速探测可用带宽
+- 公平性更好
+- 高速网络性能更好
+</code></pre><p><strong>TCP BBR（Google）</strong>：</p>
+<pre tabindex="0"><code>理念：
+- 不基于丢包，基于RTT和带宽
+- 主动探测瓶颈带宽和RTT
+
+特点：
+- 4个状态：Startup, Drain, ProbeBW, ProbeRTT
+- 更高吞吐量
+- 更低延迟
+</code></pre><hr>
+<h2 id="8-实战项目tcp可靠性分析工具">8. 实战项目：TCP可靠性分析工具
+</h2><h3 id="81-项目功能">8.1 项目功能
+</h3><p>实现工具分析：</p>
+<ol>
+<li>TCP连接的重传统计</li>
+<li>RTT和RTO监控</li>
+<li>窗口大小变化</li>
+<li>拥塞控制状态</li>
+</ol>
+<h3 id="82-工具演示">8.2 工具演示
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 监控TCP重传</span>
+</span></span><span style="display:flex;"><span>python day16_tcp_reliability.py --monitor-retrans
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 分析RTT</span>
+</span></span><span style="display:flex;"><span>python day16_tcp_reliability.py --analyze-rtt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 模拟拥塞控制</span>
+</span></span><span style="display:flex;"><span>python day16_tcp_reliability.py --simulate-congestion
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 窗口大小分析</span>
+</span></span><span style="display:flex;"><span>python day16_tcp_reliability.py --window-analysis
+</span></span></code></pre></div><hr>
+<h2 id="9-今日练习">9. 今日练习
+</h2><h3 id="练习1观察重传">练习1：观察重传
+</h3><p>使用Wireshark：</p>
+<ol>
+<li>访问一个网站</li>
+<li>筛选：<code>tcp.analysis.retransmission</code></li>
+<li>观察重传的段</li>
+<li>分析重传原因（超时/快速重传）</li>
+</ol>
+<h3 id="练习2计算rto">练习2：计算RTO
+</h3><pre tabindex="0"><code>给定RTT样本：100ms, 120ms, 90ms, 110ms
+
+计算：
+1. SRTT (Smoothed RTT)
+2. RTTVAR (RTT Variation)
+3. RTO (Retransmission Timeout)
+
+使用公式：
+SRTT = (1-α) × SRTT + α × RTT_sample
+RTTVAR = (1-β) × RTTVAR + β × |SRTT - RTT_sample|
+RTO = SRTT + 4 × RTTVAR
+</code></pre><h3 id="练习3模拟拥塞控制">练习3：模拟拥塞控制
+</h3><pre tabindex="0"><code>场景：
+- 初始cwnd = 1 MSS
+- ssthresh = 16 MSS
+- MSS = 1460 字节
+
+问题：
+1. 经过多少个RTT，cwnd达到16？
+2. 如果在cwnd=20时发生超时，新的cwnd和ssthresh是多少？
+3. 如果在cwnd=20时收到3个重复ACK，cwnd和ssthresh是多少？
+</code></pre><h3 id="练习4查看tcp统计">练习4：查看TCP统计
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Linux查看TCP统计</span>
+</span></span><span style="display:flex;"><span>netstat -s | grep -i tcp
+</span></span><span style="display:flex;"><span>ss -ti  <span style="color:#75715e"># 查看TCP详细信息</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看重传统计</span>
+</span></span><span style="display:flex;"><span>netstat -s | grep retrans
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看拥塞控制算法</span>
+</span></span><span style="display:flex;"><span>sysctl net.ipv4.tcp_congestion_control
+</span></span></code></pre></div><hr>
+<h2 id="10-常见问题">10. 常见问题
+</h2><p><strong>Q1：为什么是3个重复ACK触发快速重传，而不是2个或4个？</strong></p>
+<p>A：这是经验值的平衡：</p>
+<ul>
+<li>2个：可能误判（乱序到达）</li>
+<li>3个：较可靠地判断丢包</li>
+<li>4个：太保守，影响效率</li>
+</ul>
+<p><strong>Q2：TCP如何区分网络拥塞和接收方慢？</strong></p>
+<p>A：</p>
+<ul>
+<li>网络拥塞：超时或3个重复ACK</li>
+<li>接收方慢：Window字段变小</li>
+<li>TCP会相应调整发送速度</li>
+</ul>
+<p><strong>Q3：为什么慢启动要指数增长？</strong></p>
+<p>A：</p>
+<ul>
+<li>快速探测可用带宽</li>
+<li>避免初期过于保守</li>
+<li>遇到拥塞时能快速反应</li>
+</ul>
+<p><strong>Q4：选择性确认（SACK）是必须的吗？</strong></p>
+<p>A：</p>
+<ul>
+<li>不是必须，但强烈推荐</li>
+<li>没有SACK时效率较低</li>
+<li>现代TCP实现基本都支持SACK</li>
+</ul>
+<hr>
+<h2 id="11-总结">11. 总结
+</h2><p>今天我们深入学习了：</p>
+<h3 id="核心知识点">核心知识点
+</h3><ol>
+<li>
+<p><strong>序列号和确认号</strong>：</p>
+<ul>
+<li>序列号标识字节位置</li>
+<li>确认号表示期望接收的下一个字节</li>
+<li>累积确认机制</li>
+</ul>
+</li>
+<li>
+<p><strong>滑动窗口</strong>：</p>
+<ul>
+<li>提高传输效率</li>
+<li>发送窗口和接收窗口</li>
+<li>窗口大小 = min(rwnd, cwnd)</li>
+</ul>
+</li>
+<li>
+<p><strong>超时重传</strong>：</p>
+<ul>
+<li>RTO动态计算（Jacobson算法）</li>
+<li>Karn算法解决重传歧义</li>
+<li>指数退避</li>
+</ul>
+</li>
+<li>
+<p><strong>快速重传和快速恢复</strong>：</p>
+<ul>
+<li>3个重复ACK触发</li>
+<li>不等超时，立即重传</li>
+<li>SACK提高效率</li>
+</ul>
+</li>
+<li>
+<p><strong>流量控制</strong>：</p>
+<ul>
+<li>防止接收方过载</li>
+<li>零窗口处理</li>
+<li>糊涂窗口综合症</li>
+</ul>
+</li>
+<li>
+<p><strong>拥塞控制</strong>：</p>
+<ul>
+<li>慢启动（指数增长）</li>
+<li>拥塞避免（线性增长）</li>
+<li>快速恢复</li>
+<li>多种算法变体</li>
+</ul>
+</li>
+</ol>
+<h3 id="重点回顾">重点回顾
+</h3><pre tabindex="0"><code>TCP可靠传输 = 序列号 + 确认 + 重传 + 窗口
+
+效率优化：
+- 滑动窗口（批量发送）
+- 快速重传（不等超时）
+- SACK（选择性确认）
+
+网络友好：
+- 流量控制（保护接收方）
+- 拥塞控制（保护网络）
+</code></pre><h3 id="明天预告">明天预告
+</h3><p><strong>第17天：UDP协议详解</strong></p>
+<p>内容预览：</p>
+<ul>
+<li>UDP报文格式</li>
+<li>UDP vs TCP深入对比</li>
+<li>UDP应用场景</li>
+<li>UDP编程实战</li>
+<li>基于UDP实现可靠传输</li>
+</ul>
+<hr>
+<p><strong>继续加油！</strong> 🚀</p>
+<p>今天我们学习了TCP如何实现可靠传输，这是TCP最核心的功能。理解这些机制不仅能帮助你更好地使用TCP，还能在遇到网络问题时快速定位原因！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/15%E5%A4%A9tcp%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">15天：TCP协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%93%E4%BC%A0%E8%BE%93%E5%B1%82%E5%92%8C%E5%BA%94%E7%94%A8%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">三周总结：传输层和应用层协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E4%BA%8C%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%B1%82%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">二周总结：网络层深入理解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/14%E5%A4%A9%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%E6%80%BB%E7%BB%93%E4%B8%8E%E7%BB%BC%E5%90%88%E5%AE%9E%E6%88%98/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">14天：第一阶段总结与综合实战</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/13%E5%A4%A9dhcp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">13天：DHCP协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

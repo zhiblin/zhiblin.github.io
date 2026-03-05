@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第一周总结：网络基础入门 &ldquo;万丈高楼平地起，扎实基础是关键。&rdquo;\n🎯 本周回顾 恭喜你完成了第一周的学习！让我们回顾一下这一周的精彩内容。\n📚 本周学习内容 天数 主题 核心内容 实战项目 第1天 认识计算机网络 网络基本概念、作用 网络连接检测工具 第2天 网络分类和拓扑 LAN/WAN/MAN、拓扑结构 局域网设备扫描器 第3天 OSI七层模型 七层结构、数据封装 协议分层演示 第4天 TCP/IP四层模型 实际应用模型、协议 数据包分析器 第5天 ping命令 ICMP协议、RTT 简易ping工具 第6天 traceroute命令 路由追踪、TTL 简易traceroute工具 第7天 Wireshark抓包 抓包分析、过滤器 实际抓包分析 📖 知识点总结 1. 网络基础概念 什么是计算机网络？\n">
+<title>一周总结：网络基础入门</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/%E4%B8%80%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="一周总结：网络基础入门">
+<meta property='og:description' content="第一周总结：网络基础入门 &ldquo;万丈高楼平地起，扎实基础是关键。&rdquo;\n🎯 本周回顾 恭喜你完成了第一周的学习！让我们回顾一下这一周的精彩内容。\n📚 本周学习内容 天数 主题 核心内容 实战项目 第1天 认识计算机网络 网络基本概念、作用 网络连接检测工具 第2天 网络分类和拓扑 LAN/WAN/MAN、拓扑结构 局域网设备扫描器 第3天 OSI七层模型 七层结构、数据封装 协议分层演示 第4天 TCP/IP四层模型 实际应用模型、协议 数据包分析器 第5天 ping命令 ICMP协议、RTT 简易ping工具 第6天 traceroute命令 路由追踪、TTL 简易traceroute工具 第7天 Wireshark抓包 抓包分析、过滤器 实际抓包分析 📖 知识点总结 1. 网络基础概念 什么是计算机网络？\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/%E4%B8%80%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T14:49:32&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T14:49:32&#43;00:00'/>
+<meta name="twitter:title" content="一周总结：网络基础入门">
+<meta name="twitter:description" content="第一周总结：网络基础入门 &ldquo;万丈高楼平地起，扎实基础是关键。&rdquo;\n🎯 本周回顾 恭喜你完成了第一周的学习！让我们回顾一下这一周的精彩内容。\n📚 本周学习内容 天数 主题 核心内容 实战项目 第1天 认识计算机网络 网络基本概念、作用 网络连接检测工具 第2天 网络分类和拓扑 LAN/WAN/MAN、拓扑结构 局域网设备扫描器 第3天 OSI七层模型 七层结构、数据封装 协议分层演示 第4天 TCP/IP四层模型 实际应用模型、协议 数据包分析器 第5天 ping命令 ICMP协议、RTT 简易ping工具 第6天 traceroute命令 路由追踪、TTL 简易traceroute工具 第7天 Wireshark抓包 抓包分析、过滤器 实际抓包分析 📖 知识点总结 1. 网络基础概念 什么是计算机网络？\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#-本周回顾">🎯 本周回顾</a>
+      <ul>
+        <li><a href="#-本周学习内容">📚 本周学习内容</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识点总结">📖 知识点总结</a>
+      <ul>
+        <li><a href="#1-网络基础概念">1. 网络基础概念</a></li>
+        <li><a href="#2-osi七层模型">2. OSI七层模型</a></li>
+        <li><a href="#3-tcpip四层模型">3. TCP/IP四层模型</a></li>
+        <li><a href="#4-关键协议">4. 关键协议</a></li>
+        <li><a href="#5-重要概念">5. 重要概念</a></li>
+        <li><a href="#6-网络工具">6. 网络工具</a></li>
+      </ul>
+    </li>
+    <li><a href="#-综合练习题">🧪 综合练习题</a>
+      <ul>
+        <li><a href="#一选择题">一、选择题</a></li>
+        <li><a href="#二简答题">二、简答题</a></li>
+        <li><a href="#三实践题">三、实践题</a></li>
+      </ul>
+    </li>
+    <li><a href="#-综合实战项目">🚀 综合实战项目</a>
+      <ul>
+        <li><a href="#项目网络诊断工具箱">项目：网络诊断工具箱</a></li>
+      </ul>
+    </li>
+    <li><a href="#-自我评估">📊 自我评估</a>
+      <ul>
+        <li><a href="#检查清单">检查清单</a></li>
+        <li><a href="#掌握程度评估">掌握程度评估</a></li>
+      </ul>
+    </li>
+    <li><a href="#-学习心得">💡 学习心得</a></li>
+    <li><a href="#-下周预告">🎯 下周预告</a></li>
+    <li><a href="#-成就解锁">🏆 成就解锁</a></li>
+    <li><a href="#-参考资料">📚 参考资料</a>
+      <ul>
+        <li><a href="#推荐书籍">推荐书籍</a></li>
+        <li><a href="#在线资源">在线资源</a></li>
+        <li><a href="#练习网站">练习网站</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E4%B8%80%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/">一周总结：网络基础入门</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T14:49:32Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#-本周回顾">🎯 本周回顾</a>
+      <ul>
+        <li><a href="#-本周学习内容">📚 本周学习内容</a></li>
+      </ul>
+    </li>
+    <li><a href="#-知识点总结">📖 知识点总结</a>
+      <ul>
+        <li><a href="#1-网络基础概念">1. 网络基础概念</a></li>
+        <li><a href="#2-osi七层模型">2. OSI七层模型</a></li>
+        <li><a href="#3-tcpip四层模型">3. TCP/IP四层模型</a></li>
+        <li><a href="#4-关键协议">4. 关键协议</a></li>
+        <li><a href="#5-重要概念">5. 重要概念</a></li>
+        <li><a href="#6-网络工具">6. 网络工具</a></li>
+      </ul>
+    </li>
+    <li><a href="#-综合练习题">🧪 综合练习题</a>
+      <ul>
+        <li><a href="#一选择题">一、选择题</a></li>
+        <li><a href="#二简答题">二、简答题</a></li>
+        <li><a href="#三实践题">三、实践题</a></li>
+      </ul>
+    </li>
+    <li><a href="#-综合实战项目">🚀 综合实战项目</a>
+      <ul>
+        <li><a href="#项目网络诊断工具箱">项目：网络诊断工具箱</a></li>
+      </ul>
+    </li>
+    <li><a href="#-自我评估">📊 自我评估</a>
+      <ul>
+        <li><a href="#检查清单">检查清单</a></li>
+        <li><a href="#掌握程度评估">掌握程度评估</a></li>
+      </ul>
+    </li>
+    <li><a href="#-学习心得">💡 学习心得</a></li>
+    <li><a href="#-下周预告">🎯 下周预告</a></li>
+    <li><a href="#-成就解锁">🏆 成就解锁</a></li>
+    <li><a href="#-参考资料">📚 参考资料</a>
+      <ul>
+        <li><a href="#推荐书籍">推荐书籍</a></li>
+        <li><a href="#在线资源">在线资源</a></li>
+        <li><a href="#练习网站">练习网站</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第一周总结网络基础入门">第一周总结：网络基础入门
+</h1>
+    <blockquote>
+        <p>&ldquo;万丈高楼平地起，扎实基础是关键。&rdquo;</p>
+
+    </blockquote>
+<h2 id="-本周回顾">🎯 本周回顾
+</h2><p>恭喜你完成了第一周的学习！让我们回顾一下这一周的精彩内容。</p>
+<h3 id="-本周学习内容">📚 本周学习内容
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>天数</th>
+          <th>主题</th>
+          <th>核心内容</th>
+          <th>实战项目</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>第1天</td>
+          <td>认识计算机网络</td>
+          <td>网络基本概念、作用</td>
+          <td>网络连接检测工具</td>
+      </tr>
+      <tr>
+          <td>第2天</td>
+          <td>网络分类和拓扑</td>
+          <td>LAN/WAN/MAN、拓扑结构</td>
+          <td>局域网设备扫描器</td>
+      </tr>
+      <tr>
+          <td>第3天</td>
+          <td>OSI七层模型</td>
+          <td>七层结构、数据封装</td>
+          <td>协议分层演示</td>
+      </tr>
+      <tr>
+          <td>第4天</td>
+          <td>TCP/IP四层模型</td>
+          <td>实际应用模型、协议</td>
+          <td>数据包分析器</td>
+      </tr>
+      <tr>
+          <td>第5天</td>
+          <td>ping命令</td>
+          <td>ICMP协议、RTT</td>
+          <td>简易ping工具</td>
+      </tr>
+      <tr>
+          <td>第6天</td>
+          <td>traceroute命令</td>
+          <td>路由追踪、TTL</td>
+          <td>简易traceroute工具</td>
+      </tr>
+      <tr>
+          <td>第7天</td>
+          <td>Wireshark抓包</td>
+          <td>抓包分析、过滤器</td>
+          <td>实际抓包分析</td>
+      </tr>
+  </tbody>
+</table></div>
+<h2 id="-知识点总结">📖 知识点总结
+</h2><h3 id="1-网络基础概念">1. 网络基础概念
+</h3><p><strong>什么是计算机网络？</strong></p>
+<pre tabindex="0"><code>计算机网络 = 多台计算机通过通信线路连接
+             + 共享资源
+             + 交换信息
+</code></pre><p><strong>网络的分类</strong>：</p>
+<ul>
+<li>LAN（局域网）：家庭、办公室（几米到几公里）</li>
+<li>MAN（城域网）：城市范围（几十公里）</li>
+<li>WAN（广域网）：跨国、跨洲（几百到几万公里）</li>
+</ul>
+<p><strong>网络拓扑结构</strong>：</p>
+<ul>
+<li>总线型：所有设备连在一条线上</li>
+<li>星型：所有设备连到中心节点（最常用）</li>
+<li>环型：设备首尾相连成环</li>
+<li>网状型：设备互相连接</li>
+<li>树型：分层结构</li>
+</ul>
+<h3 id="2-osi七层模型">2. OSI七层模型
+</h3><pre tabindex="0"><code>第7层 - 应用层（Application）      → HTTP, FTP, DNS
+第6层 - 表示层（Presentation）     → 加密, 压缩
+第5层 - 会话层（Session）          → 会话管理
+第4层 - 传输层（Transport）        → TCP, UDP
+第3层 - 网络层（Network）          → IP, ICMP
+第2层 - 数据链路层（Data Link）    → Ethernet, WiFi
+第1层 - 物理层（Physical）         → 网线, 光纤
+</code></pre><p><strong>记忆口诀</strong>：应表会传网数物</p>
+<p><strong>数据封装过程</strong>：</p>
+<pre tabindex="0"><code>应用数据 → [传输层头|数据] → [网络层头|传输层头|数据]
+→ [链路层头|网络层头|传输层头|数据|链路层尾]
+</code></pre><h3 id="3-tcpip四层模型">3. TCP/IP四层模型
+</h3><pre tabindex="0"><code>┌────────────────┐
+│  应用层        │  HTTP, DNS, FTP, SSH
+├────────────────┤
+│  传输层        │  TCP, UDP
+├────────────────┤
+│  网际层        │  IP, ICMP, ARP
+├────────────────┤
+│  网络接口层    │  Ethernet, WiFi
+└────────────────┘
+</code></pre><p><strong>TCP/IP vs OSI</strong>：</p>
+<ul>
+<li>OSI：理论模型（7层）</li>
+<li>TCP/IP：实际使用（4层）</li>
+</ul>
+<h3 id="4-关键协议">4. 关键协议
+</h3><h4 id="ip协议internet-protocol">IP协议（Internet Protocol）
+</h4><ul>
+<li>作用：寻址和路由</li>
+<li>IP地址：192.168.1.100</li>
+<li>版本：IPv4（32位）、IPv6（128位）</li>
+</ul>
+<h4 id="tcp协议transmission-control-protocol">TCP协议（Transmission Control Protocol）
+</h4><ul>
+<li>作用：可靠传输</li>
+<li>特点：面向连接、可靠、有序</li>
+<li>端口：标识应用程序</li>
+</ul>
+<h4 id="udp协议user-datagram-protocol">UDP协议（User Datagram Protocol）
+</h4><ul>
+<li>作用：快速传输</li>
+<li>特点：无连接、不可靠、简单快速</li>
+</ul>
+<h4 id="icmp协议internet-control-message-protocol">ICMP协议（Internet Control Message Protocol）
+</h4><ul>
+<li>作用：错误报告、网络诊断</li>
+<li>应用：ping、traceroute</li>
+</ul>
+<h4 id="http协议hypertext-transfer-protocol">HTTP协议（Hypertext Transfer Protocol）
+</h4><ul>
+<li>作用：网页传输</li>
+<li>端口：80（HTTP）、443（HTTPS）</li>
+<li>方法：GET、POST、PUT、DELETE等</li>
+</ul>
+<h3 id="5-重要概念">5. 重要概念
+</h3><p><strong>MAC地址</strong>：</p>
+<ul>
+<li>网卡的物理地址</li>
+<li>格式：AA:BB:CC:DD:EE:FF</li>
+<li>作用：局域网内通信</li>
+</ul>
+<p><strong>IP地址</strong>：</p>
+<ul>
+<li>网络中设备的逻辑地址</li>
+<li>格式：192.168.1.1</li>
+<li>作用：跨网络通信</li>
+</ul>
+<p><strong>端口号</strong>：</p>
+<ul>
+<li>标识主机上的应用程序</li>
+<li>范围：0-65535</li>
+<li>常用：80(HTTP)、443(HTTPS)、22(SSH)</li>
+</ul>
+<p><strong>TTL（Time To Live）</strong>：</p>
+<ul>
+<li>数据包的生存时间</li>
+<li>每经过一个路由器减1</li>
+<li>为0时被丢弃</li>
+</ul>
+<p><strong>RTT（Round-Trip Time）</strong>：</p>
+<ul>
+<li>往返时间</li>
+<li>从发送到收到回复的时间</li>
+<li>单位：毫秒(ms)</li>
+</ul>
+<h3 id="6-网络工具">6. 网络工具
+</h3><p><strong>ping</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 测试连通性</span>
+</span></span><span style="display:flex;"><span>ping baidu.com
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 发送4个包</span>
+</span></span><span style="display:flex;"><span>ping -c <span style="color:#ae81ff">4</span> baidu.com  <span style="color:#75715e"># Linux/Mac</span>
+</span></span><span style="display:flex;"><span>ping -n <span style="color:#ae81ff">4</span> baidu.com  <span style="color:#75715e"># Windows</span>
+</span></span></code></pre></div><p><strong>traceroute</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 追踪路由路径</span>
+</span></span><span style="display:flex;"><span>traceroute baidu.com  <span style="color:#75715e"># Linux/Mac</span>
+</span></span><span style="display:flex;"><span>tracert baidu.com     <span style="color:#75715e"># Windows</span>
+</span></span></code></pre></div><p><strong>Wireshark</strong>：</p>
+<ul>
+<li>图形化抓包工具</li>
+<li>支持多种协议分析</li>
+<li>强大的过滤功能</li>
+</ul>
+<h2 id="-综合练习题">🧪 综合练习题
+</h2><h3 id="一选择题">一、选择题
+</h3><ol>
+<li>
+<p>以下哪个不是网络拓扑结构？
+A. 星型  B. 环型  C. 圆型  D. 总线型</p>
+</li>
+<li>
+<p>TCP/IP模型有几层？
+A. 4层  B. 5层  C. 7层  D. 9层</p>
+</li>
+<li>
+<p>ping命令使用的是哪个协议？
+A. TCP  B. UDP  C. ICMP  D. HTTP</p>
+</li>
+<li>
+<p>以下哪个IP地址是私网地址？
+A. 8.8.8.8  B. 192.168.1.1  C. 114.114.114.114  D. 220.181.38.148</p>
+</li>
+<li>
+<p>HTTP协议默认使用哪个端口？
+A. 22  B. 80  C. 443  D. 3306</p>
+</li>
+</ol>
+<h3 id="二简答题">二、简答题
+</h3><ol>
+<li>
+<p>解释OSI模型中每一层的主要作用。</p>
+</li>
+<li>
+<p>TCP和UDP有什么区别？各自适用于什么场景？</p>
+</li>
+<li>
+<p>说明ping命令的工作原理。</p>
+</li>
+<li>
+<p>什么是子网掩码？192.168.1.0/24是什么意思？</p>
+</li>
+<li>
+<p>数据包从应用层到物理层的封装过程是怎样的？</p>
+</li>
+</ol>
+<h3 id="三实践题">三、实践题
+</h3><ol>
+<li>
+<p><strong>网络诊断</strong></p>
+<ul>
+<li>使用ping测试到baidu.com的连通性</li>
+<li>记录RTT和TTL值</li>
+<li>分析结果说明什么</li>
+</ul>
+</li>
+<li>
+<p><strong>路径追踪</strong></p>
+<ul>
+<li>使用traceroute追踪到google.com的路径</li>
+<li>记录经过的跳数</li>
+<li>哪一跳延迟最大？为什么？</li>
+</ul>
+</li>
+<li>
+<p><strong>抓包分析</strong></p>
+<ul>
+<li>使用Wireshark抓取访问http://www.example.com的数据包</li>
+<li>找出DNS查询包</li>
+<li>找出TCP三次握手的包</li>
+<li>找出HTTP GET请求包</li>
+<li>分析每个包的各层结构</li>
+</ul>
+</li>
+<li>
+<p><strong>局域网扫描</strong></p>
+<ul>
+<li>扫描你所在的局域网</li>
+<li>列出所有在线设备的IP和MAC地址</li>
+<li>绘制简单的网络拓扑图</li>
+</ul>
+</li>
+</ol>
+<h2 id="-综合实战项目">🚀 综合实战项目
+</h2><h3 id="项目网络诊断工具箱">项目：网络诊断工具箱
+</h3><p><strong>需求</strong>：
+开发一个综合的网络诊断工具，整合本周学到的所有知识。</p>
+<p><strong>功能</strong>：</p>
+<ol>
+<li><strong>连通性测试</strong>：ping功能</li>
+<li><strong>路由追踪</strong>：traceroute功能</li>
+<li><strong>端口扫描</strong>：扫描指定主机的开放端口</li>
+<li><strong>局域网扫描</strong>：发现局域网内的所有设备</li>
+<li><strong>DNS查询</strong>：查询域名的IP地址</li>
+<li><strong>网络信息</strong>：显示本机网络配置</li>
+</ol>
+<p><strong>实现提示</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># day08_network_toolbox.py</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NetworkToolbox</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">ping</span>(self, host):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;测试连通性&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">traceroute</span>(self, host):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;追踪路由&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">scan_ports</span>(self, host, ports):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;扫描端口&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">scan_lan</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;扫描局域网&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">dns_lookup</span>(self, domain):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;DNS查询&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_network_info</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#34;&#34;获取本机网络信息&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    toolbox <span style="color:#f92672">=</span> NetworkToolbox()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;=== 网络诊断工具箱 ===&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;1. Ping测试&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;2. 路由追踪&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;3. 端口扫描&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;4. 局域网扫描&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;5. DNS查询&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;6. 网络信息&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;0. 退出&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>        choice <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">请选择功能: &#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 根据choice调用相应功能</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><p><strong>评分标准</strong>：</p>
+<ul>
+<li>功能完整性：40分</li>
+<li>代码质量：30分</li>
+<li>用户体验：20分</li>
+<li>创新性：10分</li>
+</ul>
+<h2 id="-自我评估">📊 自我评估
+</h2><h3 id="检查清单">检查清单
+</h3><p>完成本周学习后，你应该能够：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 解释什么是计算机网络</li>
+<li><input disabled="" type="checkbox"> 说出网络的三种分类</li>
+<li><input disabled="" type="checkbox"> 画出五种网络拓扑结构</li>
+<li><input disabled="" type="checkbox"> 列出OSI七层模型的每一层</li>
+<li><input disabled="" type="checkbox"> 说明TCP/IP四层模型</li>
+<li><input disabled="" type="checkbox"> 理解数据包的封装过程</li>
+<li><input disabled="" type="checkbox"> 使用ping命令测试网络</li>
+<li><input disabled="" type="checkbox"> 使用traceroute追踪路由</li>
+<li><input disabled="" type="checkbox"> 使用Wireshark抓包</li>
+<li><input disabled="" type="checkbox"> 编写简单的网络诊断程序</li>
+</ul>
+<h3 id="掌握程度评估">掌握程度评估
+</h3><p>为每个知识点打分（1-5分）：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>知识点</th>
+          <th>掌握程度</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>网络基础概念</td>
+          <td>□□□□□</td>
+      </tr>
+      <tr>
+          <td>网络分类和拓扑</td>
+          <td>□□□□□</td>
+      </tr>
+      <tr>
+          <td>OSI七层模型</td>
+          <td>□□□□□</td>
+      </tr>
+      <tr>
+          <td>TCP/IP四层模型</td>
+          <td>□□□□□</td>
+      </tr>
+      <tr>
+          <td>常用协议理解</td>
+          <td>□□□□□</td>
+      </tr>
+      <tr>
+          <td>ping命令使用</td>
+          <td>□□□□□</td>
+      </tr>
+      <tr>
+          <td>traceroute使用</td>
+          <td>□□□□□</td>
+      </tr>
+      <tr>
+          <td>Wireshark使用</td>
+          <td>□□□□□</td>
+      </tr>
+      <tr>
+          <td>网络编程基础</td>
+          <td>□□□□□</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>如果某项低于3分，建议复习对应章节。</p>
+<h2 id="-学习心得">💡 学习心得
+</h2><p><strong>思考题</strong>：</p>
+<ol>
+<li>本周学习中，哪个知识点你觉得最难理解？</li>
+<li>哪个实战项目你觉得最有趣？</li>
+<li>你遇到了什么困难？如何解决的？</li>
+<li>对下周的学习有什么期待？</li>
+</ol>
+<p><strong>建议</strong>：</p>
+<ul>
+<li>写下你的学习心得</li>
+<li>记录遇到的问题和解决方法</li>
+<li>整理笔记，建立知识体系</li>
+<li>多动手实践，光看不练假把式</li>
+</ul>
+<h2 id="-下周预告">🎯 下周预告
+</h2><p><strong>第二周：深入理解网络模型</strong></p>
+<p>我们将学习：</p>
+<ul>
+<li>第8天：IP地址详解</li>
+<li>第9天：子网划分实战</li>
+<li>第10天：MAC地址和ARP协议</li>
+<li>第11天：端口和Socket深入</li>
+<li>第12天：DNS协议详解</li>
+<li>第13天：DHCP协议</li>
+<li>第14天：第二周总结和项目</li>
+</ul>
+<p><strong>预习建议</strong>：</p>
+<ul>
+<li>复习本周的IP地址概念</li>
+<li>了解二进制和十进制转换</li>
+<li>思考：为什么需要子网划分？</li>
+</ul>
+<h2 id="-成就解锁">🏆 成就解锁
+</h2><p>恭喜你完成第一周的学习！你已经解锁：</p>
+<p>✅ <strong>网络入门者</strong>：完成第一周所有内容
+✅ <strong>抓包新手</strong>：学会使用Wireshark
+✅ <strong>诊断助手</strong>：会使用ping和traceroute
+✅ <strong>代码实践者</strong>：编写了5个网络工具</p>
+<p><strong>继续加油，向着网络大师的目标前进！</strong> 💪</p>
+<hr>
+<h2 id="-参考资料">📚 参考资料
+</h2><h3 id="推荐书籍">推荐书籍
+</h3><ul>
+<li>《计算机网络：自顶向下方法》</li>
+<li>《图解TCP/IP》</li>
+<li>《网络是怎样连接的》</li>
+</ul>
+<h3 id="在线资源">在线资源
+</h3><ul>
+<li>Wireshark官方文档：https://www.wireshark.org/docs/</li>
+<li>RFC文档库：https://www.rfc-editor.org/</li>
+<li>TCP/IP指南：各大技术博客</li>
+</ul>
+<h3 id="练习网站">练习网站
+</h3><ul>
+<li>HackerRank网络题目</li>
+<li>LeetCode网络相关题</li>
+<li>实验楼网络课程</li>
+</ul>
+<hr>
+<p>💡 <strong>本周金句</strong>：千里之行始于足下，网络学习贵在坚持！</p>
+<p>👉 <a class="link" href="day01.md" >返回第1天</a> | <a class="link" href="../../README.md" >返回目录</a> | <a class="link" href="../week02/day08.md" >进入第2周</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/7%E5%A4%A9wireshark%E6%8A%93%E5%8C%85%E5%85%A5%E9%97%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">7天：Wireshark抓包入门</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/6%E5%A4%A9%E7%BD%91%E7%BB%9C%E5%91%BD%E4%BB%A4%E8%BF%9B%E9%98%B6-traceroute/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">6天：网络命令进阶 - traceroute</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/5%E5%A4%A9%E7%BD%91%E7%BB%9C%E5%91%BD%E4%BB%A4%E5%85%A5%E9%97%A8-ping/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">5天：网络命令入门 - ping</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/4%E5%A4%A9tcp/ip%E5%9B%9B%E5%B1%82%E6%A8%A1%E5%9E%8B/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">4天：TCP/IP四层模型</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/3%E5%A4%A9osi%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">3天：OSI七层模型</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

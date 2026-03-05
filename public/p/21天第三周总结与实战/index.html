@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第21天：第三周总结与实战 今日目标 回顾本周核心知识点 完成综合实战项目 学习性能优化技巧 掌握调试和排错方法 了解常用工具和资源 1. 本周知识回顾 1.1 第15天：TCP协议基础 核心知识：\n">
+<title>21天：第三周总结与实战</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/21%E5%A4%A9%E7%AC%AC%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AE%9E%E6%88%98/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="21天：第三周总结与实战">
+<meta property='og:description' content="第21天：第三周总结与实战 今日目标 回顾本周核心知识点 完成综合实战项目 学习性能优化技巧 掌握调试和排错方法 了解常用工具和资源 1. 本周知识回顾 1.1 第15天：TCP协议基础 核心知识：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/21%E5%A4%A9%E7%AC%AC%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AE%9E%E6%88%98/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:25:36&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:25:36&#43;00:00'/>
+<meta name="twitter:title" content="21天：第三周总结与实战">
+<meta name="twitter:description" content="第21天：第三周总结与实战 今日目标 回顾本周核心知识点 完成综合实战项目 学习性能优化技巧 掌握调试和排错方法 了解常用工具和资源 1. 本周知识回顾 1.1 第15天：TCP协议基础 核心知识：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-本周知识回顾">1. 本周知识回顾</a>
+      <ul>
+        <li><a href="#11-第15天tcp协议基础">1.1 第15天：TCP协议基础</a></li>
+        <li><a href="#12-第16天tcp可靠传输机制">1.2 第16天：TCP可靠传输机制</a></li>
+        <li><a href="#13-第17天udp协议详解">1.3 第17天：UDP协议详解</a></li>
+        <li><a href="#14-第18天socket编程进阶">1.4 第18天：Socket编程进阶</a></li>
+        <li><a href="#15-第19天http协议基础">1.5 第19天：HTTP协议基础</a></li>
+        <li><a href="#16-第20天https和安全">1.6 第20天：HTTPS和安全</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-综合实战项目安全web应用平台">2. 综合实战项目：安全Web应用平台</a>
+      <ul>
+        <li><a href="#21-项目需求">2.1 项目需求</a></li>
+        <li><a href="#22-项目架构">2.2 项目架构</a></li>
+        <li><a href="#23-核心功能实现">2.3 核心功能实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-性能优化技巧">3. 性能优化技巧</a>
+      <ul>
+        <li><a href="#31-服务器端优化">3.1 服务器端优化</a></li>
+        <li><a href="#32-网络优化">3.2 网络优化</a></li>
+        <li><a href="#33-数据库优化">3.3 数据库优化</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-调试和排错">4. 调试和排错</a>
+      <ul>
+        <li><a href="#41-网络抓包工具">4.1 网络抓包工具</a></li>
+        <li><a href="#42-命令行工具">4.2 命令行工具</a></li>
+        <li><a href="#43-调试技巧">4.3 调试技巧</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-工具和资源推荐">5. 工具和资源推荐</a>
+      <ul>
+        <li><a href="#51-开发工具">5.1 开发工具</a></li>
+        <li><a href="#52-学习资源">5.2 学习资源</a></li>
+        <li><a href="#53-开源项目学习">5.3 开源项目学习</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-本周总结">6. 本周总结</a>
+      <ul>
+        <li><a href="#61-知识地图">6.1 知识地图</a></li>
+        <li><a href="#62-核心要点">6.2 核心要点</a></li>
+        <li><a href="#63-实践技能">6.3 实践技能</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-下周预告">7. 下周预告</a>
+      <ul>
+        <li><a href="#第22天ip协议基础">第22天：IP协议基础</a></li>
+        <li><a href="#第23天ipv6详解">第23天：IPv6详解</a></li>
+        <li><a href="#第24天icmp和诊断工具">第24天：ICMP和诊断工具</a></li>
+        <li><a href="#第25天arp和链路层">第25天：ARP和链路层</a></li>
+        <li><a href="#第26天路由协议">第26天：路由协议</a></li>
+        <li><a href="#第27天网络安全进阶">第27天：网络安全进阶</a></li>
+        <li><a href="#第28天第四周总结">第28天：第四周总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1完成综合项目">练习1：完成综合项目</a></li>
+        <li><a href="#练习2性能测试">练习2：性能测试</a></li>
+        <li><a href="#练习3安全审计">练习3：安全审计</a></li>
+        <li><a href="#练习4网络分析">练习4：网络分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-总结">9. 总结</a>
+      <ul>
+        <li><a href="#本周成就">本周成就</a></li>
+        <li><a href="#学习建议">学习建议</a></li>
+        <li><a href="#下周准备">下周准备</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/21%E5%A4%A9%E7%AC%AC%E4%B8%89%E5%91%A8%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AE%9E%E6%88%98/">21天：第三周总结与实战</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:25:36Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-本周知识回顾">1. 本周知识回顾</a>
+      <ul>
+        <li><a href="#11-第15天tcp协议基础">1.1 第15天：TCP协议基础</a></li>
+        <li><a href="#12-第16天tcp可靠传输机制">1.2 第16天：TCP可靠传输机制</a></li>
+        <li><a href="#13-第17天udp协议详解">1.3 第17天：UDP协议详解</a></li>
+        <li><a href="#14-第18天socket编程进阶">1.4 第18天：Socket编程进阶</a></li>
+        <li><a href="#15-第19天http协议基础">1.5 第19天：HTTP协议基础</a></li>
+        <li><a href="#16-第20天https和安全">1.6 第20天：HTTPS和安全</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-综合实战项目安全web应用平台">2. 综合实战项目：安全Web应用平台</a>
+      <ul>
+        <li><a href="#21-项目需求">2.1 项目需求</a></li>
+        <li><a href="#22-项目架构">2.2 项目架构</a></li>
+        <li><a href="#23-核心功能实现">2.3 核心功能实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-性能优化技巧">3. 性能优化技巧</a>
+      <ul>
+        <li><a href="#31-服务器端优化">3.1 服务器端优化</a></li>
+        <li><a href="#32-网络优化">3.2 网络优化</a></li>
+        <li><a href="#33-数据库优化">3.3 数据库优化</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-调试和排错">4. 调试和排错</a>
+      <ul>
+        <li><a href="#41-网络抓包工具">4.1 网络抓包工具</a></li>
+        <li><a href="#42-命令行工具">4.2 命令行工具</a></li>
+        <li><a href="#43-调试技巧">4.3 调试技巧</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-工具和资源推荐">5. 工具和资源推荐</a>
+      <ul>
+        <li><a href="#51-开发工具">5.1 开发工具</a></li>
+        <li><a href="#52-学习资源">5.2 学习资源</a></li>
+        <li><a href="#53-开源项目学习">5.3 开源项目学习</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-本周总结">6. 本周总结</a>
+      <ul>
+        <li><a href="#61-知识地图">6.1 知识地图</a></li>
+        <li><a href="#62-核心要点">6.2 核心要点</a></li>
+        <li><a href="#63-实践技能">6.3 实践技能</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-下周预告">7. 下周预告</a>
+      <ul>
+        <li><a href="#第22天ip协议基础">第22天：IP协议基础</a></li>
+        <li><a href="#第23天ipv6详解">第23天：IPv6详解</a></li>
+        <li><a href="#第24天icmp和诊断工具">第24天：ICMP和诊断工具</a></li>
+        <li><a href="#第25天arp和链路层">第25天：ARP和链路层</a></li>
+        <li><a href="#第26天路由协议">第26天：路由协议</a></li>
+        <li><a href="#第27天网络安全进阶">第27天：网络安全进阶</a></li>
+        <li><a href="#第28天第四周总结">第28天：第四周总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-今日练习">8. 今日练习</a>
+      <ul>
+        <li><a href="#练习1完成综合项目">练习1：完成综合项目</a></li>
+        <li><a href="#练习2性能测试">练习2：性能测试</a></li>
+        <li><a href="#练习3安全审计">练习3：安全审计</a></li>
+        <li><a href="#练习4网络分析">练习4：网络分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-总结">9. 总结</a>
+      <ul>
+        <li><a href="#本周成就">本周成就</a></li>
+        <li><a href="#学习建议">学习建议</a></li>
+        <li><a href="#下周准备">下周准备</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第21天第三周总结与实战">第21天：第三周总结与实战
+</h1><h2 id="今日目标">今日目标
+</h2><ul>
+<li>回顾本周核心知识点</li>
+<li>完成综合实战项目</li>
+<li>学习性能优化技巧</li>
+<li>掌握调试和排错方法</li>
+<li>了解常用工具和资源</li>
+</ul>
+<hr>
+<h2 id="1-本周知识回顾">1. 本周知识回顾
+</h2><h3 id="11-第15天tcp协议基础">1.1 第15天：TCP协议基础
+</h3><p><strong>核心知识</strong>：</p>
+<pre tabindex="0"><code>TCP特点：
+✅ 面向连接
+✅ 可靠传输
+✅ 有序传输
+✅ 字节流
+✅ 全双工
+✅ 流量控制
+✅ 拥塞控制
+
+三次握手：
+1. SYN
+2. SYN-ACK
+3. ACK
+
+四次挥手：
+1. FIN
+2. ACK
+3. FIN
+4. ACK
+
+11种状态：
+CLOSED → LISTEN → SYN_SENT → SYN_RECEIVED →
+ESTABLISHED → FIN_WAIT_1 → FIN_WAIT_2 →
+CLOSING → TIME_WAIT → CLOSE_WAIT → LAST_ACK
+</code></pre><p><strong>关键概念</strong>：</p>
+<pre tabindex="0"><code>TIME_WAIT：
+- 持续2MSL（通常2分钟）
+- 确保对方收到ACK
+- 防止旧连接的数据包干扰
+
+SYN Flood攻击：
+- 发送大量SYN包
+- 不完成三次握手
+- 耗尽服务器资源
+
+防御：
+- SYN Cookie
+- 增加半连接队列
+- 缩短超时时间
+</code></pre><h3 id="12-第16天tcp可靠传输机制">1.2 第16天：TCP可靠传输机制
+</h3><p><strong>核心知识</strong>：</p>
+<pre tabindex="0"><code>可靠性保证：
+1. 序列号和确认号
+2. 超时重传
+3. 快速重传
+4. 滑动窗口
+5. 流量控制
+6. 拥塞控制
+
+滑动窗口：
+发送窗口 = min(接收窗口, 拥塞窗口)
+
+拥塞控制算法：
+- 慢启动（Slow Start）
+- 拥塞避免（Congestion Avoidance）
+- 快速重传（Fast Retransmit）
+- 快速恢复（Fast Recovery）
+
+RTO计算（Jacobson算法）：
+SRTT = (1-α) × SRTT + α × RTT
+RTTVAR = (1-β) × RTTVAR + β × |SRTT-RTT|
+RTO = SRTT + 4 × RTTVAR
+</code></pre><p><strong>关键概念</strong>：</p>
+<pre tabindex="0"><code>TCP Reno vs TCP CUBIC vs BBR：
+
+TCP Reno：
+- 经典算法
+- 基于丢包
+- 适合低延迟网络
+
+TCP CUBIC：
+- Linux默认
+- 立方增长
+- 适合高带宽网络
+
+BBR：
+- Google开发
+- 基于带宽和RTT
+- 适合高延迟网络
+</code></pre><h3 id="13-第17天udp协议详解">1.3 第17天：UDP协议详解
+</h3><p><strong>核心知识</strong>：</p>
+<pre tabindex="0"><code>UDP特点：
+✅ 无连接
+✅ 不可靠
+✅ 快速
+✅ 轻量级
+✅ 支持广播/多播
+
+UDP头部：8字节
+- 源端口（2字节）
+- 目标端口（2字节）
+- 长度（2字节）
+- 校验和（2字节）
+
+UDP vs TCP：
+┌────────────┬────────┬────────┐
+│   特性     │  TCP   │  UDP   │
+├────────────┼────────┼────────┤
+│  可靠性    │   ✅   │   ❌   │
+│  速度      │   慢   │   快   │
+│  开销      │   大   │   小   │
+│  连接      │   是   │   否   │
+│  顺序      │   是   │   否   │
+└────────────┴────────┴────────┘
+</code></pre><p><strong>关键概念</strong>：</p>
+<pre tabindex="0"><code>UDP使用场景：
+- 实时音视频（VoIP、视频会议）
+- 在线游戏
+- DNS查询
+- DHCP
+- 流媒体
+- IoT设备通信
+
+可靠UDP实现：
+- 应用层实现
+- 序列号
+- ACK确认
+- 超时重传
+- 滑动窗口
+</code></pre><h3 id="14-第18天socket编程进阶">1.4 第18天：Socket编程进阶
+</h3><p><strong>核心知识</strong>：</p>
+<pre tabindex="0"><code>阻塞 vs 非阻塞：
+阻塞：等待直到完成
+非阻塞：立即返回
+
+IO多路复用：
+- select：跨平台，最多1024个
+- poll：无限制，O(n)
+- epoll：Linux专用，O(1)，最快
+
+Socket选项：
+- SO_REUSEADDR：地址重用
+- TCP_NODELAY：禁用Nagle算法
+- SO_KEEPALIVE：保活机制
+- SO_LINGER：关闭行为
+
+服务器架构：
+1. 单线程阻塞：简单但慢
+2. 多线程：简单但有限
+3. IO多路复用：高性能
+4. IO多路复用+线程池：最佳
+</code></pre><p><strong>关键概念</strong>：</p>
+<pre tabindex="0"><code>C10K问题：
+10000个并发连接
+
+解决方案：
+- IO多路复用（epoll）
+- 非阻塞IO
+- 事件驱动
+- 异步IO
+
+现在的挑战：
+C100K、C1000K（百万并发）
+</code></pre><h3 id="15-第19天http协议基础">1.5 第19天：HTTP协议基础
+</h3><p><strong>核心知识</strong>：</p>
+<pre tabindex="0"><code>HTTP特点：
+- 应用层协议
+- 无状态
+- 明文传输
+- 请求-响应模式
+
+HTTP格式：
+请求 = 请求行 + 请求头 + 空行 + 请求体
+响应 = 状态行 + 响应头 + 空行 + 响应体
+
+HTTP方法：
+- GET：查询
+- POST：创建
+- PUT：更新（完整）
+- PATCH：更新（部分）
+- DELETE：删除
+- HEAD：获取头部
+- OPTIONS：查询方法
+
+状态码：
+1xx：信息
+2xx：成功（200 OK）
+3xx：重定向（301、302、304）
+4xx：客户端错误（400、401、403、404）
+5xx：服务器错误（500、502、503）
+</code></pre><p><strong>关键概念</strong>：</p>
+<pre tabindex="0"><code>Cookie vs Session：
+Cookie：客户端存储
+Session：服务器存储
+
+HTTP版本：
+HTTP/1.0：短连接
+HTTP/1.1：持久连接
+HTTP/2：多路复用、二进制
+HTTP/3：基于QUIC(UDP)
+</code></pre><h3 id="16-第20天https和安全">1.6 第20天：HTTPS和安全
+</h3><p><strong>核心知识</strong>：</p>
+<pre tabindex="0"><code>HTTPS = HTTP + TLS/SSL
+
+加密技术：
+- 对称加密：AES（快速）
+- 非对称加密：RSA（安全）
+- 哈希函数：SHA-256
+- 数字签名：身份认证
+
+TLS握手：
+TLS 1.2：2-RTT
+TLS 1.3：1-RTT（更快）
+
+证书：
+- DV：域名验证
+- OV：组织验证
+- EV：扩展验证
+
+安全攻击：
+- 中间人攻击（MITM）
+- SSL剥离
+- XSS
+- CSRF
+- SQL注入
+</code></pre><p><strong>关键概念</strong>：</p>
+<pre tabindex="0"><code>混合加密：
+1. RSA交换对称密钥（安全）
+2. AES加密实际数据（快速）
+
+HSTS：
+Strict-Transport-Security
+强制使用HTTPS
+防止SSL剥离攻击
+
+Let&#39;s Encrypt：
+免费的CA
+自动化证书管理
+90天有效期
+</code></pre><hr>
+<h2 id="2-综合实战项目安全web应用平台">2. 综合实战项目：安全Web应用平台
+</h2><h3 id="21-项目需求">2.1 项目需求
+</h3><pre tabindex="0"><code>项目名称：SecureWebApp
+项目描述：一个安全的Web应用平台
+
+功能需求：
+1. 用户管理
+   - 注册/登录
+   - Session管理
+   - 权限控制
+
+2. 数据API
+   - RESTful API
+   - JSON格式
+   - CRUD操作
+
+3. 实时通信
+   - WebSocket（模拟）
+   - 实时消息推送
+
+4. 文件服务
+   - 静态文件服务
+   - 文件上传/下载
+
+5. 安全特性
+   - HTTPS支持
+   - Cookie安全
+   - CSRF防护
+   - XSS防护
+   - 输入验证
+
+技术要求：
+- 支持HTTP和HTTPS
+- 使用IO多路复用（epoll/select）
+- 实现完整的HTTP/1.1协议
+- 安全最佳实践
+- 性能监控
+- 日志记录
+</code></pre><h3 id="22-项目架构">2.2 项目架构
+</h3><pre tabindex="0"><code>┌─────────────────────────────────────────┐
+│           客户端（浏览器）               │
+└─────────────────────────────────────────┘
+                    │
+                    │ HTTPS
+                    ↓
+┌─────────────────────────────────────────┐
+│          负载均衡（可选）                │
+└─────────────────────────────────────────┘
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+        ↓           ↓           ↓
+┌─────────┐   ┌─────────┐   ┌─────────┐
+│  Web    │   │  Web    │   │  Web    │
+│ Server  │   │ Server  │   │ Server  │
+│  进程1  │   │  进程2  │   │  进程3  │
+└─────────┘   └─────────┘   └─────────┘
+        │           │           │
+        └───────────┼───────────┘
+                    │
+                    ↓
+┌─────────────────────────────────────────┐
+│          数据存储（JSON文件/数据库）     │
+└─────────────────────────────────────────┘
+
+模块划分：
+1. HTTP服务器模块
+   - 请求解析
+   - 响应生成
+   - 路由管理
+
+2. HTTPS模块
+   - SSL/TLS处理
+   - 证书管理
+
+3. 认证模块
+   - 用户注册/登录
+   - Session管理
+   - 权限验证
+
+4. API模块
+   - RESTful接口
+   - 数据处理
+
+5. 文件模块
+   - 静态文件
+   - 文件上传
+
+6. 安全模块
+   - CSRF Token
+   - XSS过滤
+   - 输入验证
+
+7. 监控模块
+   - 性能统计
+   - 日志记录
+</code></pre><h3 id="23-核心功能实现">2.3 核心功能实现
+</h3><p><strong>用户认证流程</strong>：</p>
+<pre tabindex="0"><code>注册：
+1. 用户提交注册表单（POST /api/register）
+2. 服务器验证输入（用户名、密码、邮箱）
+3. 密码哈希（使用bcrypt或类似算法）
+4. 存储到数据库
+5. 返回成功
+
+登录：
+1. 用户提交登录表单（POST /api/login）
+2. 服务器验证用户名和密码
+3. 创建Session
+4. 设置Session Cookie（HttpOnly、Secure、SameSite）
+5. 返回成功
+
+认证检查：
+1. 客户端请求带上Cookie
+2. 服务器解析Cookie获取Session ID
+3. 查找Session数据
+4. 验证Session有效性
+5. 获取用户信息
+6. 继续处理请求
+</code></pre><p><strong>安全措施</strong>：</p>
+<pre tabindex="0"><code>1. CSRF防护
+   - 生成CSRF Token
+   - 存储在Session中
+   - 表单中包含Token
+   - 服务器验证Token
+
+2. XSS防护
+   - 输出编码（HTML实体）
+   - Content-Security-Policy头
+   - HttpOnly Cookie
+
+3. SQL注入防护
+   - 参数化查询
+   - ORM框架
+   - 输入验证
+
+4. 密码安全
+   - 强密码要求
+   - 密码哈希（bcrypt、argon2）
+   - 加盐（Salt）
+   - 限制登录尝试
+
+5. HTTPS
+   - 强制HTTPS（HSTS）
+   - 只使用TLS 1.2+
+   - 强加密套件
+</code></pre><hr>
+<h2 id="3-性能优化技巧">3. 性能优化技巧
+</h2><h3 id="31-服务器端优化">3.1 服务器端优化
+</h3><p><strong>IO优化</strong>：</p>
+<pre tabindex="0"><code>1. 使用epoll（Linux）
+   - O(1)复杂度
+   - 边缘触发
+   - 百万并发
+
+2. 非阻塞IO
+   - 提高并发能力
+   - 避免线程阻塞
+
+3. 零拷贝
+   - sendfile()系统调用
+   - 减少数据拷贝
+   - 提高文件传输效率
+
+4. 内存映射
+   - mmap()
+   - 直接映射文件到内存
+   - 适合大文件
+</code></pre><p><strong>连接优化</strong>：</p>
+<pre tabindex="0"><code>1. 连接池
+   - 复用连接
+   - 减少建立开销
+
+2. Keep-Alive
+   - HTTP持久连接
+   - 复用TCP连接
+
+3. 连接限制
+   - 限制最大连接数
+   - 防止资源耗尽
+
+4. 超时设置
+   - 读超时
+   - 写超时
+   - 空闲超时
+</code></pre><p><strong>缓存优化</strong>：</p>
+<pre tabindex="0"><code>1. 静态资源缓存
+   - Cache-Control头
+   - ETag
+   - Last-Modified
+
+2. 内存缓存
+   - Redis
+   - Memcached
+   - 应用内缓存
+
+3. CDN
+   - 内容分发网络
+   - 边缘缓存
+   - 减少延迟
+
+4. 浏览器缓存
+   - 强缓存
+   - 协商缓存
+</code></pre><p><strong>并发优化</strong>：</p>
+<pre tabindex="0"><code>1. 多进程
+   - 利用多核CPU
+   - 进程隔离
+   - 稳定性好
+
+2. 线程池
+   - 固定数量线程
+   - 任务队列
+   - 避免频繁创建
+
+3. 协程
+   - 轻量级
+   - 高并发
+   - 适合IO密集
+
+4. 异步编程
+   - asyncio
+   - 事件循环
+   - 回调函数
+</code></pre><h3 id="32-网络优化">3.2 网络优化
+</h3><p><strong>TCP优化</strong>：</p>
+<pre tabindex="0"><code>1. 调整窗口大小
+   net.ipv4.tcp_window_scaling = 1
+   net.core.rmem_max = 16777216
+   net.core.wmem_max = 16777216
+
+2. 启用快速回收
+   net.ipv4.tcp_tw_reuse = 1
+   net.ipv4.tcp_fin_timeout = 30
+
+3. 调整队列长度
+   net.core.somaxconn = 1024
+   net.ipv4.tcp_max_syn_backlog = 2048
+
+4. 启用BBR拥塞控制
+   net.ipv4.tcp_congestion_control = bbr
+</code></pre><p><strong>HTTP优化</strong>：</p>
+<pre tabindex="0"><code>1. HTTP/2
+   - 多路复用
+   - 头部压缩
+   - 服务器推送
+
+2. 压缩
+   - Gzip
+   - Brotli
+   - 减少传输大小
+
+3. 减少请求
+   - 合并文件
+   - CSS Sprite
+   - 内联小资源
+
+4. 异步加载
+   - defer、async
+   - 懒加载
+   - 按需加载
+</code></pre><h3 id="33-数据库优化">3.3 数据库优化
+</h3><pre tabindex="0"><code>1. 索引优化
+   - 合理创建索引
+   - 避免过度索引
+   - 定期维护
+
+2. 查询优化
+   - 避免SELECT *
+   - 使用LIMIT
+   - 避免N+1查询
+
+3. 连接池
+   - 复用连接
+   - 限制最大连接
+
+4. 读写分离
+   - 主从复制
+   - 分散负载
+</code></pre><hr>
+<h2 id="4-调试和排错">4. 调试和排错
+</h2><h3 id="41-网络抓包工具">4.1 网络抓包工具
+</h3><p><strong>Wireshark</strong>：</p>
+<pre tabindex="0"><code>使用场景：
+- 分析网络流量
+- 查看数据包详情
+- 诊断网络问题
+
+常用过滤器：
+tcp.port == 80              # HTTP流量
+tcp.port == 443             # HTTPS流量
+http.request.method == GET  # GET请求
+ip.addr == 192.168.1.100    # 特定IP
+
+操作步骤：
+1. 选择网络接口
+2. 开始捕获
+3. 应用过滤器
+4. 分析数据包
+5. 导出数据
+</code></pre><p><strong>tcpdump</strong>：</p>
+<pre tabindex="0"><code>基本用法：
+# 捕获指定端口
+sudo tcpdump -i any port 80
+
+# 保存到文件
+sudo tcpdump -i any port 80 -w capture.pcap
+
+# 读取文件
+tcpdump -r capture.pcap
+
+# 过滤主机
+sudo tcpdump -i any host 192.168.1.100
+
+# 详细输出
+sudo tcpdump -i any port 80 -v -X
+</code></pre><h3 id="42-命令行工具">4.2 命令行工具
+</h3><p><strong>curl</strong>：</p>
+<pre tabindex="0"><code>基本请求：
+curl http://example.com
+
+显示头部：
+curl -I http://example.com
+
+POST请求：
+curl -X POST -d &#39;{&#34;key&#34;:&#34;value&#34;}&#39; \
+  -H &#34;Content-Type: application/json&#34; \
+  http://example.com/api
+
+HTTPS请求：
+curl -k https://localhost:8443
+
+跟随重定向：
+curl -L http://example.com
+
+显示详细信息：
+curl -v http://example.com
+
+测试速度：
+curl -w &#34;@curl-format.txt&#34; -o /dev/null -s http://example.com
+</code></pre><p><strong>netstat / ss</strong>：</p>
+<pre tabindex="0"><code>查看所有连接：
+netstat -an
+ss -an
+
+查看监听端口：
+netstat -lntp
+ss -lntp
+
+查看TCP连接：
+netstat -nt
+ss -nt
+
+查看连接数量：
+netstat -an | grep ESTABLISHED | wc -l
+ss -s
+
+查看某端口连接：
+netstat -an | grep :80
+ss -tan | grep :80
+</code></pre><p><strong>telnet / nc</strong>：</p>
+<pre tabindex="0"><code>测试端口：
+telnet example.com 80
+nc -zv example.com 80
+
+发送HTTP请求：
+telnet example.com 80
+GET / HTTP/1.1
+Host: example.com
+[空行]
+
+监听端口：
+nc -l 8080
+
+端口转发：
+nc -l 8080 | nc example.com 80
+</code></pre><h3 id="43-调试技巧">4.3 调试技巧
+</h3><p><strong>日志分析</strong>：</p>
+<pre tabindex="0"><code>日志级别：
+DEBUG &lt; INFO &lt; WARNING &lt; ERROR &lt; CRITICAL
+
+日志内容：
+- 时间戳
+- 级别
+- 模块
+- 消息
+- 异常堆栈
+
+示例：
+[2024-01-15 10:30:45] INFO [server] Client connected: 192.168.1.100:54321
+[2024-01-15 10:30:45] DEBUG [handler] Request: GET /api/users
+[2024-01-15 10:30:46] ERROR [database] Connection failed: timeout
+</code></pre><p><strong>性能分析</strong>：</p>
+<pre tabindex="0"><code>Python profiling：
+python -m cProfile -o profile.out script.py
+python -m pstats profile.out
+
+内存分析：
+memory_profiler
+objgraph
+
+网络性能：
+ping - 测试延迟
+traceroute - 追踪路由
+iperf - 测试带宽
+ab - HTTP压力测试
+wrk - 现代化压力测试
+</code></pre><p><strong>常见问题排查</strong>：</p>
+<pre tabindex="0"><code>连接被拒绝：
+- 检查服务是否启动
+- 检查端口是否正确
+- 检查防火墙规则
+
+连接超时：
+- 检查网络连通性
+- 检查路由
+- 检查防火墙
+
+连接重置：
+- 服务器主动关闭
+- 防火墙拦截
+- 代理问题
+
+慢查询：
+- 网络延迟高
+- 服务器负载高
+- 数据库慢查询
+- 锁竞争
+
+内存泄漏：
+- 使用内存分析工具
+- 检查循环引用
+- 检查资源释放
+</code></pre><hr>
+<h2 id="5-工具和资源推荐">5. 工具和资源推荐
+</h2><h3 id="51-开发工具">5.1 开发工具
+</h3><p><strong>代码编辑器</strong>：</p>
+<pre tabindex="0"><code>VS Code：
+- 免费开源
+- 插件丰富
+- 推荐插件：
+  - Python
+  - Remote SSH
+  - REST Client
+  - GitLens
+
+PyCharm：
+- 专业Python IDE
+- 强大的调试功能
+- 数据库工具
+
+Vim：
+- 轻量级
+- 高效编辑
+- 服务器必备
+</code></pre><p><strong>API测试工具</strong>：</p>
+<pre tabindex="0"><code>Postman：
+- 功能强大
+- 团队协作
+- 自动化测试
+
+Insomnia：
+- 简洁界面
+- 支持GraphQL
+- 开源
+
+curl：
+- 命令行
+- 脚本友好
+- 通用性强
+
+httpie：
+- 用户友好
+- 彩色输出
+- 简单语法
+</code></pre><p><strong>网络工具</strong>：</p>
+<pre tabindex="0"><code>Wireshark：包分析
+tcpdump：抓包
+nmap：端口扫描
+netcat：网络调试
+iperf：性能测试
+mtr：路由追踪
+</code></pre><h3 id="52-学习资源">5.2 学习资源
+</h3><p><strong>书籍推荐</strong>：</p>
+<pre tabindex="0"><code>网络协议：
+- 《TCP/IP详解 卷1》
+- 《计算机网络：自顶向下方法》
+- 《HTTP权威指南》
+
+编程实践：
+- 《Unix网络编程》
+- 《高性能网络编程》
+- 《Web性能权威指南》
+
+安全：
+- 《白帽子讲Web安全》
+- 《Web应用安全权威指南》
+- 《密码学原理与实践》
+</code></pre><p><strong>在线资源</strong>：</p>
+<pre tabindex="0"><code>文档：
+- MDN Web Docs
+- Python官方文档
+- RFC文档
+
+博客：
+- High Scalability
+- Cloudflare Blog
+- Google Developers
+
+视频：
+- YouTube技术频道
+- Bilibili技术区
+- Udemy课程
+
+实践：
+- GitHub开源项目
+- LeetCode
+- CTF比赛
+</code></pre><p><strong>工具网站</strong>：</p>
+<pre tabindex="0"><code>测试工具：
+- SSL Labs（SSL测试）
+- WebPageTest（性能测试）
+- GTmetrix（网站分析）
+
+在线工具：
+- regex101（正则测试）
+- JSON Editor Online
+- Base64编解码
+
+监控服务：
+- UptimeRobot
+- Pingdom
+- New Relic
+</code></pre><h3 id="53-开源项目学习">5.3 开源项目学习
+</h3><pre tabindex="0"><code>Web服务器：
+- Nginx（高性能HTTP服务器）
+- Apache（传统Web服务器）
+- Caddy（现代Web服务器）
+
+框架：
+- Flask（Python微框架）
+- Django（Python全栈框架）
+- Express（Node.js框架）
+
+工具：
+- curl（HTTP客户端）
+- redis（内存数据库）
+- PostgreSQL（关系数据库）
+</code></pre><hr>
+<h2 id="6-本周总结">6. 本周总结
+</h2><h3 id="61-知识地图">6.1 知识地图
+</h3><pre tabindex="0"><code>第三周：传输层和应用层协议
+
+传输层：
+├─ TCP协议
+│  ├─ 三次握手
+│  ├─ 四次挥手
+│  ├─ 可靠传输
+│  ├─ 流量控制
+│  └─ 拥塞控制
+│
+└─ UDP协议
+   ├─ 无连接
+   ├─ 不可靠
+   └─ 快速
+
+应用层：
+├─ HTTP协议
+│  ├─ 请求/响应
+│  ├─ 方法
+│  ├─ 状态码
+│  └─ Cookie/Session
+│
+└─ HTTPS协议
+   ├─ TLS/SSL
+   ├─ 加密
+   ├─ 证书
+   └─ 安全
+
+编程实践：
+├─ Socket编程
+│  ├─ TCP Socket
+│  ├─ UDP Socket
+│  └─ IO多路复用
+│
+└─ Web开发
+   ├─ HTTP服务器
+   ├─ HTTPS服务器
+   └─ 安全实践
+</code></pre><h3 id="62-核心要点">6.2 核心要点
+</h3><pre tabindex="0"><code>TCP：
+三次握手建立连接
+四次挥手断开连接
+通过序列号、ACK、重传保证可靠性
+通过滑动窗口实现流量控制
+通过拥塞控制算法避免网络拥塞
+
+UDP：
+无连接、不可靠、快速
+8字节头部
+适合实时应用
+可以在应用层实现可靠性
+
+HTTP：
+请求 = 请求行 + 请求头 + 空行 + 请求体
+响应 = 状态行 + 响应头 + 空行 + 响应体
+无状态，通过Cookie/Session保持状态
+HTTP/2多路复用，HTTP/3基于QUIC
+
+HTTPS：
+HTTP + TLS/SSL
+混合加密：RSA交换密钥 + AES加密数据
+数字证书验证身份
+TLS 1.3比TLS 1.2快一倍
+
+Socket编程：
+阻塞vs非阻塞
+IO多路复用：select/poll/epoll
+epoll性能最好（Linux）
+高性能服务器架构
+</code></pre><h3 id="63-实践技能">6.3 实践技能
+</h3><pre tabindex="0"><code>已掌握：
+✅ 分析TCP连接过程
+✅ 理解TCP可靠性机制
+✅ 使用UDP编程
+✅ 实现IO多路复用
+✅ 构建HTTP服务器
+✅ 配置HTTPS服务器
+✅ 生成SSL证书
+✅ 实现安全认证
+✅ 网络抓包分析
+✅ 性能优化
+
+待提升：
+□ 大规模并发处理
+□ 分布式系统
+□ 负载均衡
+□ 服务发现
+□ 容器化部署
+</code></pre><hr>
+<h2 id="7-下周预告">7. 下周预告
+</h2><p><strong>第四周：网络层协议（第22-28天）</strong></p>
+<h3 id="第22天ip协议基础">第22天：IP协议基础
+</h3><ul>
+<li>IPv4地址和子网划分</li>
+<li>IP报文格式</li>
+<li>IP路由原理</li>
+<li>NAT技术</li>
+</ul>
+<h3 id="第23天ipv6详解">第23天：IPv6详解
+</h3><ul>
+<li>IPv6地址格式</li>
+<li>IPv6 vs IPv4</li>
+<li>过渡技术</li>
+<li>IPv6部署</li>
+</ul>
+<h3 id="第24天icmp和诊断工具">第24天：ICMP和诊断工具
+</h3><ul>
+<li>ICMP协议</li>
+<li>ping原理</li>
+<li>traceroute原理</li>
+<li>网络诊断</li>
+</ul>
+<h3 id="第25天arp和链路层">第25天：ARP和链路层
+</h3><ul>
+<li>ARP协议</li>
+<li>ARP缓存</li>
+<li>ARP欺骗</li>
+<li>链路层概述</li>
+</ul>
+<h3 id="第26天路由协议">第26天：路由协议
+</h3><ul>
+<li>静态路由</li>
+<li>动态路由</li>
+<li>RIP、OSPF、BGP</li>
+<li>路由表</li>
+</ul>
+<h3 id="第27天网络安全进阶">第27天：网络安全进阶
+</h3><ul>
+<li>防火墙</li>
+<li>VPN</li>
+<li>IDS/IPS</li>
+<li>DDoS防护</li>
+</ul>
+<h3 id="第28天第四周总结">第28天：第四周总结
+</h3><ul>
+<li>网络层知识回顾</li>
+<li>路由器实现</li>
+<li>网络安全实战</li>
+</ul>
+<hr>
+<h2 id="8-今日练习">8. 今日练习
+</h2><h3 id="练习1完成综合项目">练习1：完成综合项目
+</h3><pre tabindex="0"><code>基于本周所学知识，完成SecureWebApp项目：
+
+必需功能：
+1. HTTP和HTTPS服务器
+2. 用户注册/登录
+3. Session管理
+4. RESTful API
+5. 静态文件服务
+6. 安全防护（CSRF、XSS）
+
+加分项：
+1. 多进程/线程池
+2. 性能监控
+3. 日志系统
+4. 限流功能
+5. WebSocket支持
+</code></pre><h3 id="练习2性能测试">练习2：性能测试
+</h3><pre tabindex="0"><code>对你的服务器进行压力测试：
+
+使用工具：
+- ab（Apache Bench）
+- wrk
+- locust
+
+测试场景：
+1. 静态文件服务
+2. API接口
+3. 并发连接
+4. 长连接
+
+分析指标：
+- QPS（每秒请求数）
+- 响应时间
+- 并发能力
+- 错误率
+</code></pre><h3 id="练习3安全审计">练习3：安全审计
+</h3><pre tabindex="0"><code>检查你的应用安全性：
+
+检查项目：
+1. HTTPS配置
+2. 密码存储
+3. Session安全
+4. CSRF防护
+5. XSS防护
+6. SQL注入防护
+7. 输入验证
+8. 错误处理
+
+使用工具：
+- SSL Labs
+- OWASP ZAP
+- Burp Suite
+</code></pre><h3 id="练习4网络分析">练习4：网络分析
+</h3><pre tabindex="0"><code>使用Wireshark分析：
+
+任务：
+1. 捕获HTTP通信
+2. 分析TCP三次握手
+3. 查看TLS握手过程
+4. 识别加密流量
+5. 分析DNS查询
+6. 追踪完整会话
+
+输出：
+- 截图
+- 分析报告
+- 发现的问题
+</code></pre><hr>
+<h2 id="9-总结">9. 总结
+</h2><p>恭喜你完成了第三周的学习！🎉</p>
+<h3 id="本周成就">本周成就
+</h3><pre tabindex="0"><code>✅ 深入理解TCP和UDP协议
+✅ 掌握Socket编程技术
+✅ 学会构建HTTP/HTTPS服务器
+✅ 了解网络安全基础
+✅ 实践性能优化
+✅ 掌握调试和排错技巧
+
+完成的实战项目：
+✅ TCP连接分析器
+✅ UDP聊天室
+✅ 多人聊天服务器（IO多路复用）
+✅ HTTP服务器
+✅ HTTPS服务器
+✅ 证书生成器
+✅ 综合Web应用
+</code></pre><h3 id="学习建议">学习建议
+</h3><pre tabindex="0"><code>1. 动手实践
+   - 理论要结合实践
+   - 多写代码
+   - 多做实验
+
+2. 深入理解
+   - 不要停留在表面
+   - 思考为什么
+   - 查看源代码
+
+3. 系统学习
+   - 从底层到应用层
+   - 建立知识体系
+   - 相互关联
+
+4. 持续学习
+   - 技术在演进
+   - 保持好奇心
+   - 关注新技术
+</code></pre><h3 id="下周准备">下周准备
+</h3><pre tabindex="0"><code>第四周将学习网络层协议：
+
+预习内容：
+- IP地址和子网
+- IPv4 vs IPv6
+- 路由原理
+- ICMP协议
+
+准备工具：
+- Wireshark
+- tcpdump
+- ping、traceroute
+- iptables
+</code></pre><hr>
+<p><strong>继续加油！</strong> 🚀</p>
+<p>三周的学习让你已经打下了坚实的基础，从物理层、数据链路层，到网络基础，再到传输层和应用层，你已经掌握了网络编程的核心知识。下周我们将深入网络层，学习IP协议和路由原理，这将让你对网络有更全面的理解！</p>
+<p><strong>进度：21/180天（11.7%）</strong></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/20%E5%A4%A9https%E5%92%8C%E5%AE%89%E5%85%A8/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">20天：HTTPS和安全</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/%E5%9B%9B%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">四周总结：网络层协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/19%E5%A4%A9http%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">19天：HTTP协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/18%E5%A4%A9socket%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">18天：Socket编程进阶</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/17%E5%A4%A9udp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">17天：UDP协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>

