@@ -2,7 +2,7 @@
 title: 24天：ICMP和网络诊断工具
 date: 2025-11-10 15:25:39
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第24天：ICMP和网络诊断工具
 

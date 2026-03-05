@@ -2,7 +2,7 @@
 title: 11天：端口和Socket深入
 date: 2025-11-10 15:21:38
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第11天：端口和Socket深入
 

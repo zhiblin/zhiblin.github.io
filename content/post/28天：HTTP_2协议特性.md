@@ -2,7 +2,7 @@
 title: 28天：HTTP/2协议特性
 date: 2025-11-10 15:25:43
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第28天：HTTP/2协议特性
 

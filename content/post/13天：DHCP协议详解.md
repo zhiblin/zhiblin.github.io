@@ -2,7 +2,7 @@
 title: 13天：DHCP协议详解
 date: 2025-11-10 15:21:40
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第13天：DHCP协议详解
 

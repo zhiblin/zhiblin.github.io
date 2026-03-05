@@ -2,7 +2,7 @@
 title: 16天：TCP可靠传输机制
 date: 2025-11-10 15:24:36
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第16天：TCP可靠传输机制
 

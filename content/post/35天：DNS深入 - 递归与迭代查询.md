@@ -2,7 +2,7 @@
 title: 35天：DNS深入 - 递归与迭代查询
 date: 2025-11-10 15:25:56
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第35天：DNS深入 - 递归与迭代查询
 

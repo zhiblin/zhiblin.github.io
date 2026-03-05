@@ -2,7 +2,7 @@
 title: 7天：Wireshark抓包入门
 date: 2025-11-10 14:49:32
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第7天：Wireshark抓包入门
 

@@ -2,7 +2,7 @@
 title: 6天：网络命令进阶 - traceroute
 date: 2025-11-10 14:39:39
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第6天：网络命令进阶 - traceroute
 

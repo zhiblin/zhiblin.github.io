@@ -2,7 +2,7 @@
 title: 18天：Socket编程进阶
 date: 2025-11-10 15:24:38
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第18天：Socket编程进阶
 

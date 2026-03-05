@@ -2,7 +2,7 @@
 title: 3天：OSI七层模型
 date: 2025-11-10 14:39:36
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第3天：OSI七层模型
 

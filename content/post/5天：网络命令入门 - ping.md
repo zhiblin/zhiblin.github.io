@@ -2,7 +2,7 @@
 title: 5天：网络命令入门 - ping
 date: 2025-11-10 14:39:38
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第5天：网络命令入门 - ping
 

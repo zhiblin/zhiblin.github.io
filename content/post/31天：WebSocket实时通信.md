@@ -2,7 +2,7 @@
 title: 31天：WebSocket实时通信
 date: 2025-11-10 15:25:46
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第31天：WebSocket实时通信
 

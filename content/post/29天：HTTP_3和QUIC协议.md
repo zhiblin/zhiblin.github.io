@@ -2,7 +2,7 @@
 title: 29天：HTTP/3和QUIC协议
 date: 2025-11-10 15:25:44
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第29天：HTTP/3和QUIC协议
 

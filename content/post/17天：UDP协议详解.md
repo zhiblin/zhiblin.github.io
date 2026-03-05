@@ -2,7 +2,7 @@
 title: 17天：UDP协议详解
 date: 2025-11-10 15:24:37
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第17天：UDP协议详解
 

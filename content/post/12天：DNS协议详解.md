@@ -2,7 +2,7 @@
 title: 12天：DNS协议详解
 date: 2025-11-10 15:21:39
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第12天：DNS协议详解
 

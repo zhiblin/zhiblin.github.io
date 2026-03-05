@@ -2,7 +2,7 @@
 title: 25天：ARP协议和链路层
 date: 2025-11-10 15:25:40
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第25天：ARP协议和链路层
 

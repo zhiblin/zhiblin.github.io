@@ -2,7 +2,7 @@
 title: 30天：RESTful API设计
 date: 2025-11-10 15:25:45
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第30天：RESTful API设计
 

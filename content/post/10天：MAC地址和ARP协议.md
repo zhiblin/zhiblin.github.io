@@ -2,7 +2,7 @@
 title: 10天：MAC地址和ARP协议
 date: 2025-11-10 15:21:37
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第10天：MAC地址和ARP协议
 

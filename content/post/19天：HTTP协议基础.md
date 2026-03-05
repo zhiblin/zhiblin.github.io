@@ -2,7 +2,7 @@
 title: 19天：HTTP协议基础
 date: 2025-11-10 15:24:39
 categories: Network 
-tags: Network, Book, Python
+tags: [Network, Book, Python]
 ---
 # 第19天：HTTP协议基础
 
