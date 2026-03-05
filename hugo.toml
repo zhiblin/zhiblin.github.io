@@ -1,17 +1,37 @@
 baseURL = 'https://zhiblin.github.io/'
 languageCode = 'en-us'
+defaultContentLanguage = 'en'
+hasCJKLanguage = true
 title = 'Diyouo'
 
 theme = "hugo-theme-stack"
 
-publishDir = "docs"
-
 [pagination]
   pagerSize = 5
 
+[permalinks]
+  post = "/p/:slug/"
+
 [params]
   mainSections = ["post"]
+  favicon = ""
 
   [params.sidebar]
     emoji = "🌙"
     subtitle = "A clean blog"
+
+  [params.article]
+    [params.article.license]
+      enabled = false
+
+  [params.widgets]
+    homepage = [
+      { type = "search" },
+      { type = "archives", params = { limit = 5 } },
+      { type = "categories", params = { limit = 10 } },
+      { type = "tag-cloud", params = { limit = 10 } },
+    ]
+    page = [{ type = "toc" }]
+
+  [params.comments]
+    enabled = false
